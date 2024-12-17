@@ -19,15 +19,22 @@ jobs:
           ref: main  # Or your default branch
           fetch-depth: 0
 
+      - name: Get version from package.json
+        if: github.event_name == 'push'
+        id: package_version
+        run: |
+          VERSION=$(cat package.json | jq -r '.version')
+          echo "version=v${VERSION}" >> $GITHUB_OUTPUT
+          
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
         with:
-          latest-version: ${{ github.event.client_payload.tag || github.event.release.tag_name }}
-          release-notes: ${{ github.event.release.body || '' }}
+          latest-version: ${{ github.event_name == 'push' && steps.package_version.outputs.version || github.event.client_payload.tag }}
+          release-notes: ${{ github.event.client_payload.notes || '' }}
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          branch: main  # Or your default branch
-          commit_message: "docs: update CHANGELOG.md for ${{ github.event.client_payload.tag || github.event.release.tag_name }}"
+          branch: main
+          commit_message: "docs: update CHANGELOG.md for ${{ github.event_name == 'push' && steps.package_version.outputs.version || github.event.client_payload.tag }}"
           file_pattern: CHANGELOG.md
