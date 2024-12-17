@@ -19,6 +19,12 @@ jobs:
         with:
           ref: develop
           fetch-depth: 0
+      
+      - name: Ensure Unreleased Section Exists
+        run: |
+              if ! grep -q "## Unreleased" CHANGELOG.md; then
+                echo -e "## Unreleased\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
+              fi
 
       # For PRs, generate release notes from the PR title and body
       - name: Get PR details
