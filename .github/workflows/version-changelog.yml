@@ -17,22 +17,28 @@ jobs:
           ref: develop
           fetch-depth: 0
 
-          # For PRs, generate release notes from the PR title and body
       - name: Ensure Unreleased Section Exists
         run: |
-            if ! grep -q "## Unreleased" CHANGELOG.md; then
-              echo -e "## Unreleased\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
-            fi
-        
+          # Add "## Unreleased" at the top ONLY if it doesn't exist, with no extra spaces
+          if ! grep -q "^## Unreleased$" CHANGELOG.md; then
+            echo -e "## Unreleased\n" > tmp_changelog
+            cat CHANGELOG.md >> tmp_changelog
+            mv tmp_changelog CHANGELOG.md
+          fi
+
       - name: Move Unreleased to Version
         run: |
-            # Read current changelog
-            CHANGELOG=$(cat CHANGELOG.md)
-            VERSION="${GITHUB_REF#refs/tags/}"
-            DATE=$(date +%Y-%m-%d)
-            
-            # Replace "## Unreleased" with new version and add new unreleased section
-            echo "$CHANGELOG" | sed "s/## Unreleased/## [$VERSION] - $DATE\n\n## Unreleased/" > CHANGELOG.md
+          # Replace "## Unreleased" with the new version and date, cleanly add a new Unreleased section
+          VERSION="${GITHUB_REF#refs/tags/}"
+          DATE=$(date +%Y-%m-%d)
+          
+          awk -v version="## [$VERSION] - $DATE" '
+          /^## Unreleased$/ {print version; print ""; next} 
+          1
+          ' CHANGELOG.md > tmp && mv tmp CHANGELOG.md
+
+          # Insert "## Unreleased" again at the top cleanly
+          sed -i "1i## Unreleased\n" CHANGELOG.md
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5

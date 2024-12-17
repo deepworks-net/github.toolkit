@@ -20,24 +20,20 @@ jobs:
           ref: develop
           fetch-depth: 0
       
-      - name: Ensure Unreleased Section Exists
+      - name: Ensure Unreleased Section Exists and Add PR Notes
         run: |
-              if ! grep -q "## Unreleased" CHANGELOG.md; then
-                echo -e "## Unreleased\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
-              fi
-
-      # For PRs, generate release notes from the PR title and body
-      - name: Get PR details
-        if: github.event_name == 'pull_request'
-        id: pr_details
-        run: |
-          echo "notes=PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
-
-      - name: Update Changelog
-        uses: stefanzweifel/changelog-updater-action@v1
-        with:
-          latest-version: ${{ github.event.client_payload.tag || 'Unreleased' }}
-          release-notes: ${{ github.event_name == 'pull_request' && steps.pr_details.outputs.notes || github.event.client_payload.notes }}
+            # Ensure "## Unreleased" exists at the top
+            if ! grep -q "## Unreleased" CHANGELOG.md; then
+              echo -e "## Unreleased" > tmp_changelog
+              cat CHANGELOG.md >> tmp_changelog
+              mv tmp_changelog CHANGELOG.md
+            fi
+  
+            # Append PR details directly under "## Unreleased" without extra spacing
+            PR_DETAILS="- PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+            awk -v details="$PR_DETAILS" '
+            /^## Unreleased$/ {print; print details; next} 1
+            ' CHANGELOG.md > tmp && mv tmp CHANGELOG.md
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
