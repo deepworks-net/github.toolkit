@@ -12,6 +12,10 @@ on:
   # pull_request_target:
   #   types: [opened, reopened, synchronize]
   workflow_call:
+    inputs:
+      config-path:
+        required: true
+        type: string
 
 permissions:
   contents: read
