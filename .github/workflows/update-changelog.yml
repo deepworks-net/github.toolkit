@@ -2,12 +2,14 @@
 name: "Update Changelog"
 on:
   pull_request:
-    types: [opened]
+    types: [closed]
   repository_dispatch:
     types: [update_changelog]
 
 jobs:
   update:
+    # Only run if the PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: develop
           fetch-depth: 0
 
       # For PRs, generate release notes from the PR title and body
