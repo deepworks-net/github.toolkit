@@ -1,9 +1,8 @@
 # update-changelog.yml 
 name: "Update Changelog"
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened, reopened, synchronize]
   repository_dispatch:
     types: [update_changelog]
 
@@ -16,25 +15,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: main  # Or your default branch
+          ref: main
           fetch-depth: 0
 
-      - name: Get version from package.json
-        if: github.event_name == 'push'
-        id: package_version
-        run: |
-          VERSION=$(cat package.json | jq -r '.version')
-          echo "version=v${VERSION}" >> $GITHUB_OUTPUT
-          
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
         with:
-          latest-version: ${{ github.event_name == 'push' && steps.package_version.outputs.version || github.event.client_payload.tag }}
+          latest-version: ${{ github.event.client_payload.tag || 'Unreleased' }}
           release-notes: ${{ github.event.client_payload.notes || '' }}
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
-          commit_message: "docs: update CHANGELOG.md for ${{ github.event_name == 'push' && steps.package_version.outputs.version || github.event.client_payload.tag }}"
+          commit_message: "docs: update CHANGELOG.md for ${{ github.event.client_payload.tag || 'Unreleased' }}"
           file_pattern: CHANGELOG.md
