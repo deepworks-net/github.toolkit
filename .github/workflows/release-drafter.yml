@@ -5,6 +5,10 @@ on:
       - main
     tags:
       - 'v*'
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
   workflow_call:
     inputs:
       config-path:
@@ -23,6 +27,6 @@ jobs:
     steps:
       - uses: release-drafter/release-drafter@v6
         with:
-          publish: ${{ contains(github.ref, 'refs/tags/') }}  # Only publish when it's a tag
+          publish: ${{ contains(github.ref, 'refs/tags/') && github.ref_name == 'main'}}  # Only publish when it's a tag and the main branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
