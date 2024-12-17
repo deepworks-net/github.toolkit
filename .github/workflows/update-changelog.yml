@@ -18,11 +18,18 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      # For PRs, generate release notes from the PR title and body
+      - name: Get PR details
+        if: github.event_name == 'pull_request'
+        id: pr_details
+        run: |
+          echo "notes=PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ github.event.client_payload.tag || 'Unreleased' }}
-          release-notes: ${{ github.event.client_payload.notes || '' }}
+          release-notes: ${{ github.event_name == 'pull_request' && steps.pr_details.outputs.notes || github.event.client_payload.notes }}
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
