@@ -2,7 +2,7 @@
 name: "Update Changelog"
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened]
   repository_dispatch:
     types: [update_changelog]
 
@@ -35,5 +35,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: develop
-          commit_message: "docs: update CHANGELOG.md for ${{ github.event.client_payload.tag || 'Unreleased' }}"
+          commit_message: "docs: update CHANGELOG.md"
           file_pattern: CHANGELOG.md
