@@ -1,17 +1,57 @@
 # update-changelog.yml 
-name: "Update Changelog"
-
+name: Update Changelog
 on:
   pull_request:
     types: [closed]
     branches:
       - develop
+    paths-ignore:
+      - 'CHANGELOG.md'  # Prevent recursive triggers
 
 jobs:
-  changelog:
+  update-changelog:
     runs-on: ubuntu-latest
     steps:
-      - name: "✏️ Generate release changelog"
-        uses: janheinrichmerker/action-github-changelog-generator@v2.3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }} 
+      - uses: actions/checkout@v4
+      
+      - name: Get PR Info and Update Changelog
+        run: |
+          # Get the latest commit message to extract PR number
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          PR_NUM=$(echo "$COMMIT_MSG" | grep -oP '#\K\d+' || echo "")
+          
+          if [ ! -z "$PR_NUM" ]; then
+            # Get current date
+            TODAY=$(date +"%m/%d/%Y")
+            
+            # Read current CHANGELOG.md
+            if [ ! -f CHANGELOG.md ]; then
+              # Create new changelog if it doesn't exist
+              echo "# Github.Actions Repository Changelog
+                *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
+                ## **$TODAY - Unreleased**" > CHANGELOG.md
+            fi
+            
+            # Check if Unreleased section exists
+            if ! grep -q "Unreleased" CHANGELOG.md; then
+              # Add Unreleased section at top
+              sed -i "1i## **$TODAY - Unreleased**\n" CHANGELOG.md
+            fi
+            
+            # Update the Unreleased section date
+            sed -i "s/[0-9]\{2\}\/[0-9]\{2\}\/[0-9]\{4\} - Unreleased/$TODAY - Unreleased/" CHANGELOG.md
+            
+            # Add the new PR entry under Unreleased
+            PR_TITLE=$(gh pr view $PR_NUM --json title -q .title)
+            sed -i "/## \*\*.*Unreleased\*\*/a - PR #$PR_NUM: $PR_TITLE" CHANGELOG.md
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG.md [skip ci]" || exit 0
+          git push

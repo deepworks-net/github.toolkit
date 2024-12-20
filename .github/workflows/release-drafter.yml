@@ -1,32 +1,48 @@
-name: Draft Github Release
+name: Create Release
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
-  pull_request:
-    types: [closed]
-    branches:
-      - develop
-  workflow_call:
+  workflow_dispatch:
     inputs:
-      config-path:
+      version:
+        description: 'Version number (vX.Y.Z format)'
         required: true
         type: string
 
-permissions:
-  contents: read
-
 jobs:
-  update_release_draft:
-    permissions:
-      contents: write
-      pull-requests: write
+  create-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter@v6
+      - uses: actions/checkout@v4
+        
+      - name: Update Changelog for Release
+        run: |
+          TODAY=$(date +"%m/%d/%Y")
+          VERSION=${{ github.event.inputs.version }}
+          REPO="${GITHUB_REPOSITORY}"
+          
+          # Move Unreleased changes to new version section
+          sed -i "/## \*\*.*Unreleased\*\*/,/## \*\*/!b;/## \*\*/!{H;d};x;s/Unreleased/$TODAY - $VERSION/" CHANGELOG.md
+          
+          # Update version section to include release link
+          sed -i "s|$TODAY - $VERSION|[$TODAY - $VERSION](https://github.com/$REPO/releases/tag/$VERSION)|" CHANGELOG.md
+          
+          # Add new Unreleased section
+          sed -i "1i## **$TODAY - Unreleased**\n" CHANGELOG.md
+          
+      - name: Commit Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG.md for release ${{ github.event.inputs.version }} [skip ci]"
+          git push
+          
+      - name: Create and Push Tag
+        run: |
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          publish: ${{ contains(github.ref, 'refs/tags/') && github.ref_name == 'main'}}  # Only publish when it's a tag and the main branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.event.inputs.version }}
+          generate_release_notes: true
