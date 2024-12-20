@@ -1,8 +1,6 @@
-# update-changelog.yml 
 name: Update Changelog
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - develop
     paths-ignore:
@@ -14,6 +12,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup Changelog if Missing
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            TODAY=$(date +"%m/%d/%Y")
+            cat << 'EOL' > CHANGELOG.md
+              # Github.Actions Repository Changelog
+              *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
+
+              ## **${TODAY} - Unreleased**
+            EOL
+            # Replace ${TODAY} with actual date since it's not expanded in the heredoc
+            sed -i "s/\${TODAY}/$TODAY/" CHANGELOG.md
+            echo "Created new CHANGELOG.md file"
+          fi
+
       - name: Get PR Info and Update Changelog
         run: |
           # Get the latest commit message to extract PR number
@@ -24,18 +37,10 @@ jobs:
             # Get current date
             TODAY=$(date +"%m/%d/%Y")
             
-            # Read current CHANGELOG.md
-            if [ ! -f CHANGELOG.md ]; then
-              # Create new changelog if it doesn't exist
-              echo "# Github.Actions Repository Changelog
-                *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
-                ## **$TODAY - Unreleased**" > CHANGELOG.md
-            fi
-            
             # Check if Unreleased section exists
             if ! grep -q "Unreleased" CHANGELOG.md; then
-              # Add Unreleased section at top
-              sed -i "1i## **$TODAY - Unreleased**\n" CHANGELOG.md
+              # Add Unreleased section after the header
+              sed -i '/^# Github.Actions Repository Changelog/a\\\n## **'"$TODAY"' - Unreleased**\n' CHANGELOG.md
             fi
             
             # Update the Unreleased section date
