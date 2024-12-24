@@ -42,7 +42,7 @@ jobs:
           git push origin ${{ github.event.inputs.version }}
           
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
           generate_release_notes: true
