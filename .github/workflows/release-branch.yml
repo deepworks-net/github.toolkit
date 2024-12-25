@@ -1,0 +1,121 @@
+name: Create Release Branch
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number for release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+          
+      - name: Create Release Branch
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          RELEASE_BRANCH="release/${VERSION}"
+          
+          echo "Creating release branch: $RELEASE_BRANCH"
+          git checkout -b "$RELEASE_BRANCH"
+          
+          # Get today's date
+          TODAY=$(date +"%m/%d/%Y")
+          
+          # Create temp file
+          TEMP_FILE=$(mktemp)
+          
+          # Process changelog
+          awk -v version="$VERSION" -v today="$TODAY" -v repo="${GITHUB_REPOSITORY#*/}" '
+            BEGIN {
+              in_unreleased = 0
+              unreleased_content = ""
+            }
+            
+            # Detect Unreleased section
+            /## \*\*.*Unreleased\*\*/ {
+              in_unreleased = 1
+              print
+              next
+            }
+            
+            # Start of any other section ends Unreleased
+            /^## \*\*/ {
+              if (in_unreleased) {
+                in_unreleased = 0
+                # Print the new versioned section before the next section
+                print ""
+                print "## **[(" today ") - " version "](https://github.com/suny-upstate-cwt/" repo "/releases/tag/" version ")**"
+                print unreleased_content
+                print ""
+              }
+              print
+              next
+            }
+            
+            # Collect content from Unreleased section
+            {
+              if (in_unreleased) {
+                if ($0 != "") {
+                  unreleased_content = unreleased_content $0 "\n"
+                }
+              } else {
+                print
+              }
+            }
+            
+            END {
+              if (in_unreleased) {
+                print ""
+                print "## **[(" today ") - " version "](https://github.com/suny-upstate-cwt/" repo "/releases/tag/" version ")**"
+                print unreleased_content
+              }
+            }
+          ' CHANGELOG.md > "$TEMP_FILE"
+          
+          # Create new Unreleased section at the top (after header)
+          awk '
+            NR == 1 { print; next }
+            NR == 2 { 
+              print
+              print ""
+              print "## **" strftime("%m/%d/%Y") " - Unreleased**"
+              print ""
+            }
+            { print }
+          ' "$TEMP_FILE" > CHANGELOG.md
+          
+          # Commit changes
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git commit -m "chore: Update changelog for $VERSION release"
+          
+          # Push release branch
+          git push origin "$RELEASE_BRANCH"
+          
+          # Create PR for release branch
+          gh pr create \
+            --title "Release $VERSION" \
+            --body "## Release Preparation for $VERSION
+            
+            This PR prepares the release for version $VERSION.
+            
+            ### Changelog Updates
+            - Updated CHANGELOG.md with version $VERSION
+            - Created new Unreleased section
+            
+            ### Next Steps
+            1. Review the changelog
+            2. Perform any final release preparations
+            3. Merge this PR to develop
+            4. Create release tag" \
+            --base develop \
+            --head "$RELEASE_BRANCH"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
