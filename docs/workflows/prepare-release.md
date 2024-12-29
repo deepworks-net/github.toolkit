@@ -50,11 +50,9 @@ The workflow:
 
 Commits the updated changelog to the new release branch with a message like:
 
-arduino
-
-Copy code
-
-`chore: prepare release 1.0.0`
+```arduino
+chore: prepare release 1.0.0
+```
 
 ### 5. **Create Pull Request**
 
