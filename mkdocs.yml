@@ -64,3 +64,5 @@ theme:
         'README.md'
     - 'Workflows':
       - 'Prepare Release': 'workflows/prepare-release.md'
+      - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
+      
