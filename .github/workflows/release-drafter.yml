@@ -1,8 +1,21 @@
-name: Publish Github Release
+name: Publish GitHub Release
+
 on:
+  # Keep existing trigger for this repo
   push:
     tags:
       - 'v*'
+  # Add workflow_call to make it reusable
+  workflow_call:
+    inputs:
+      tag-name:
+        description: 'Tag name for the release (e.g., v1.0.0)'
+        required: false
+        type: string
+    secrets:
+      token:
+        description: 'GitHub token for release creation'
+        required: false
 
 permissions:
   contents: write
@@ -13,6 +26,11 @@ jobs:
     steps:
       - uses: release-drafter/release-drafter@v6
         with:
-          publish: true  # Always publish since we're only triggering on tags
+          publish: true
+          tag: ${{ inputs.tag-name || github.ref_name }}
+          header: |
+            ## Release ${{ inputs.tag-name || github.ref_name }}
+          footer: |
+            See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }}
