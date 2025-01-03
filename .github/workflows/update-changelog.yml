@@ -20,39 +20,44 @@ jobs:
           echo "Processing merged pull request..."
           
           TODAY=$(date +"%m/%d/%Y")
-          echo "Date: $TODAY"
           PR_NUM=${{ github.event.pull_request.number }}
           PR_TITLE="${{ github.event.pull_request.title }}"
+          
+          # Detect if this is a release branch PR
+          IS_RELEASE=false
+          NEW_VERSION=""
+          if [[ "$PR_TITLE" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            IS_RELEASE=true
+            NEW_VERSION="${BASH_REMATCH[1]}"
+            echo "This is a release PR for version $NEW_VERSION"
+          fi
           
           # Create temp file
           TEMP_FILE=$(mktemp)
           
-          # Read the current changelog and process it
-          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
-            BEGIN {
-              found_unreleased = 0
-            }
-            
-            /## \*\*.*Unreleased\*\*/ {
-              print
-              print "- PR #" pr_num ": " pr_title
-              found_unreleased = 1
-              next
-            }
-            
-            # Print everything else as is
-            { print }
-            
-            END {
-              if (!found_unreleased) {
-                print "## **" today " - Unreleased**"
-                print "- PR #" pr_num ": " pr_title
+          if [ "$IS_RELEASE" = true ]; then
+            # For release PRs - convert Unreleased to versioned
+            awk -v today="$TODAY" -v new_version="$NEW_VERSION" '
+              /^## \*\*.*- Unreleased\*\*/ {
+                print "## **[(" today ") - v" new_version ")](https://github.com/deepworks-net/github.actions/releases/tag/v" new_version ")**"
+                next
               }
-            }
-          ' CHANGELOG.md > "$TEMP_FILE"
+              { print }
+            ' CHANGELOG.md > "$TEMP_FILE"
+          else
+            # For regular PRs - add to Unreleased section
+            awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
+              /^## \*\*.*- Unreleased\*\*/ {
+                print
+                print "- PR #" pr_num ": " pr_title
+                next
+              }
+              { print }
+            ' CHANGELOG.md > "$TEMP_FILE"
+          fi
           
           cat "$TEMP_FILE" > CHANGELOG.md
-          
+
       - name: Commit and Push Changes
         run: |
           git config --local user.email "action@github.com"
