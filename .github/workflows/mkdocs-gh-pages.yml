@@ -61,7 +61,15 @@ jobs:
         with:
           python-version: ${{ inputs.python-version || '3.x' }}
       - run: pip install -r ${{ inputs.requirements-file || 'requirements.txt' }}
-      - run: cp ${{ inputs.readme-source || 'README' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }}
-      - run: cp ${{ inputs.changelog-source || 'CHANGELOG' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }}
-      - run: cp ${{ inputs.license-source || 'LICENSE' }} ${{ inputs.license-destination || 'docs/repo/inc/LICENSE.md' }}
+      # Create necessary directories
+      - name: Create documentation directories
+        run: |
+          mkdir -p docs/repo/inc
+      # Copy files if they exist
+      - name: Copy repository files
+        run: |
+          [ -f ${{ inputs.readme-source || 'README' }} ] && cp ${{ inputs.readme-source || 'README' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }} || echo "README not found"
+          [ -f ${{ inputs.changelog-source || 'CHANGELOG' }} ] && cp ${{ inputs.changelog-source || 'CHANGELOG' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }} || echo "CHANGELOG not found"
+          [ -f ${{ inputs.license-source || 'LICENSE' }} ] && cp ${{ inputs.license-source || 'LICENSE' }} ${{ inputs.license-destination || 'docs/repo/inc/LICENSE.md' }} || echo "LICENSE not found"
       - run: mkdocs gh-deploy --force
+      
