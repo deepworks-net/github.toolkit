@@ -1,16 +1,42 @@
-name: release
+name: Create GitHub Release
+
 on:
+  # Keep existing trigger for this repo
   push:
     tags:
       - 'v*'
+  # Add workflow_call to make it reusable
+  workflow_call:
+    inputs:
+      prerelease:
+        description: 'Whether this is a prerelease'
+        default: false
+        required: false
+        type: boolean
+      release-title:
+        description: 'Custom release title (defaults to tag name)'
+        default: ''
+        required: false
+        type: string
+      draft:
+        description: 'Whether this is a draft release'
+        default: false
+        required: false
+        type: boolean
+    secrets:
+      token:
+        description: 'GitHub token for release creation'
+        required: false
+
 jobs:
   tagged-release:
-    name: "Tagged Release"
+    name: "Create Release"
     runs-on: ubuntu-latest
     steps:
-    - name: Create a Release
-      uses: marvinpinto/action-automatic-releases@latest
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        title: "${{ env.GITHUB_REF_NAME }}"
-        prerelease: false
+      - name: Create GitHub Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.token || secrets.GITHUB_TOKEN }}"
+          title: "${{ inputs.release-title || github.ref_name }}"
+          prerelease: ${{ inputs.prerelease }}
+          draft: ${{ inputs.draft }}
