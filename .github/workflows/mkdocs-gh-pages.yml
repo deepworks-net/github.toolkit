@@ -19,13 +19,33 @@ on:
         required: false
         type: string
       readme-source:
-        description: 'Source path for README.md'
-        default: 'README.md'
+        description: 'Source path for README'
+        default: 'README'
         required: false
         type: string
       readme-destination:
-        description: 'Destination path for README.md'
-        default: 'docs/README.md'
+        description: 'Destination path for README'
+        default: 'docs/repo/inc/README.md'
+        required: false
+        type: string
+      changelog-source:
+        description: 'Source path for CHANGELOG'
+        default: 'CHANGELOG'
+        required: false
+        type: string
+      changelog-destination:
+        description: 'Destination path for CHANGELOG'
+        default: 'docs/repo/inc/CHANGELOG.md'
+        required: false
+        type: string
+      license-source:
+        description: 'Source path for LICENSE'
+        default: 'LICENSE'
+        required: false
+        type: string
+      license-destination:
+        description: 'Destination path for LICENSE'
+        default: 'docs/repo/inc/LICENSE.md'
         required: false
         type: string
 
@@ -40,9 +60,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version || '3.x' }}
-      
       - run: pip install -r ${{ inputs.requirements-file || 'requirements.txt' }}
-      
-      - run: cp ${{ inputs.readme-source || 'README.md' }} ${{ inputs.readme-destination || 'docs/README.md' }}
-      
+      - run: cp ${{ inputs.readme-source || 'README' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }}
+      - run: cp ${{ inputs.changelog-source || 'CHANGELOG' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }}
+      - run: cp ${{ inputs.license-source || 'LICENSE' }} ${{ inputs.license-destination || 'docs/repo/inc/LICENSE.md' }}
       - run: mkdocs gh-deploy --force

@@ -2,17 +2,20 @@ site_name: Deepworks Core Github Repository
 site_description: The core repository that contains documentation, actions and templates for Deepworks github repositories.
 site_author: Deepworks
 copyright: Deepworks 2022-2024
+repo_url: https://github.com/deepworks-net/github.actions
 docs_dir: docs
 site_dir: site
 extra:
-    version: 1.0.5
+    version: 1.1.0
 extra_css:
   - stylesheets/extra.css
 plugins:
   # Mono Repo must come before search!
   - monorepo
-  - blog
   - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
   - macros
   - tags
 markdown_extensions:
@@ -61,8 +64,8 @@ theme:
         name: Switch to light mode
 'nav':
     - 'Home': 
-        'README.md'
+      - 'index.md'
+      - 'Repository': 'repo/index.md'
     - 'Workflows':
       - 'Prepare Release': 'workflows/prepare-release.md'
       - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
-      

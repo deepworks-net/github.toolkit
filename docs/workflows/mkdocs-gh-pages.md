@@ -41,8 +41,12 @@ jobs:
     with:
       python-version: '3.11'
       requirements-file: 'docs/requirements.txt'
-      readme-source: 'docs/README.md'
-      readme-destination: 'docs/index.md'
+      readme-source: 'docs/README'
+      readme-destination: 'docs/repo/inc/README.md'
+      changelog-source: 'CHANGELOG'
+      changelog-destination: 'docs/repo/inc/CHANGELOG.md'
+      license-source: 'LICENSE'
+      license-destination: 'docs/repo/inc/LICENSE.md'
 ```
 
 ## Input Parameters
@@ -51,8 +55,12 @@ jobs:
 |-----------|-------------|----------|---------|
 | `python-version` | Python version to use for the build | No | `3.x` |
 | `requirements-file` | Path to the requirements.txt file | No | `requirements.txt` |
-| `readme-source` | Source path for README.md | No | `README.md` |
-| `readme-destination` | Destination path for README.md | No | `docs/README.md` |
+| `readme-source` | Source path for README | No | `README` |
+| `readme-destination` | Destination path for README | No | `docs/repo/inc/README.md` |
+| `changelog-source` | Source path for CHANGELOG | No | `CHANGELOG` |
+| `changelog-destination` | Destination path for CHANGELOG | No | `docs/repo/inc/CHANGELOG.md` |
+| `license-source` | Source path for LICENSE | No | `LICENSE` |
+| `license-destination` | Destination path for LICENSE | No | `docs/repo/inc/LICENSE.md` |
 
 ## Workflow Details
 
