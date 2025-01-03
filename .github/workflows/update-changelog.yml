@@ -20,39 +20,16 @@ jobs:
           echo "Processing merged pull request..."
           
           TODAY=$(date +"%m/%d/%Y")
-          echo "Date: $TODAY"
-          PR_NUM=${{ github.event.pull_request.number }}
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          NEW_VERSION="1.0.18"  # We'll get this from PR later
           
           # Create temp file
           TEMP_FILE=$(mktemp)
           
-          # Read the current changelog and process it
-          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
-            BEGIN {
-              found_unreleased = 0
-            }
-            
-            /## \*\*.*Unreleased\*\*/ {
-              print
-              print "- PR #" pr_num ": " pr_title
-              found_unreleased = 1
-              next
-            }
-            
-            # Print everything else as is
-            { print }
-            
-            END {
-              if (!found_unreleased) {
-                print "## **" today " - Unreleased**"
-                print "- PR #" pr_num ": " pr_title
-              }
-            }
-          ' CHANGELOG.md > "$TEMP_FILE"
+          # Just transform the Unreleased header to a release header
+          sed "/## \*\*.*- Unreleased\*\*/c## **[(${TODAY}) - v${NEW_VERSION}](https://github.com/deepworks-net/github.actions/releases/tag/v${NEW_VERSION})**" CHANGELOG.md > "$TEMP_FILE"
           
           cat "$TEMP_FILE" > CHANGELOG.md
-          
+
       - name: Commit and Push Changes
         run: |
           git config --local user.email "action@github.com"
