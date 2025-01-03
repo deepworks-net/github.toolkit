@@ -17,42 +17,68 @@ jobs:
           
       - name: Update Changelog
         run: |
-          echo "Processing merged pull request..."
-          
-          TODAY=$(date +"%m/%d/%Y")
-          echo "Date: $TODAY"
-          PR_NUM=${{ github.event.pull_request.number }}
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          
-          # Create temp file
-          TEMP_FILE=$(mktemp)
-          
-          # Read the current changelog and process it
-          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
-            BEGIN {
-              found_unreleased = 0
-            }
+            echo "Processing merged pull request..."
             
-            /## \*\*.*Unreleased\*\*/ {
-              print
-              print "- PR #" pr_num ": " pr_title
-              found_unreleased = 1
-              next
-            }
+            TODAY=$(date +"%m/%d/%Y")
+            echo "Date: $TODAY"
+            PR_NUM=${{ github.event.pull_request.number }}
+            PR_TITLE="${{ github.event.pull_request.title }}"
             
-            # Print everything else as is
-            { print }
+            # Detect if this is a release branch PR
+            IS_RELEASE=false
+            NEW_VERSION=""
+            if [[ "$PR_TITLE" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+              IS_RELEASE=true
+              NEW_VERSION="${BASH_REMATCH[1]}"
+              echo "This is a release PR for version $NEW_VERSION"
+            fi
             
-            END {
-              if (!found_unreleased) {
-                print "## **" today " - Unreleased**"
-                print "- PR #" pr_num ": " pr_title
+            # Create temp file
+            TEMP_FILE=$(mktemp)
+            
+            # Read the current changelog and process it
+            awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" \
+                -v is_release="$IS_RELEASE" -v new_version="$NEW_VERSION" '
+              BEGIN {
+                found_unreleased = 0
+                printed_new_entry = 0
               }
-            }
-          ' CHANGELOG.md > "$TEMP_FILE"
-          
-          cat "$TEMP_FILE" > CHANGELOG.md
-          
+              
+              # Print the header lines until first section
+              !found_unreleased && !/^## / {
+                print
+                next
+              }
+              
+              # Handle unreleased section if it exists
+              /^## \*\*.*- Unreleased\*\*/ {
+                found_unreleased = 1
+                if (is_release == "true") {
+                  # Convert to versioned section
+                  print "## **[(" today ") - v" new_version "](https://github.com/deepworks-net/github.actions/releases/tag/v" new_version ")**"
+                  # Start new unreleased section
+                  print "\n## **" today " - Unreleased**"
+                } else {
+                  print
+                }
+                print "- PR #" pr_num ": " pr_title
+                next
+              }
+              
+              # Print everything else as is
+              { print }
+              
+              END {
+                if (!found_unreleased) {
+                  if (NR > 0) print ""  # Add blank line if file not empty
+                  print "## **" today " - Unreleased**"
+                  print "- PR #" pr_num ": " pr_title
+                }
+              }
+            ' CHANGELOG.md > "$TEMP_FILE"
+            
+            cat "$TEMP_FILE" > CHANGELOG.md
+            
       - name: Commit and Push Changes
         run: |
           git config --local user.email "action@github.com"
