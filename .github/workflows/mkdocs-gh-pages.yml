@@ -29,8 +29,8 @@ on:
         required: false
         type: string
       changelog-source:
-        description: 'Source path for CHANGELOG'
-        default: 'CHANGELOG'
+        description: 'Source path for CHANGELOG.md'
+        default: 'CHANGELOG.md'
         required: false
         type: string
       changelog-destination:
@@ -72,7 +72,7 @@ jobs:
       - name: Copy repository files
         run: |
           [ -f ${{ inputs.readme-source || 'README.md' }} ] && cp ${{ inputs.readme-source || 'README.md' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }} || echo "README.md not found"
-          [ -f ${{ inputs.changelog-source || 'CHANGELOG' }} ] && cp ${{ inputs.changelog-source || 'CHANGELOG' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }} || echo "CHANGELOG not found"
+          [ -f ${{ inputs.changelog-source || 'CHANGELOG.md' }} ] && cp ${{ inputs.changelog-source || 'CHANGELOG.md' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }} || echo "CHANGELOG.md not found"
           [ -f ${{ inputs.license-source || 'LICENSE' }} ] && cp ${{ inputs.license-source || 'LICENSE' }} ${{ inputs.license-destination || 'docs/repo/inc/LICENSE.md' }} || echo "LICENSE not found"
       # Create repository index file
       - name: Create repository index file
