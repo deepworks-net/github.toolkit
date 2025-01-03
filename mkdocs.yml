@@ -68,6 +68,7 @@ theme:
       - 'Repository': 'repo/index.md'
     - 'Workflows':
       - 'Create Github Release': 'workflows/create-release.md'
+      - 'Publish Github Release': 'workflows/release-drafter.md'
       - 'Prepare Release': 'workflows/prepare-release.md'
       - 'Update Changelog': 'workflows/update-changelog.md'
       - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
