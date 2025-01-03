@@ -1,7 +1,7 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-## **01/03/2025 - Unreleased**
+## **[(01/03/2025) - v1.0.24](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.24)**
 - PR #53: 52 Fix Release Tag Bug
 
 ## **[(01/03/2025) - v1.0.16](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.16)**
