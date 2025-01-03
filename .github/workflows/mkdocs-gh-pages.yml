@@ -126,18 +126,56 @@ jobs:
               if 'nav' not in config:
                   config['nav'] = []
 
-              # Check if Repository section exists
-              repo_section_exists = False
-              for item in config['nav']:
-                  if isinstance(item, dict) and 'Repository' in item:
-                      repo_section_exists = True
-                      break
+              def find_repository_entry(nav_items):
+                  """Recursively search for 'repo/index.md' in navigation"""
+                  if not isinstance(nav_items, list):
+                      return False
 
-              # Add Repository section if it doesn't exist
-              if not repo_section_exists:
-                  config['nav'].append({
-                      'Repository': 'repo/index.md'
-                  })
+                  for item in nav_items:
+                      if isinstance(item, dict):
+                          # Check direct value
+                          for _, value in item.items():
+                              if value == 'repo/index.md':
+                                  return True
+                              # Recurse into nested structures
+                              if isinstance(value, list):
+                                  if find_repository_entry(value):
+                                      return True
+                  return False
+
+              def add_repository_entry(nav_items):
+                  """Add repo entry to the most appropriate place"""
+                  # If nav is empty, just add it
+                  if not nav_items:
+                      nav_items.append({'Repository': 'repo/index.md'})
+                      return True
+
+                  # Try to find a logical place for it
+                  # First, look for sections like 'Repository', 'Docs', 'Documentation', etc.
+                  preferred_sections = ['Repository', 'Documentation', 'Docs', 'Home']
+                  
+                  for section in preferred_sections:
+                      for item in nav_items:
+                          if isinstance(item, dict) and section in item:
+                              if isinstance(item[section], list):
+                                  item[section].append({'Repository Files': 'repo/index.md'})
+                                  return True
+                              else:
+                                  # Convert string value to list
+                                  current_value = item[section]
+                                  item[section] = [current_value, {'Repository Files': 'repo/index.md'}]
+                                  return True
+
+                  # If no preferred section found, add it at root level
+                  nav_items.append({'Repository Files': 'repo/index.md'})
+                  return True
+
+              # Check if repo/index.md exists anywhere in the navigation
+              if not find_repository_entry(config['nav']):
+                  add_repository_entry(config['nav'])
+                  print("Added Repository entry to navigation")
+              else:
+                  print("Repository entry already exists")
 
               # Write the updated configuration
               with open(file_path, 'w') as file:
