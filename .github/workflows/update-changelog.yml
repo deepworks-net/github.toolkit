@@ -17,41 +17,65 @@ jobs:
           
       - name: Update Changelog
         run: |
-          echo "Processing merged pull request..."
-          
-          TODAY=$(date +"%m/%d/%Y")
-          echo "Date: $TODAY"
-          PR_NUM=${{ github.event.pull_request.number }}
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          
-          # Create temp file
-          TEMP_FILE=$(mktemp)
-          
-          # Read the current changelog and process it
-          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
-            BEGIN {
-              found_unreleased = 0
-            }
+            echo "Processing merged pull request..."
             
-            /## \*\*.*Unreleased\*\*/ {
-              print
-              print "- PR #" pr_num ": " pr_title
-              found_unreleased = 1
-              next
-            }
+            TODAY=$(date +"%m/%d/%Y")
+            echo "Date: $TODAY"
+            PR_NUM=${{ github.event.pull_request.number }}
+            PR_TITLE="${{ github.event.pull_request.title }}"
             
-            # Print everything else as is
-            { print }
+            # Create temp file
+            TEMP_FILE=$(mktemp)
             
-            END {
-              if (!found_unreleased) {
-                print "## **" today " - Unreleased**"
-                print "- PR #" pr_num ": " pr_title
+            # Read the current changelog and process it
+            awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" '
+              BEGIN {
+                found_unreleased = 0
+                printed_new_entry = 0
               }
-            }
-          ' CHANGELOG.md > "$TEMP_FILE"
-          
-          cat "$TEMP_FILE" > CHANGELOG.md
+              
+              # Print the header lines until first section
+              !found_unreleased && !/^## / {
+                print
+                next
+              }
+              
+              # Handle unreleased section if it exists
+              /^## \*\*.*Unreleased\*\*/ {
+                if (!printed_new_entry) {
+                  print
+                  print "- PR #" pr_num ": " pr_title
+                  printed_new_entry = 1
+                }
+                found_unreleased = 1
+                next
+              }
+              
+              # Handle start of a new versioned section
+              /^## \*\*\[/ {
+                if (!found_unreleased && !printed_new_entry) {
+                  print "## **" today " - Unreleased**"
+                  print "- PR #" pr_num ": " pr_title
+                  print ""  # Add blank line before next section
+                  printed_new_entry = 1
+                }
+                print
+                next
+              }
+              
+              # Print everything else as is
+              { print }
+              
+              END {
+                if (!found_unreleased && !printed_new_entry) {
+                  if (NR > 0) print ""  # Add blank line if file not empty
+                  print "## **" today " - Unreleased**"
+                  print "- PR #" pr_num ": " pr_title
+                }
+              }
+            ' CHANGELOG.md > "$TEMP_FILE"
+            
+            cat "$TEMP_FILE" > CHANGELOG.md
           
       - name: Commit and Push Changes
         run: |
