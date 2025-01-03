@@ -10,3 +10,5 @@
 - PR #18: Added gitignore File
 - PR #16: Update Changelog
 - PR #15: Updated Changelog github action
+## **01/03/2025 - Unreleased**
+- PR #53: 52 Fix Release Tag Bug
