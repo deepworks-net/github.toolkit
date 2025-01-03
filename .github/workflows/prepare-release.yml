@@ -1,8 +1,6 @@
 name: Prepare Release Branch
 on:
   push:
-    branches:
-      - develop
     tags:
       - 'prep-v*'  # Only triggers on tags like prep-v1.0.0
 
