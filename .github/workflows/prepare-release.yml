@@ -42,60 +42,25 @@ jobs:
           # Second pass: Process the changelog
           awk -v version="$VERSION" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" '
             BEGIN {
-              found_unreleased = 0
-              reading_unreleased = 0
-              unreleased_content = ""
+              print_buffer = ""
+              in_unreleased = 0
             }
-            
-            # Store the header and note lines
-            NR == 1 { header = $0; next }
-            NR == 2 { note = $0; next }
             
             # Match the Unreleased section start
-            /## \*\*.*Unreleased\*\*/ {
-              found_unreleased = 1
-              reading_unreleased = 1
+            /^## \*\*.*Unreleased\*\*/ {
+              in_unreleased = 1
+              # Transform the header to release format
+              print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
               next
             }
             
-            # Match any other section header
+            # Match next section header
             /^## \*\*/ {
-              reading_unreleased = 0
-              if (!printed_version) {
-                print header
-                print note
-                print ""
-                if (unreleased_content != "") {
-                  print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
-                  printf "%s", unreleased_content
-                  print ""
-                }
-                printed_version = 1
-              }
-              print $0
-              next
+              in_unreleased = 0
             }
             
-            # Collect unreleased content or print regular content
-            {
-              if (reading_unreleased && NF > 0) {
-                unreleased_content = unreleased_content $0 "\n"
-              } else if (!reading_unreleased) {
-                print $0
-              }
-            }
-            
-            END {
-              if (!printed_version) {
-                print header
-                print note
-                print ""
-                if (unreleased_content != "") {
-                  print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
-                  printf "%s", unreleased_content
-                }
-              }
-            }
+            # Print everything as is
+            { print }
           ' CHANGELOG.md > "$TEMP_FILE"
           
           # Check if any changes were made
