@@ -19,12 +19,12 @@ on:
         required: false
         type: string
       readme-source:
-        description: 'Source path for README'
-        default: 'README'
+        description: 'Source path for README.md'
+        default: 'README.md'
         required: false
         type: string
       readme-destination:
-        description: 'Destination path for README'
+        description: 'Destination path for README.md'
         default: 'docs/repo/inc/README.md'
         required: false
         type: string
@@ -34,7 +34,7 @@ on:
         required: false
         type: string
       changelog-destination:
-        description: 'Destination path for CHANGELOG'
+        description: 'Destination path for CHANGELOG.md'
         default: 'docs/repo/inc/CHANGELOG.md'
         required: false
         type: string
@@ -44,7 +44,7 @@ on:
         required: false
         type: string
       license-destination:
-        description: 'Destination path for LICENSE'
+        description: 'Destination path for LICENSE.md'
         default: 'docs/repo/inc/LICENSE.md'
         required: false
         type: string
@@ -60,7 +60,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version || '3.x' }}
-      - run: pip install -r ${{ inputs.requirements-file || 'requirements.txt' }}
+      - name: Install dependencies
+        run: |
+          pip install -r ${{ inputs.requirements-file || 'requirements.txt' }}
+          pip install ruamel.yaml
       # Create necessary directories
       - name: Create documentation directories
         run: |
@@ -68,8 +71,80 @@ jobs:
       # Copy files if they exist
       - name: Copy repository files
         run: |
-          [ -f ${{ inputs.readme-source || 'README' }} ] && cp ${{ inputs.readme-source || 'README' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }} || echo "README not found"
+          [ -f ${{ inputs.readme-source || 'README.md' }} ] && cp ${{ inputs.readme-source || 'README.md' }} ${{ inputs.readme-destination || 'docs/repo/inc/README.md' }} || echo "README.md not found"
           [ -f ${{ inputs.changelog-source || 'CHANGELOG' }} ] && cp ${{ inputs.changelog-source || 'CHANGELOG' }} ${{ inputs.changelog-destination || 'docs/repo/inc/CHANGELOG.md' }} || echo "CHANGELOG not found"
           [ -f ${{ inputs.license-source || 'LICENSE' }} ] && cp ${{ inputs.license-source || 'LICENSE' }} ${{ inputs.license-destination || 'docs/repo/inc/LICENSE.md' }} || echo "LICENSE not found"
+      # Create repository index file
+      - name: Create repository index file
+        shell: bash
+        run: |
+          cat << 'EOFMARKDOWN' > docs/repo/index.md
+          # GitHub Core Repository
+
+          ## GitHub Core Repository Files
+
+          === "README.md"
+
+              *Below is the Github Core Repository Readme*
+
+              {% filter indent(width=4) %}{% include 'repo/inc/README.md' ignore missing %}{% endfilter %}
+
+          === "CHANGELOG"
+
+              *Below is the Github Core Repository Changelog*
+
+              {% filter indent(width=4) %}{% include 'repo/inc/CHANGELOG.md' ignore missing %}{% endfilter %}
+
+          === "LICENSE"
+
+              *Below is the Github Core Repository License*
+
+              {% filter indent(width=4) %}{% include 'repo/inc/LICENSE.md' ignore missing %}{% endfilter %}
+          EOFMARKDOWN
+
+      # Update MkDocs configuration
+      - name: Update MkDocs configuration
+        run: |
+          cat > update_config.py << 'EOF'
+          #!/usr/bin/env python3
+          import sys
+          import ruamel.yaml
+
+          def update_mkdocs_config(file_path='mkdocs.yml'):
+              yaml = ruamel.yaml.YAML()
+              yaml.preserve_quotes = True
+              yaml.indent(mapping=2, sequence=4, offset=2)
+              
+              try:
+                  with open(file_path, 'r') as file:
+                      config = yaml.load(file)
+              except FileNotFoundError:
+                  print(f"Error: {file_path} not found")
+                  sys.exit(1)
+
+              # Initialize nav if it doesn't exist
+              if 'nav' not in config:
+                  config['nav'] = []
+
+              # Check if Repository section exists
+              repo_section_exists = False
+              for item in config['nav']:
+                  if isinstance(item, dict) and 'Repository' in item:
+                      repo_section_exists = True
+                      break
+
+              # Add Repository section if it doesn't exist
+              if not repo_section_exists:
+                  config['nav'].append({
+                      'Repository': 'repo/index.md'
+                  })
+
+              # Write the updated configuration
+              with open(file_path, 'w') as file:
+                  yaml.dump(config, file)
+
+          if __name__ == '__main__':
+              update_mkdocs_config()
+          EOF
+          python update_config.py
       - run: mkdocs gh-deploy --force
-      

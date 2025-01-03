@@ -40,8 +40,8 @@ jobs:
     uses: deepworks-net/github.actions/.github/workflows/mkdocs-gh-pages.yml@main
     with:
       python-version: '3.11'
-      requirements-file: 'docs/requirements.txt'
-      readme-source: 'docs/README'
+      requirements-file: 'requirements.txt'
+      readme-source: 'README.md'
       readme-destination: 'docs/repo/inc/README.md'
       changelog-source: 'CHANGELOG'
       changelog-destination: 'docs/repo/inc/CHANGELOG.md'
@@ -55,7 +55,7 @@ jobs:
 |-----------|-------------|----------|---------|
 | `python-version` | Python version to use for the build | No | `3.x` |
 | `requirements-file` | Path to the requirements.txt file | No | `requirements.txt` |
-| `readme-source` | Source path for README | No | `README` |
+| `readme-source` | Source path for README | No | `README.md` |
 | `readme-destination` | Destination path for README | No | `docs/repo/inc/README.md` |
 | `changelog-source` | Source path for CHANGELOG | No | `CHANGELOG` |
 | `changelog-destination` | Destination path for CHANGELOG | No | `docs/repo/inc/CHANGELOG.md` |
@@ -69,8 +69,10 @@ The workflow performs the following steps:
 1. Checks out the repository with submodules
 2. Sets up Python environment
 3. Installs dependencies from requirements.txt
-4. Copies README to docs directory
-5. Builds and deploys MkDocs to GitHub Pages
+4. Copies README.md (if it exists) to `docs/repo/inc` directory
+5. Copies CHANGELOG (if it exists) to `docs/repo/inc` directory
+6. Copies LICENSE (if it exists) to `docs/repo/inc` directory
+7. Builds and deploys MkDocs to GitHub Pages
 
 ## Requirements
 
