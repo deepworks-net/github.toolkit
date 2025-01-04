@@ -57,9 +57,21 @@ jobs:
             echo "Error: Version $VERSION already exists in changelog"
             exit 1
           fi
+
+          # Get content from draft release
+          echo "Fetching draft release content..."
+          RELEASE_CONTENT=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            repos/$ORG/$PROJ/releases \
+            --jq '.[] | select(.draft == true) | .body' | sed -e '1,/^## Changes/d')
+          
+          if [ -z "$RELEASE_CONTENT" ]; then
+            echo "Warning: No content found in draft release"
+            RELEASE_CONTENT="No changes recorded"
+          fi
           
           # Process the changelog
-          awk -v version="$VERSION" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" '
+          awk -v version="$VERSION" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" -v release_content="$RELEASE_CONTENT" '
             BEGIN {
               found_first_section = 0
               made_changes = 0
@@ -76,6 +88,7 @@ jobs:
               if (!found_first_section) {
                 # Insert our new version section before first existing section
                 print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                print release_content
                 print ""
                 made_changes = 1
                 found_first_section = 1
@@ -92,9 +105,10 @@ jobs:
                 # If no sections found, add ours at the end
                 if (NR > 0) print ""
                 print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                print release_content
                 made_changes = 1
               }
-              exit !made_changes  # Exit with 0 if changes made, 1 if not
+              exit !made_changes
             }
           ' CHANGELOG.md > "$TEMP_FILE"
           
@@ -125,7 +139,7 @@ jobs:
               - Commits Since Last Release: $COMMIT_COUNT
               
               ### Changelog Updates
-              - Added version $VERSION section
+              - Added version $VERSION section with content from draft release
               
               ### Next Steps
               1. Review the changelog
