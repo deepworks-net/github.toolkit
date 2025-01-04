@@ -5,13 +5,10 @@ inputs: {}
 outputs:
   next_version:
     description: "The calculated next version."
-    required: true
 runs:
   using: "docker"
-  image: "docker://python:3.9-slim"
-  args:
-    - "python"
-    - "/action/version_calculation.py"
+  image: "Dockerfile"
 branding:
   icon: "tag"
   color: "blue"
+  

@@ -5,6 +5,14 @@ import subprocess
 import re
 import sys
 
+def setup_git():
+    """Configure git to trust the workspace."""
+    try:
+        subprocess.check_output(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'], text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error configuring git: {e}")
+        sys.exit(1)
+
 def get_latest_tag():
     """Retrieve the latest version tag."""
     try:
@@ -40,6 +48,7 @@ def get_commit_count_since_tag(tag):
         sys.exit(1)
 
 def main():
+    setup_git()  # Configure git before running commands
     latest_tag = get_latest_tag()
     print(f"Latest tag: {latest_tag}")
 

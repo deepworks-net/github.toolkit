@@ -37,13 +37,20 @@ jobs:
 
       - name: Debug Repository Structure
         run: |
-            echo "Current directory:"
-            pwd
-            echo "Files in repository:"
-            ls -R /home/runner/work/github.actions/github.actions
+          echo "Current directory:"
+          pwd
+          echo "Files in repository:"
+          ls -R /home/runner/work/github.actions/github.actions
+
+      - name: Debug Action Files
+        run: |
+          echo "Contents of actions/version_calculation:"
+          ls -l /home/runner/work/github.actions/github.actions/actions/version_calculation
+          echo "Contents of action.yml:"
+          cat /home/runner/work/github.actions/github.actions/actions/version_calculation/action.yml
 
       - name: Calculate Next Version
-        uses: ./actions/version-calculation
+        uses: ./actions/version_calculation
         id: version
 
       - name: Draft Release
@@ -57,9 +64,6 @@ jobs:
             See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Clear Cache
-        run: rm -rf /home/runner/work/github.actions/github.actions
 
   publish_release:
     runs-on: ubuntu-latest

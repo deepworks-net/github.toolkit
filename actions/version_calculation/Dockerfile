@@ -1,11 +1,12 @@
-# Dockerfile for Version Calculation GitHub Action
 FROM python:3.9-slim
 
-# Set working directory
 WORKDIR /action
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Copy the script into the container
-COPY version_calculation.py /action/version_calculation.py
+# Configure git to trust the workspace
+RUN git config --global --add safe.directory /github/workspace
 
-# Set entrypoint to execute the script
+COPY version_calculation.py /action/
+COPY action.yml /action/
+
 ENTRYPOINT ["python", "/action/version_calculation.py"]
