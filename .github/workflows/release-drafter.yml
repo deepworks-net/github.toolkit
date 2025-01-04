@@ -1,17 +1,20 @@
 name: Publish GitHub Release
 
 on:
-  # Keep existing trigger for this repo
   push:
     tags:
       - 'v*'
-  # Add workflow_call to make it reusable
   workflow_call:
     inputs:
       tag-name:
         description: 'Tag name for the release (e.g., v1.0.0)'
         required: false
         type: string
+      draft:
+        description: 'Create as draft release'
+        required: false
+        type: boolean
+        default: false
     secrets:
       token:
         description: 'GitHub token for release creation'
@@ -24,10 +27,45 @@ jobs:
   publish_release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for version calculation
+
+      - name: Calculate Next Version
+        id: version
+        run: |
+          # Get the latest version tag
+          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Parse the version numbers
+          if [[ $LATEST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+            
+            # Count commits since last tag
+            COMMIT_COUNT=$(git rev-list $LATEST_TAG..HEAD --count)
+            
+            # Calculate new patch version
+            NEW_PATCH=$((PATCH + COMMIT_COUNT))
+            
+            # Format new version
+            NEXT_VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
+            
+            echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+            echo "Next version will be: $NEXT_VERSION"
+          else
+            echo "Could not parse version from tag: $LATEST_TAG"
+            exit 1
+          fi
+
       - uses: release-drafter/release-drafter@v6
         with:
           publish: true
           tag: ${{ inputs.tag-name || github.ref_name }}
+          version: ${{ steps.version.outputs.next_version }}
+          draft: ${{ inputs.draft }}
           header: |
             ## Release ${{ inputs.tag-name || github.ref_name }}
           footer: |
