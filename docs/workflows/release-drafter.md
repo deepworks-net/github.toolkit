@@ -1,58 +1,160 @@
-# Publish GitHub Release Workflow
+# Release Drafter Workflow
 
-This reusable workflow automatically creates and publishes GitHub Releases when version tags are pushed to the repository. It's designed to work in conjunction with the prepare-release and update-changelog workflows.
+This workflow automates the creation and management of GitHub Releases. It maintains a draft release that updates automatically with new changes and publishes final releases when version tags are pushed.
 
 ## Workflow File
 
 `.github/workflows/release-drafter.yml`
 
-## Trigger
+## Triggers
 
-The workflow can be triggered in two ways:
+The workflow responds to three types of events:
 
-### 1. Tag Push
+1. **Push to develop branch**:
+   - Updates the draft release
+   - Calculates next version based on commit count
+   - Updates release notes
 
-Automatically triggers when a tag matching the pattern `v*` is pushed to the repository. For example:
+2. **Push of version tags** (`v*`):
+   - Publishes the final release
+   - Uses the tag's version number
+   - Finalizes release notes
 
-- v1.0.0
-- v2.1.3
-- v0.1.0
+3. **Workflow call**:
+   - Allows other workflows to trigger release operations
+   - Supports custom tag names and options
+
+## Version Calculation
+
+The workflow automatically calculates the next version number based on:
+
+- Latest version tag (vX.Y.Z format)
+- Number of commits since that tag
+- Semantic versioning principles
+
+Example:
+
+- Current version: v1.0.16
+- 3 new commits
+- Next calculated version: v1.0.19
+
+## Jobs
+
+### 1. Update Release Draft
+
+Runs when changes are pushed to develop:
 
 ```yaml
-on:
-  push:
-    tags:
-      - 'v*'
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
 ```
 
-### 2. Workflow Call
+Steps:
 
-Can be called from another workflow using the `workflow_call` trigger.
+1. Checkout repository with full history
+2. Calculate next version based on commit count
+3. Update draft release with new version and changes
+
+### 2. Publish Release
+
+Runs when a version tag is pushed:
+
+```yaml
+jobs:
+  publish_release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+```
+
+Steps:
+
+1. Checkout repository
+2. Publish final release with tag version
+3. Update release notes
 
 ## Input Parameters
 
 | Parameter | Description | Required | Default |
 |-----------|-------------|----------|---------|
-| `tag-name` | Tag name for the release (e.g., v1.0.0) | No | Current tag |
-| `draft` | Create as draft release | No | `false` |
+| `tag-name` | Release tag name | No | Current tag |
+| `draft` | Create as draft | No | `false` |
 
 ## Secrets
 
 | Secret | Description | Required | Default |
 |--------|-------------|----------|---------|
-| `token` | GitHub token for release creation | No | `GITHUB_TOKEN` |
+| `token` | GitHub token | No | `GITHUB_TOKEN` |
 
-## Usage
+## Release Format
 
-### As a Standalone Workflow
+### Draft Release
 
-When a version tag is pushed, the workflow automatically:
+```markdown
+## Draft Release v1.0.X
 
-1. Creates a new GitHub Release
-2. Sets the release title and description
-3. Publishes the release
+[Automatically populated release notes]
 
-### As a Reusable Workflow
+See the [Changelog](link) for more details.
+```
+
+### Final Release
+
+```markdown
+## Release v1.0.X
+
+[Release notes from draft]
+
+See the [Changelog](link) for more details.
+```
+
+## Integration
+
+This workflow integrates with:
+
+- Changelog updates
+- Release preparation
+- Version tagging
+
+## Configuration
+
+The workflow uses release-drafter configuration from `.github/release-drafter.yml` for:
+
+- Change categorization
+- Note formatting
+- Version resolution
+
+## Permissions
+
+Required permissions:
+
+```yaml
+permissions:
+  contents: write
+```
+
+## Usage Examples
+
+### As Part of Release Process
+
+1. Push changes to develop:
+   - Updates draft release
+   - Increments version number
+   - Updates release notes
+
+2. Create version tag:
+
+   ```bash
+   git tag v1.0.x
+   git push origin v1.0.x
+   ```
+
+   - Publishes final release
+   - Uses tag version
+   - Finalizes release notes
+
+### Called from Another Workflow
 
 ```yaml
 jobs:
@@ -60,98 +162,29 @@ jobs:
     uses: deepworks-net/github.actions/.github/workflows/release-drafter.yml@main
     with:
       tag-name: 'v1.0.0'
-      draft: false
-    secrets:
-      token: ${% raw %}{{ secrets.GITHUB_TOKEN }}{% endraw %}
 ```
-
-## Release Format
-
-The workflow creates releases with:
-
-1. Title based on the tag name
-2. Standard header section
-3. Link to changelog in footer
-4. Content from the release draft
-
-## Permissions
-
-The workflow requires:
-
-- `contents: write` permission to create releases
-- GitHub token with appropriate permissions
-
-## Integration with Other Workflows
-
-This workflow is part of the release process that includes:
-
-1. **Prepare Release Workflow**
-   - Creates release branch
-   - Updates changelog
-   - Prepares release PR
-
-2. **Update Changelog Workflow**
-   - Maintains changelog during development
-   - Tracks unreleased changes
-
-3. **Release Drafter (This Workflow)**
-   - Creates final release
-   - Publishes to GitHub
-
-## Release Process
-
-1. Release preparation initiated (`prep-v*` tag)
-2. Release branch created
-3. Changelog updated
-4. Release PR merged
-5. Version tag pushed
-6. Release published
 
 ## Troubleshooting
 
 Common issues and solutions:
 
-1. **Release Not Publishing**
-   - Check tag format matches `v*` pattern
-   - Verify workflow has write permissions
-   - Check GitHub token permissions
+1. **Version Calculation Fails**
+   - Ensure repository has at least one version tag
+   - Check tag format matches `vX.Y.Z`
+   - Verify git history is available (fetch-depth: 0)
 
-2. **Missing Content**
-   - Ensure changelog is properly formatted
-   - Verify release draft exists
+2. **Draft Not Updating**
+   - Check branch name matches 'develop'
+   - Verify workflow has write permissions
    - Check release-drafter configuration
 
-3. **Permission Errors**
-   - Check repository settings
-   - Verify token permissions
-   - Ensure workflow permissions are set
-
-## Contributing
-
-To modify this workflow:
-
-1. Fork the repository
-2. Edit `.github/workflows/release-drafter.yml`
-3. Test changes by creating a release
-4. Submit a pull request
-
-## Configuration
-
-release-drafter configuration options:
-
-```yaml
-publish: true
-tag: ${tag name}
-draft: false
-header: |
-  ## Release ${version}
-footer: |
-  See the [Changelog](link) for more details.
-```
+3. **Release Not Publishing**
+   - Verify tag format matches `v*`
+   - Check GitHub token permissions
+   - Review release-drafter logs
 
 ## Related Documentation
 
-- [GitHub Actions documentation](https://docs.github.com/en/actions)
 - [release-drafter action](https://github.com/release-drafter/release-drafter)
 - [Semantic Versioning](https://semver.org/)
-- [GitHub Releases documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+- [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
