@@ -9,30 +9,35 @@ A collection of reusable GitHub Actions workflows for standardizing development 
 Two workflows that work together to manage the release process:
 
 #### 1. Prepare Release Branch (`prep-release.yml`)
+
 Creates a release branch and prepares the changelog for release.
 
 **Trigger:**  
 Push a tag with prefix `prep-v` (e.g., `prep-v1.0.0`)
 
 **Actions:**
+
 - Creates a release branch
 - Moves Unreleased changelog items to a new version section
 - Removes the Unreleased section for release
 - Creates a PR for review
 
 **Usage:**
+
 ```bash
 git tag prep-v1.0.0
 git push origin prep-v1.0.0
 ```
 
 #### 2. Update Changelog (`update-changelog.yml`)
+
 Automatically updates the changelog when PRs are merged to develop.
 
 **Trigger:**  
 PR merged to develop branch
 
 **Actions:**
+
 - Adds PR to Unreleased section of changelog
 - Creates Unreleased section if it doesn't exist
 - Maintains changelog formatting
@@ -76,9 +81,10 @@ The workflows maintain the following changelog format:
 ## Support
 
 For issues, questions, or contributions:
+
 1. Open an issue in this repository
 2. Include workflow name and description of need
 
 ## License
 
-MIT License - See [LICENSE.md](LICENSE.md) file for details
+MIT License - See [LICENSE.md](https://github.com/deepworks-net/github.actions/blob/main/LICENSE.md) file for details

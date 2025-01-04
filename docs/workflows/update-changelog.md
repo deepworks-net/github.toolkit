@@ -78,14 +78,16 @@ The workflow runs automatically when PRs are merged. No manual intervention is r
 ### PR Title Examples
 
 Good PR titles that make meaningful changelog entries:
-```
+
+```none
 Add user authentication system
 Fix memory leak in data processing
 Update dependencies to latest versions
 ```
 
 Poor PR titles to avoid:
-```
+
+```none
 Fix bug
 Update code
 WIP: Changes
@@ -94,6 +96,7 @@ WIP: Changes
 ### Changelog Entry Examples
 
 The workflow will create entries like:
+
 ```markdown
 ## **01/02/2025 - Unreleased**
 - PR #123: Add user authentication system
@@ -104,6 +107,7 @@ The workflow will create entries like:
 ## Permissions
 
 The workflow requires:
+
 - Read access to pull request metadata
 - Write access to the repository (for pushing changes)
 
