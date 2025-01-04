@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version-calculation
+        uses: ./actions/version-calculation/action.yml
         id: version
 
       - name: Draft Release
