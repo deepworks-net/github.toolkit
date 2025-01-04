@@ -1,0 +1,17 @@
+name: "Version Calculation"
+description: "Calculate the next version based on the latest Git tag."
+author: "Deepworks"
+inputs: {}
+outputs:
+  next_version:
+    description: "The calculated next version."
+    required: true
+runs:
+  using: "docker"
+  image: "docker://python:3.9-slim"
+  args:
+    - "python"
+    - "/action/version_calculation.py"
+branding:
+  icon: "tag"
+  color: "blue"
