@@ -69,7 +69,6 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
           header: |
             ## Draft Release ${{ steps.version.outputs.next_version }}
-            &#8203;
           footer: |
             See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
@@ -86,8 +85,7 @@ jobs:
           publish: true
           tag: ${{ github.ref_name }}
           header: |
-            ## Release ${{ github.ref_name }} 
-            &#8203;
+            ## Release ${{ github.ref_name }}
           footer: |
             See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
