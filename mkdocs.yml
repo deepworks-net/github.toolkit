@@ -65,6 +65,8 @@ theme:
 'nav':
     - 'Home': 
       - 'index.md'
+      - 'Getting Started': 'getting-started.md'
+      - 'Release Process': 'release-process.md'
       - 'Repository': 'repo/index.md'
     - 'Workflows':
       - 'Create Github Release': 'workflows/create-release.md'

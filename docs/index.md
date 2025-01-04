@@ -5,24 +5,29 @@ This repository contains a collection of reusable GitHub Actions workflows. Thes
 ## Available Workflows
 
 ### MkDocs GitHub Pages Workflow
+
 **[View Documentation](workflows/mkdocs-gh-pages.md)**
 
 Automates the deployment of MkDocs documentation to GitHub Pages. This workflow:
+
 - Copies repository files (README, CHANGELOG, LICENSE) to documentation
 - Updates MkDocs navigation configuration
 - Deploys to GitHub Pages
 - Supports custom Python versions and file locations
 
 ### Create GitHub Release
+
 **[View Documentation](workflows/create-release.md)**
 
 Automates the creation of GitHub releases. This workflow:
+
 - Creates releases from version tags
 - Supports prereleases and draft releases
 - Allows custom release titles
 - Can be triggered manually or by tags
 
 ### Update Changelog
+
 **[View Documentation](workflows/update-changelog.md)**
 
 Automatically updates CHANGELOG.md when pull requests are merged. This workflow:
