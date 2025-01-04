@@ -2,11 +2,11 @@ name: Prepare Release Branch
 on:
   push:
     tags:
-      - 'prep-v*'  # Only triggers on tags like prep-v1.0.0
+      - 'prep'  # Simple trigger
 
 jobs:
   create-release-branch:
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/prep-')
+    if: github.ref_type == 'tag' && github.ref == 'refs/tags/prep'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,18 +14,37 @@ jobs:
           ref: develop
           fetch-depth: 0
           
-      - name: Create Release Branch
+      - name: Calculate Version and Create Release Branch
         run: |
-          # Extract version from prep tag (remove 'prep-' prefix)
-          PREP_TAG=${GITHUB_REF#refs/tags/}
-          VERSION=${PREP_TAG#prep-}
+          # Get the latest version tag
+          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1)
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Parse the version numbers
+          if [[ $LATEST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+            
+            # Count commits since last tag
+            COMMIT_COUNT=$(git rev-list $LATEST_TAG..HEAD --count)
+            
+            # Calculate new patch version
+            NEW_PATCH=$((PATCH + COMMIT_COUNT))
+            
+            # Format new version
+            VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
+            echo "Calculated version: $VERSION"
+          else
+            echo "Could not parse version from tag: $LATEST_TAG"
+            exit 1
+          fi
+
           RELEASE_BRANCH="release/${VERSION}"
           TODAY=$(date +"%m/%d/%Y")
           ORG="${{ github.repository_owner }}"
           PROJ="${{ github.event.repository.name }}"
           
-          echo "Prep tag: $PREP_TAG"
-          echo "Version: $VERSION"
           echo "Creating release branch: $RELEASE_BRANCH"
           
           git checkout -b "$RELEASE_BRANCH"
@@ -33,38 +52,54 @@ jobs:
           # Create temp file
           TEMP_FILE=$(mktemp)
           
-          # First pass: Find if we already have this version in the changelog
+          # Check if version already exists
           if grep -q "$VERSION" CHANGELOG.md; then
             echo "Error: Version $VERSION already exists in changelog"
             exit 1
           fi
           
-          # Second pass: Process the changelog
+          # Process the changelog
           awk -v version="$VERSION" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" '
             BEGIN {
-              print_buffer = ""
-              in_unreleased = 0
+              found_first_section = 0
+              made_changes = 0
             }
             
-            # Match the Unreleased section start
-            /^## \*\*.*Unreleased\*\*/ {
-              in_unreleased = 1
-              # Transform the header to release format
-              print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+            # Print header lines before first section
+            !found_first_section && !/^## / {
+              print
               next
             }
             
-            # Match next section header
-            /^## \*\*/ {
-              in_unreleased = 0
+            # Handle start of any section
+            /^## / {
+              if (!found_first_section) {
+                # Insert our new version section before first existing section
+                print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                print ""
+                made_changes = 1
+                found_first_section = 1
+              }
+              print
+              next
             }
             
-            # Print everything as is
+            # Print everything else as is
             { print }
+            
+            END {
+              if (!found_first_section) {
+                # If no sections found, add ours at the end
+                if (NR > 0) print ""
+                print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                made_changes = 1
+              }
+              exit !made_changes  # Exit with 0 if changes made, 1 if not
+            }
           ' CHANGELOG.md > "$TEMP_FILE"
           
-          # Check if any changes were made
-          if ! diff -q CHANGELOG.md "$TEMP_FILE" > /dev/null; then
+          # Always update if awk indicated changes were made
+          if [ $? -eq 0 ]; then
             cat "$TEMP_FILE" > CHANGELOG.md
             
             # Commit changes
@@ -77,28 +112,29 @@ jobs:
             git push origin "$RELEASE_BRANCH"
             
             # Delete the prep tag as it's no longer needed
-            git push origin :refs/tags/$PREP_TAG
+            git push origin :refs/tags/prep
             
             # Create PR for release branch
             gh pr create \
               --title "Release $VERSION" \
-              --body "## Release Preparation for $VERSION
-              
-              Release branch created from prep tag: $PREP_TAG
+              --body "## Release Preparation
+
+              ### Version Information
+              - Calculated Version: $VERSION
+              - Based on: $LATEST_TAG
+              - Commits Since Last Release: $COMMIT_COUNT
               
               ### Changelog Updates
-              - Converted Unreleased section to version $VERSION
-              - Removed Unreleased section for release
+              - Added version $VERSION section
               
               ### Next Steps
               1. Review the changelog
-              2. Perform any final release preparations
-              3. Merge this PR to develop
-              4. Create final release tag" \
+              2. Merge this PR to develop
+              3. Final release will be created automatically" \
               --base develop \
               --head "$RELEASE_BRANCH"
           else
-            echo "No changes needed in CHANGELOG.md"
+            echo "Failed to update CHANGELOG.md"
             exit 1
           fi
         env:
