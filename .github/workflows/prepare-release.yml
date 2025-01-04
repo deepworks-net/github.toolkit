@@ -89,7 +89,7 @@ jobs:
             /^## / {
               if (!found_first_section) {
                 # Insert our new version section before first existing section
-                print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
                 print release_content
                 print ""
                 made_changes = 1
@@ -106,7 +106,7 @@ jobs:
               if (!found_first_section) {
                 # If no sections found, add ours at the end
                 if (NR > 0) print ""
-                print "## **[(" today ") - " version ")](https://github.com/" org "/" proj "/releases/tag/" version ")**"
+                print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
                 print release_content
                 made_changes = 1
               }
