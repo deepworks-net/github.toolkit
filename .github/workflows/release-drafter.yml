@@ -28,8 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
+          ref: develop
           fetch-depth: 0
 
       - name: Calculate Next Version
