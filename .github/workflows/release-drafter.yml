@@ -31,11 +31,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: develop
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: develop  # Explicitly specify the develop branch
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version-calculation/action.yml
+        uses: ./actions/version-calculation
         id: version
 
       - name: Draft Release
