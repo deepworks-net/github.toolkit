@@ -1,4 +1,5 @@
 name: Prepare Release Branch
+
 on:
   push:
     tags:
@@ -8,57 +9,26 @@ jobs:
   create-release-branch:
     if: github.ref_type == 'tag' && github.ref == 'refs/tags/prep'
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
           ref: develop
           fetch-depth: 0
-          
-      - name: Calculate Version and Create Release Branch
-        run: |
-          # Get the latest version tag
-          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n1)
-          echo "Latest tag: $LATEST_TAG"
-          
-          # Parse the version numbers
-          if [[ $LATEST_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-            MAJOR="${BASH_REMATCH[1]}"
-            MINOR="${BASH_REMATCH[2]}"
-            PATCH="${BASH_REMATCH[3]}"
-            
-            # Count commits since last tag
-            COMMIT_COUNT=$(git rev-list $LATEST_TAG..HEAD --count)
-            
-            # Calculate new patch version
-            NEW_PATCH=$((PATCH + COMMIT_COUNT))
-            
-            # Format new version
-            VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
-            echo "Calculated version: $VERSION"
-          else
-            echo "Could not parse version from tag: $LATEST_TAG"
-            exit 1
-          fi
 
-          RELEASE_BRANCH="release/${VERSION}"
+      - name: Calculate Version
+        uses: ./actions/version-calculation
+        id: version
+
+      - name: Update Changelog
+        run: |
+          RELEASE_BRANCH="release/${{ steps.version.outputs.next_version }}"
           TODAY=$(date +"%m/%d/%Y")
           ORG="${{ github.repository_owner }}"
           PROJ="${{ github.event.repository.name }}"
-          
           echo "Creating release branch: $RELEASE_BRANCH"
           
-          git checkout -b "$RELEASE_BRANCH"
-          
-          # Create temp file
-          TEMP_FILE=$(mktemp)
-          
-          # Check if version already exists
-          if grep -q "$VERSION" CHANGELOG.md; then
-            echo "Error: Version $VERSION already exists in changelog"
-            exit 1
-          fi
-
-          # Get content from draft release
+          # Fetch draft release content
           echo "Fetching draft release content..."
           RELEASE_CONTENT=$(gh api \
             -H "Accept: application/vnd.github+json" \
@@ -66,29 +36,25 @@ jobs:
             --jq '.[] | select(.draft == true) | .body' | \
             sed -n '/^-/p' | \
             sed 's/See the.*$//')
-          
+
           if [ -z "$RELEASE_CONTENT" ]; then
             echo "Warning: No content found in draft release"
             RELEASE_CONTENT="No changes recorded"
           fi
-          
+
           # Process the changelog
-          awk -v version="$VERSION" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" -v release_content="$RELEASE_CONTENT" '
+          TEMP_FILE=$(mktemp)
+          awk -v version="${{ steps.version.outputs.next_version }}" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" -v release_content="$RELEASE_CONTENT" '
             BEGIN {
               found_first_section = 0
               made_changes = 0
             }
-            
-            # Print header lines before first section
             !found_first_section && !/^## / {
               print
               next
             }
-            
-            # Handle start of any section
             /^## / {
               if (!found_first_section) {
-                # Insert our new version section before first existing section
                 print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
                 print release_content
                 print ""
@@ -98,13 +64,9 @@ jobs:
               print
               next
             }
-            
-            # Print everything else as is
             { print }
-            
             END {
               if (!found_first_section) {
-                # If no sections found, add ours at the end
                 if (NR > 0) print ""
                 print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
                 print release_content
@@ -113,35 +75,25 @@ jobs:
               exit !made_changes
             }
           ' CHANGELOG.md > "$TEMP_FILE"
-          
-          # Always update if awk indicated changes were made
+
           if [ $? -eq 0 ]; then
             cat "$TEMP_FILE" > CHANGELOG.md
-            
-            # Commit changes
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
             git add CHANGELOG.md
-            git commit -m "chore: Prepare changelog for $VERSION release"
-            
-            # Push release branch
+            git commit -m "chore: Prepare changelog for ${{ steps.version.outputs.next_version }} release"
             git push origin "$RELEASE_BRANCH"
-            
-            # Delete the prep tag as it's no longer needed
             git push origin :refs/tags/prep
-            
-            # Create PR for release branch
             gh pr create \
-              --title "Release $VERSION" \
+              --title "Release ${{ steps.version.outputs.next_version }}" \
               --body "## Release Preparation
 
               ### Version Information
-              - Calculated Version: $VERSION
-              - Based on: $LATEST_TAG
-              - Commits Since Last Release: $COMMIT_COUNT
+              - Calculated Version: ${{ steps.version.outputs.next_version }}
+              - Based on: latest tag
               
               ### Changelog Updates
-              - Added version $VERSION section with content from draft release
+              - Added version ${{ steps.version.outputs.next_version }} section with content from draft release
               
               ### Next Steps
               1. Review the changelog
