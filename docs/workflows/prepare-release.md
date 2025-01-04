@@ -6,9 +6,9 @@ This page documents the **Prepare Release** workflow located in the [.github/wor
 
 ## Overview
 
-The **Prepare Release** workflow is triggered manually by tagging a commit with the prefix: 
+The **Prepare Release** workflow is triggered manually by tagging a commit with the tag: 
 
-`prep-v(*)` 
+`prep` 
 
 It automates the following steps:
 
