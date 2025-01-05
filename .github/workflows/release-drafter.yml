@@ -52,6 +52,9 @@ jobs:
       - name: Calculate Next Version
         uses: ./actions/version_calculation
         id: version
+      
+      - name: Set Output for Version
+        run: echo "::set-output name=version::${{ steps.version.outputs.next_version }}"
 
       - name: Draft Release
         uses: release-drafter/release-drafter@v6

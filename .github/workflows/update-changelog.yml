@@ -6,21 +6,28 @@ on:
     types: [closed]
 
 jobs:
-  update-changelog:
+  update_changelog:
     # Only run if the PR was merged (not just closed)
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          ref: develop
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: develop  # Explicitly specify the develop branch
+          fetch-depth: 0
+
+      - name: Calculate Next Version
+        uses: ./actions/version_calculation
+        id: version
           
       - name: Update Changelog
         run: |
           echo "Processing merged pull request..."
           
           TODAY=$(date +"%m/%d/%Y")
-          NEW_VERSION="1.0.18"  # We'll get this from PR later
+          NEW_VERSION="${{ steps.version.outputs.next_version }}"
           
           # Create temp file
           TEMP_FILE=$(mktemp)
