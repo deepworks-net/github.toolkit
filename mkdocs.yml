@@ -75,3 +75,6 @@ theme:
       - 'Prepare Release': 'workflows/prepare-release.md'
       - 'Update Changelog': 'workflows/update-changelog.md'
       - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
+    - 'Actions':
+      - 'Overview': 'actions/index.md'
+      - 'Version Calculation': 'actions/version-calculation/index.md'
