@@ -1,19 +1,8 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-## **01/05/2025 - v1.0.72 Unreleased**
-- 73 Abstract out Changelog updates @mattbuske (#85)
-- 73 Abstract out Changelog updates @mattbuske (#84)
-- 73 Abstract out Changelog updates @mattbuske (#83)
-- 73 Abstract out Changelog updates @mattbuske (#82)
-- 73 Abstract out Changelog updates @mattbuske (#81)
-- 73 Abstract out Changelog updates @mattbuske (#80)
-- Updated Update Changelog @mattbuske (#79)
-- Update Workflow @mattbuske (#78)
-- 72 Abstract out Calculate Version Number @mattbuske (#77)
-- Update Release Drafter Documentation @mattbuske (#75)
-- Update Release Drafter @mattbuske (#74)
-- Various Updates @mattbuske (#71)
+## **01/05/2025 - v1.0.94 Unreleased**
+- Change to Pre-release Mode @mattbuske (#99)
 
 ## **[(01/04/2025) - v1.0.34](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.34)**
 - 52 Fix Release Tag Bug @mattbuske (#63)
