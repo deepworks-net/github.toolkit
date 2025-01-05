@@ -12,7 +12,7 @@ This workflow automates the creation and management of GitHub Releases. It maint
 
 The workflow responds to two types of events:
 
-1. **Push to the** `**develop**` **branch**:
+1. **Push to the** `develop` **branch**:
 
     - Updates the draft release.
     - Calculates the next version using a centralized version calculation.
@@ -118,7 +118,7 @@ jobs:
 
 [Automatically populated release notes]
 
-See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
+See the [Changelog](https://github.com/${% raw %}{{ github.repository }}{% endraw %}/blob/main/CHANGELOG.md) for more details.
 ```
 
 ---
