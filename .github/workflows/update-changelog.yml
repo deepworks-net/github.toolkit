@@ -24,19 +24,28 @@ jobs:
           
       - name: Update Changelog
         run: |
-          echo "Processing merged pull request..."
-          
           TODAY=$(date +"%m/%d/%Y")
-          PR_NUM=${{ github.event.pull_request.number }}
-          PR_TITLE="${{ github.event.pull_request.title }}"
           VERSION="${{ steps.version.outputs.next_version }}"
+          
+          # Fetch draft release content
+          echo "Fetching draft release content..."
+          RELEASE_CONTENT=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            repos/${{ github.repository_owner }}/${{ github.repository }}/releases \
+            --jq '.[] | select(.draft == true) | .body' | \
+            sed -n '/^-/p' | \
+            sed 's/See the.*$//')
+          
+          if [ -z "$RELEASE_CONTENT" ]; then
+            echo "Warning: No content found in draft release"
+            exit 1
+          fi
           
           TEMP_FILE=$(mktemp)
           
-          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" -v version="$VERSION" '
+          awk -v today="$TODAY" -v version="$VERSION" -v release_content="$RELEASE_CONTENT" '
             BEGIN {
               found_unreleased = 0
-              printed_new_entry = 0
             }
             
             # Keep header content
@@ -49,13 +58,7 @@ jobs:
             /^## \*\*.*[Uu]nreleased\*\*/ {
               found_unreleased = 1
               print "## **" today " - " version " Unreleased**"
-              print "- PR #" pr_num ": " pr_title
-              next
-            }
-            
-            # Collect existing unreleased entries
-            found_unreleased == 1 && /^- PR #/ {
-              print
+              print release_content
               next
             }
             
@@ -63,7 +66,7 @@ jobs:
             /^## \*\*\[/ {
               if (!found_unreleased) {
                 print "## **" today " - " version " Unreleased**"
-                print "- PR #" pr_num ": " pr_title
+                print release_content
                 print ""
                 found_unreleased = 1
               }
@@ -78,7 +81,7 @@ jobs:
               if (!found_unreleased) {
                 if (NR > 0) print ""
                 print "## **" today " - " version " Unreleased**"
-                print "- PR #" pr_num ": " pr_title
+                print release_content
               }
             }
           ' CHANGELOG.md > "$TEMP_FILE"
