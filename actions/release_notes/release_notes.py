@@ -147,9 +147,9 @@ def main():
     """Main function."""
     setup_git()
     
-    mode = os.environ.get('MODE')
+    mode = os.environ.get('INPUT_MODE')
     if not mode:
-        print("MODE environment variable not set")
+        print("INPUT_MODE environment variable not set")
         sys.exit(1)
     
     if mode == 'pr-merge':
