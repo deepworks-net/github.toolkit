@@ -27,13 +27,61 @@ jobs:
           echo "Processing merged pull request..."
           
           TODAY=$(date +"%m/%d/%Y")
-          NEW_VERSION="${{ steps.version.outputs.next_version }}"
+          PR_NUM=${{ github.event.pull_request.number }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          VERSION="${{ steps.version.outputs.next_version }}"
           
-          # Create temp file
           TEMP_FILE=$(mktemp)
           
-          # Just transform the Unreleased header to a release header
-          sed "/## \*\*.*- Unreleased\*\*/c## **[(${TODAY}) - v${NEW_VERSION}](https://github.com/deepworks-net/github.actions/releases/tag/v${NEW_VERSION})**" CHANGELOG.md > "$TEMP_FILE"
+          awk -v today="$TODAY" -v pr_num="$PR_NUM" -v pr_title="$PR_TITLE" -v version="$VERSION" '
+            BEGIN {
+              found_unreleased = 0
+              printed_new_entry = 0
+            }
+            
+            # Keep header content
+            !found_unreleased && !/^## / {
+              print
+              next
+            }
+            
+            # Handle unreleased section or create new one
+            /^## \*\*.*[Uu]nreleased\*\*/ {
+              found_unreleased = 1
+              print "## **" today " - " version " Unreleased**"
+              print "- PR #" pr_num ": " pr_title
+              next
+            }
+            
+            # Collect existing unreleased entries
+            found_unreleased == 1 && /^- PR #/ {
+              print
+              next
+            }
+            
+            # When we hit the next section
+            /^## \*\*\[/ {
+              if (!found_unreleased) {
+                print "## **" today " - " version " Unreleased**"
+                print "- PR #" pr_num ": " pr_title
+                print ""
+                found_unreleased = 1
+              }
+              print
+              next
+            }
+            
+            # Print everything else
+            { print }
+            
+            END {
+              if (!found_unreleased) {
+                if (NR > 0) print ""
+                print "## **" today " - " version " Unreleased**"
+                print "- PR #" pr_num ": " pr_title
+              }
+            }
+          ' CHANGELOG.md > "$TEMP_FILE"
           
           cat "$TEMP_FILE" > CHANGELOG.md
 
