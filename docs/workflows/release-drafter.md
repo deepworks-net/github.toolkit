@@ -13,10 +13,13 @@ This workflow automates the creation and management of GitHub Releases. It maint
 The workflow responds to two types of events:
 
 1. **Push to the** `**develop**` **branch**:
+
     - Updates the draft release.
     - Calculates the next version using a centralized version calculation.
     - Updates release notes dynamically.
+
 2. **Workflow call**:
+
     - Allows other workflows to trigger release operations.
     - Supports custom tag names and options.
 
