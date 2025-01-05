@@ -60,14 +60,19 @@ def extract_pr_entries(content):
 def create_draft_release():
     """Create new draft release."""
     try:
+        token = os.environ.get('INPUT_GITHUB_TOKEN')
         cmd = [
-            'gh', 'api',
-            '--method', 'POST',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
-            '-f', 'tag_name=DRAFT',
-            '-f', 'name=Draft Release',
-            '-F', 'draft=true',
-            '-f', 'body= '
+            'curl', '-s',
+            '-X', 'POST',
+            '-H', f'Authorization: token {token}',
+            '-H', 'Accept: application/vnd.github+json',
+            f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
+            '-d', json.dumps({
+                'tag_name': 'DRAFT',
+                'name': 'Draft Release',
+                'draft': True,
+                'body': ' '
+            })
         ]
         
         subprocess.check_call(cmd)
@@ -88,11 +93,14 @@ def update_draft_release(content):
             print("Failed to create/get draft release")
             sys.exit(1)
             
+        token = os.environ.get('INPUT_GITHUB_TOKEN')
         cmd = [
-            'gh', 'api',
-            '--method', 'PATCH',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases/{draft["id"]}',
-            '-f', f'body={content}'
+            'curl', '-s',
+            '-X', 'PATCH',
+            '-H', f'Authorization: token {token}',
+            '-H', 'Accept: application/vnd.github+json',
+            f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/releases/{draft["id"]}',
+            '-d', json.dumps({'body': content})
         ]
         
         subprocess.check_call(cmd)
