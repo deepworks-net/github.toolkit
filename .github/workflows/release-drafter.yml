@@ -35,20 +35,6 @@ jobs:
           ref: develop  # Explicitly specify the develop branch
           fetch-depth: 0
 
-      - name: Debug Repository Structure
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Files in repository:"
-          ls -R /home/runner/work/github.actions/github.actions
-
-      - name: Debug Action Files
-        run: |
-          echo "Contents of actions/version_calculation:"
-          ls -l /home/runner/work/github.actions/github.actions/actions/version_calculation
-          echo "Contents of action.yml:"
-          cat /home/runner/work/github.actions/github.actions/actions/version_calculation/action.yml
-
       - name: Calculate Next Version
         uses: ./actions/version_calculation
         id: version
