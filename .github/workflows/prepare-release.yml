@@ -30,7 +30,7 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: ./actions/changelog
+        uses: ./actions/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'

@@ -37,7 +37,7 @@ jobs:
           pr-title: ${{ github.event.pull_request.title }}
           
       - name: Update Changelog File
-        uses: ./actions/changelog
+        uses: ./actions/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
