@@ -1,9 +1,14 @@
 name: Update Changelog
+
 on:
   pull_request:
     branches:
       - staging  # Updated to new naming convention
     types: [closed]
+
+permissions:
+  contents: write  # for modifying changelog
+  pull-requests: read  # for PR info
 
 jobs:
   update_changelog:
@@ -26,12 +31,13 @@ jobs:
         uses: ./actions/release_notes
         id: notes
         with:
-          mode: 'pr-merge'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'prepare-release'
           pr-number: ${{ github.event.pull_request.number }}
           pr-title: ${{ github.event.pull_request.title }}
           
       - name: Update Changelog File
-        uses: ./actions/changelog
+        uses: ./actions/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
@@ -43,3 +49,5 @@ jobs:
           files: 'CHANGELOG.md'
           commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
           create-pr: false
+        env:
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

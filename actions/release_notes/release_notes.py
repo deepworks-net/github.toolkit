@@ -15,25 +15,38 @@ def setup_git():
 
 def get_draft_release():
     """Get current draft release content."""
+    token = os.environ.get('INPUT_GITHUB_TOKEN')  # Note: this is how the input is passed
+    if not token:
+        print("Error: github-token input not set")
+        sys.exit(1)
+
     try:
+        # Get repository information from environment
+        repository = os.environ.get('GITHUB_REPOSITORY')
+        if not repository:
+            print("Error: GITHUB_REPOSITORY not set")
+            sys.exit(1)
+
+        # Use curl instead of gh cli
         cmd = [
-            'gh', 'api',
+            'curl', '-s',
+            '-H', f'Authorization: token {token}',
             '-H', 'Accept: application/vnd.github+json',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
-            '--jq', '.[] | select(.draft == true)'
+            f'https://api.github.com/repos/{repository}/releases'
         ]
         
-        # Set both tokens for gh cli
-        env = {
-            'GITHUB_TOKEN': os.environ['GITHUB_TOKEN'],
-            'GH_TOKEN': os.environ['GITHUB_TOKEN']  # Add this line
-        }
+        result = subprocess.check_output(cmd, text=True)
+        releases = json.loads(result)
         
-        result = subprocess.check_output(cmd, text=True, env=env)
-        return json.loads(result) if result else None
+        # Find draft release
+        draft = next((r for r in releases if r.get('draft', False)), None)
+        return draft
         
     except subprocess.CalledProcessError as e:
         print(f"Error fetching draft release: {e}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing API response: {e}")
         sys.exit(1)
 
 def extract_pr_entries(content):
@@ -47,14 +60,19 @@ def extract_pr_entries(content):
 def create_draft_release():
     """Create new draft release."""
     try:
+        token = os.environ.get('INPUT_GITHUB_TOKEN')
         cmd = [
-            'gh', 'api',
-            '--method', 'POST',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
-            '-f', 'tag_name=DRAFT',
-            '-f', 'name=Draft Release',
-            '-F', 'draft=true',
-            '-f', 'body= '
+            'curl', '-s',
+            '-X', 'POST',
+            '-H', f'Authorization: token {token}',
+            '-H', 'Accept: application/vnd.github+json',
+            f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
+            '-d', json.dumps({
+                'tag_name': 'DRAFT',
+                'name': 'Draft Release',
+                'draft': True,
+                'body': ' '
+            })
         ]
         
         subprocess.check_call(cmd)
@@ -75,11 +93,14 @@ def update_draft_release(content):
             print("Failed to create/get draft release")
             sys.exit(1)
             
+        token = os.environ.get('INPUT_GITHUB_TOKEN')
         cmd = [
-            'gh', 'api',
-            '--method', 'PATCH',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases/{draft["id"]}',
-            '-f', f'body={content}'
+            'curl', '-s',
+            '-X', 'PATCH',
+            '-H', f'Authorization: token {token}',
+            '-H', 'Accept: application/vnd.github+json',
+            f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/releases/{draft["id"]}',
+            '-d', json.dumps({'body': content})
         ]
         
         subprocess.check_call(cmd)
@@ -90,8 +111,8 @@ def update_draft_release(content):
 
 def handle_pr_merge():
     """Handle PR merge mode."""
-    pr_number = os.environ.get('PR_NUMBER')
-    pr_title = os.environ.get('PR_TITLE')
+    pr_number = os.environ.get('INPUT_PR_NUMBER')  # Changed from PR_NUMBER
+    pr_title = os.environ.get('INPUT_PR_TITLE')    # Changed from PR_TITLE
     
     if not pr_number or not pr_title:
         print("Missing PR information")
@@ -134,9 +155,9 @@ def main():
     """Main function."""
     setup_git()
     
-    mode = os.environ.get('MODE')
+    mode = os.environ.get('INPUT_MODE')
     if not mode:
-        print("MODE environment variable not set")
+        print("INPUT_MODE environment variable not set")
         sys.exit(1)
     
     if mode == 'pr-merge':
