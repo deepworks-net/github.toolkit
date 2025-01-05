@@ -28,7 +28,9 @@ jobs:
           TODAY=$(date +"%m/%d/%Y")
           ORG="${{ github.repository_owner }}"
           PROJ="${{ github.event.repository.name }}"
+          
           echo "Creating release branch: $RELEASE_BRANCH"
+          git checkout -b "$RELEASE_BRANCH"  # Create and switch to release branch
           
           # Fetch draft release content
           echo "Fetching draft release content..."
@@ -84,8 +86,14 @@ jobs:
             git config --local user.name "GitHub Action"
             git add CHANGELOG.md
             git commit -m "chore: Prepare changelog for ${{ steps.version.outputs.next_version }} release"
+            
+            # Push the new branch
             git push origin "$RELEASE_BRANCH"
+            
+            # Delete the prep tag
             git push origin :refs/tags/prep
+            
+            # Create PR
             gh pr create \
               --title "Release ${{ steps.version.outputs.next_version }}" \
               --body "## Release Preparation
