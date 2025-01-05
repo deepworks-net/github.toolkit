@@ -17,10 +17,6 @@ jobs:
           repository: ${{ github.repository }}  # Ensures the current repository
           ref: staging    # Updated to new naming convention
           fetch-depth: 0
-
-      - name: Calculate Next Version
-        uses: ./actions/version_calculation
-        id: version
           
       - name: Update Changelog
         uses: ./actions/update_changelog
