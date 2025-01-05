@@ -32,7 +32,7 @@ jobs:
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'pr-merge'
+          mode: 'prepare-release'
           pr-number: ${{ github.event.pull_request.number }}
           pr-title: ${{ github.event.pull_request.title }}
           
