@@ -91,6 +91,7 @@ def update_changelog(content):
             if skip_old_unreleased:
                 if line.startswith('## '):
                     skip_old_unreleased = False
+                    new_lines.append('\n')  # Add extra newline before first release
                 else:
                     continue
                     
