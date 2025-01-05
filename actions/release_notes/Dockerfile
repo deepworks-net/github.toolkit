@@ -9,7 +9,12 @@ RUN apt-get update && \
     apt-get install -y gh && \
     rm -rf /var/lib/apt/lists/*
 
+# Add environment setup script
+RUN echo '#!/bin/sh\n\
+export GH_TOKEN="$INPUT_GITHUB_TOKEN"\n\
+exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
+
 COPY release_notes.py /action/
 COPY action.yml /action/
 
-ENTRYPOINT ["python", "/action/release_notes.py"]
+ENTRYPOINT ["/entrypoint.sh", "python", "/action/release_notes.py"]
