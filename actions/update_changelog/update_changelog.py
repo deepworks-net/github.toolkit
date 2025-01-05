@@ -70,9 +70,10 @@ def update_changelog(content):
         
         new_lines = []
         found_unreleased = False
+        skip_old_unreleased = False
         
         # Process lines
-        for i, line in enumerate(lines):
+        for line in lines:
             # Keep header content
             if not found_unreleased and not line.startswith('## '):
                 new_lines.append(line)
@@ -83,20 +84,18 @@ def update_changelog(content):
                 found_unreleased = True
                 new_lines.append(f'## **{today} - {version} Unreleased**\n')
                 new_lines.append(content + '\n')
+                skip_old_unreleased = True
                 continue
-                
-            # Handle first version section
-            if line.startswith('## **['):
-                if not found_unreleased:
-                    found_unreleased = True
-                    new_lines.append(f'## **{today} - {version} Unreleased**\n')
-                    new_lines.append(content + '\n\n')
-                new_lines.append(line)
-                continue
-                
-            # Add line if we're not skipping unreleased content
-            if not found_unreleased or not line.startswith('- '):
-                new_lines.append(line)
+            
+            # Skip old unreleased content until we hit next section
+            if skip_old_unreleased:
+                if line.startswith('## '):
+                    skip_old_unreleased = False
+                else:
+                    continue
+                    
+            # Add versioned sections and other content
+            new_lines.append(line)
         
         # Add unreleased section at end if not found
         if not found_unreleased:
