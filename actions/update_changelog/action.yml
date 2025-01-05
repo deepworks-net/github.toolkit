@@ -1,0 +1,19 @@
+name: "Changelog Update"
+description: "Updates CHANGELOG.md with content from draft release"
+author: "Deepworks"
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+  version:
+    description: 'Version number to use in unreleased section'
+    required: true
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+    VERSION: ${{ inputs.version }}
+branding:
+  icon: "tag"
+  color: "blue"

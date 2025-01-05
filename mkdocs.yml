@@ -76,4 +76,5 @@ theme:
       - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
     - 'Actions':
       - 'Overview': 'actions/index.md'
-      - 'Version Calculation': 'actions/version-calculation/index.md'
+      - 'Update Changelog': 'actions/update_changelog/index.md'
+      - 'Version Calculation': 'actions/version_calculation/index.md'
