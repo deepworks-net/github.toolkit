@@ -1,48 +1,48 @@
 # Release Drafter Workflow
 
-This workflow automates the creation and management of GitHub Releases. It maintains a draft release that updates automatically with new changes and publishes final releases when version tags are pushed.
+This workflow automates the creation and management of GitHub Releases. It maintains a draft release that updates automatically with new changes. It also allows other workflows to trigger release operations via a workflow call.
 
 ## Workflow File
 
 `.github/workflows/release-drafter.yml`
 
+---
+
 ## Triggers
 
-The workflow responds to three types of events:
+The workflow responds to two types of events:
 
-1. **Push to develop branch**:
-   - Updates the draft release
-   - Calculates next version based on commit count
-   - Updates release notes
+1. **Push to the** `**develop**` **branch**:
+    - Updates the draft release.
+    - Calculates the next version using a centralized version calculation.
+    - Updates release notes dynamically.
+2. **Workflow call**:
+    - Allows other workflows to trigger release operations.
+    - Supports custom tag names and options.
 
-2. **Push of version tags** (`v*`):
-   - Publishes the final release
-   - Uses the tag's version number
-   - Finalizes release notes
-
-3. **Workflow call**:
-   - Allows other workflows to trigger release operations
-   - Supports custom tag names and options
+---
 
 ## Version Calculation
 
-The workflow automatically calculates the next version number based on:
+The workflow calculates the next version number using the **version_calculation** Action, based on:
 
-- Latest version tag (vX.Y.Z format)
-- Number of commits since that tag
-- Semantic versioning principles
+- The latest version tag (`vX.Y.Z` format).
+- The number of commits since the last tag.
+This ensures consistent and centralized versioning logic across workflows.
 
-Example:
+**Example:**
 
-- Current version: v1.0.16
-- 3 new commits
-- Next calculated version: v1.0.19
+- Latest version: `v1.0.16`
+- 3 new commits.
+- Next calculated version: `v1.0.19`.
+
+---
 
 ## Jobs
 
 ### 1. Update Release Draft
 
-Runs when changes are pushed to develop:
+Triggered when changes are pushed to the `develop` branch:
 
 ```yaml
 jobs:
@@ -51,15 +51,25 @@ jobs:
     if: github.ref == 'refs/heads/develop'
 ```
 
-Steps:
+**Steps:**
 
-1. Checkout repository with full history
-2. Calculate next version based on commit count
-3. Update draft release with new version and changes
+1. **Checkout Repository**:
+    - Ensures the `develop` branch is checked out.
+    - Fetches the full Git history for accurate version calculations.
+2. **Debugging Steps**:
+    - Confirms the repository structure and Action files are present.
+3. **Calculate Next Version**:
+    - Uses the centralized `version_calculation` Action.
+4. **Set Output for Version**:
+    - Saves the calculated version as a workflow output for future steps.
+5. **Draft Release**:
+    - Updates the draft release with the calculated version and release notes.
 
-### 2. Publish Release
+---
 
-Runs when a version tag is pushed:
+### 2. Publish Release (Conditional)
+
+This job is configured to publish a final release if the workflow is triggered with a `refs/tags/v*` reference. It is conditional on such an event being passed to the workflow:
 
 ```yaml
 jobs:
@@ -68,24 +78,33 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 ```
 
-Steps:
+**Steps:**
 
-1. Checkout repository
-2. Publish final release with tag version
-3. Update release notes
+1. **Checkout Repository**:
+    - Ensures the correct repository and tag are available.
+2. **Publish Final Release**:
+    - Publishes the release using the `release-drafter/release-drafter@v6` Action.
+    - Uses the provided tag to finalize release notes.
+
+---
 
 ## Input Parameters
 
-| Parameter | Description | Required | Default |
-|-----------|-------------|----------|---------|
-| `tag-name` | Release tag name | No | Current tag |
-| `draft` | Create as draft | No | `false` |
+|Parameter|Description|Required|Default|
+|---|---|---|---|
+|`tag-name`|Release tag name|No|Current tag|
+|`draft`|Create as draft|No|`false`|
+
+---
 
 ## Secrets
 
-| Secret | Description | Required | Default |
-|--------|-------------|----------|---------|
-| `token` | GitHub token | No | `GITHUB_TOKEN` |
+|   |   |   |   |
+|---|---|---|---|
+|Secret|Description|Required|Default|
+|`token`|GitHub token|No|`GITHUB_TOKEN`|
+
+---
 
 ## Release Format
 
@@ -96,34 +115,20 @@ Steps:
 
 [Automatically populated release notes]
 
-See the [Changelog](link) for more details.
+See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
 ```
 
-### Final Release
-
-```markdown
-## Release v1.0.X
-
-[Release notes from draft]
-
-See the [Changelog](link) for more details.
-```
+---
 
 ## Integration
 
 This workflow integrates with:
 
-- Changelog updates
-- Release preparation
-- Version tagging
+- Centralized version calculation logic.
+- Draft release management.
+- Optional release publishing.
 
-## Configuration
-
-The workflow uses release-drafter configuration from `.github/release-drafter.yml` for:
-
-- Change categorization
-- Note formatting
-- Version resolution
+---
 
 ## Permissions
 
@@ -134,25 +139,18 @@ permissions:
   contents: write
 ```
 
+---
+
 ## Usage Examples
 
 ### As Part of Release Process
 
-1. Push changes to develop:
-   - Updates draft release
-   - Increments version number
-   - Updates release notes
+1. Push changes to the `develop` branch:
+    - Updates the draft release.
+    - Dynamically calculates the next version.
+    - Updates release notes.
 
-2. Create version tag:
-
-   ```bash
-   git tag v1.0.x
-   git push origin v1.0.x
-   ```
-
-   - Publishes final release
-   - Uses tag version
-   - Finalizes release notes
+---
 
 ### Called from Another Workflow
 
@@ -162,26 +160,27 @@ jobs:
     uses: deepworks-net/github.actions/.github/workflows/release-drafter.yml@main
     with:
       tag-name: 'v1.0.0'
+      draft: true
 ```
 
-## Troubleshooting
+---
 
-Common issues and solutions:
+### Troubleshooting
 
-1. **Version Calculation Fails**
-   - Ensure repository has at least one version tag
-   - Check tag format matches `vX.Y.Z`
-   - Verify git history is available (fetch-depth: 0)
+#### Common Issues and Solutions
 
-2. **Draft Not Updating**
-   - Check branch name matches 'develop'
-   - Verify workflow has write permissions
-   - Check release-drafter configuration
+1. **Version Calculation Fails**:
 
-3. **Release Not Publishing**
-   - Verify tag format matches `v*`
-   - Check GitHub token permissions
-   - Review release-drafter logs
+    - Ensure the repository has at least one version tag.
+    - Verify the `version_calculation` Action is properly configured.
+
+2. **Draft Not Updating**:
+
+    - Ensure the branch name matches `develop`.
+    - Verify the workflow has write permissions.
+    - Check the release-drafter configuration.
+
+---
 
 ## Related Documentation
 
