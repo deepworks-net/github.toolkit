@@ -43,3 +43,5 @@ jobs:
           files: 'CHANGELOG.md'
           commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
           create-pr: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -43,4 +43,6 @@ jobs:
           commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
           create-pr: true
           base: 'staging'
-          pr-title: 'Release ${{ steps.version.outputs.next_version }}' 
+          pr-title: 'Release ${{ steps.version.outputs.next_version }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
