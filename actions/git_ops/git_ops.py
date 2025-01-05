@@ -69,6 +69,7 @@ def create_pr():
         body = os.environ.get('PR_BODY', '')
         
         cmd = ['gh', 'pr', 'create',
+               '--fill',
                '--base', base,
                '--title', title]
                
