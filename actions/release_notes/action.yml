@@ -24,7 +24,7 @@ runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}  # Changed hyphen to underscore
+    INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
     INPUT_MODE: ${{ inputs.mode }}
     INPUT_PR_NUMBER: ${{ inputs.pr-number }}
     INPUT_PR_TITLE: ${{ inputs.pr-title }}
