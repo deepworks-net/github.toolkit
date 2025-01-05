@@ -26,6 +26,7 @@ jobs:
         uses: ./actions/release_notes
         id: notes
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'prepare-release'
           version: ${{ steps.version.outputs.next_version }}
 
@@ -45,4 +46,4 @@ jobs:
           base: 'staging'
           pr-title: 'Release ${{ steps.version.outputs.next_version }}'
         env:
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
