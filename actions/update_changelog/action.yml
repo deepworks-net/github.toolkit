@@ -1,19 +1,20 @@
-name: "Changelog Update"
-description: "Updates CHANGELOG.md with content from draft release"
-author: "Deepworks"
+name: "Changelog"
+description: "Manages CHANGELOG.md file content and formatting"
 inputs:
-  github-token:
-    description: 'GitHub token for API access'
+  content:
+    description: 'Content to add to changelog'
+    required: true
+  mode:
+    description: 'Operation mode (unreleased, release)'
     required: true
   version:
-    description: 'Version number to use in unreleased section'
+    description: 'Version number'
     required: true
+
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    GITHUB_TOKEN: ${{ inputs.github-token }}
+    CONTENT: ${{ inputs.content }}
+    MODE: ${{ inputs.mode }}
     VERSION: ${{ inputs.version }}
-branding:
-  icon: "tag"
-  color: "blue"

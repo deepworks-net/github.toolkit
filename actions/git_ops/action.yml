@@ -1,0 +1,42 @@
+name: "Git Operations"
+description: "Handles git operations like commits, PRs, and branches"
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+  files:
+    description: 'Files to commit (space-separated)'
+    required: true
+  commit-message:
+    description: 'Commit message'
+    required: true
+  create-pr:
+    description: 'Whether to create a PR'
+    required: false
+    default: 'false'
+  base:
+    description: 'Base branch for PR'
+    required: false
+    default: 'staging'
+  pr-title:
+    description: 'PR title'
+    required: false
+  pr-body:
+    description: 'PR description'
+    required: false
+  branch-name:
+    description: 'Branch to create/use'
+    required: false
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+    FILES: ${{ inputs.files }}
+    COMMIT_MESSAGE: ${{ inputs.commit-message }}
+    CREATE_PR: ${{ inputs.create-pr }}
+    BASE_BRANCH: ${{ inputs.base }}
+    PR_TITLE: ${{ inputs.pr-title }}
+    PR_BODY: ${{ inputs.pr-body }}
+    BRANCH_NAME: ${{ inputs.branch-name }}

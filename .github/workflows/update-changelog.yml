@@ -21,9 +21,25 @@ jobs:
       - name: Calculate Next Version
         uses: ./actions/version_calculation
         id: version
-          
-      - name: Update Changelog
-        uses: ./actions/update_changelog
+
+      - name: Get Release Content
+        uses: ./actions/release_notes
+        id: notes
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'pr-merge'
+          pr-number: ${{ github.event.pull_request.number }}
+          pr-title: ${{ github.event.pull_request.title }}
+          
+      - name: Update Changelog File
+        uses: ./actions/changelog
+        with:
+          content: ${{ steps.notes.outputs.content }}
+          mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
+      
+      - name: Commit Changes
+        uses: ./actions/git_ops
+        with:
+          files: 'CHANGELOG.md'
+          commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
+          create-pr: false
