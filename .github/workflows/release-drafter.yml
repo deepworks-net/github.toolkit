@@ -52,7 +52,7 @@ jobs:
           footer: |
             See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish_release:
     runs-on: ubuntu-latest
@@ -69,4 +69,4 @@ jobs:
           footer: |
             See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -45,4 +45,4 @@ jobs:
           base: 'staging'
           pr-title: 'Release ${{ steps.version.outputs.next_version }}'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

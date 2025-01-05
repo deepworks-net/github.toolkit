@@ -15,7 +15,7 @@ def setup_git():
 
 def get_draft_release():
     """Get current draft release content."""
-    token = os.environ.get('INPUT_GITHUB-TOKEN')  # Note: this is how the input is passed
+    token = os.environ.get('INPUT_GITHUB_TOKEN')  # Note: this is how the input is passed
     if not token:
         print("Error: github-token input not set")
         sys.exit(1)
@@ -103,8 +103,8 @@ def update_draft_release(content):
 
 def handle_pr_merge():
     """Handle PR merge mode."""
-    pr_number = os.environ.get('PR_NUMBER')
-    pr_title = os.environ.get('PR_TITLE')
+    pr_number = os.environ.get('INPUT_PR_NUMBER')  # Changed from PR_NUMBER
+    pr_title = os.environ.get('INPUT_PR_TITLE')    # Changed from PR_TITLE
     
     if not pr_number or not pr_title:
         print("Missing PR information")
