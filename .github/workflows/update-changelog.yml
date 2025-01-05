@@ -1,9 +1,14 @@
 name: Update Changelog
+
 on:
   pull_request:
     branches:
       - staging  # Updated to new naming convention
     types: [closed]
+
+permissions:
+  contents: write  # for modifying changelog
+  pull-requests: read  # for PR info
 
 jobs:
   update_changelog:
@@ -26,6 +31,7 @@ jobs:
         uses: ./actions/release_notes
         id: notes
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'pr-merge'
           pr-number: ${{ github.event.pull_request.number }}
           pr-title: ${{ github.event.pull_request.title }}
@@ -44,4 +50,4 @@ jobs:
           commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
           create-pr: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
