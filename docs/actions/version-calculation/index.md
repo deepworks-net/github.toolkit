@@ -1,6 +1,7 @@
+
 # Version Calculation Action
 
-This reusable action calculates the next version number based on Git tags and commit history. It follows semantic versioning principles where the patch number represents the number of commits since the last release.
+This action calculates the next version number based on Git tags and commit history, adhering to semantic versioning. The patch number reflects the count of commits since the last release.
 
 ## Usage
 
@@ -11,47 +12,55 @@ steps:
     id: version
 ```
 
+---
+
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
-| `next_version` | The calculated next version (e.g., v1.0.34) |
+| Output         | Description                           |
+|----------------|---------------------------------------|
+| `next_version` | Calculated next version (e.g., v1.0.34) |
+
+---
 
 ## How It Works
 
-1. Finds the latest version tag (format: v*.*.*) in the repository
-2. Counts commits since that tag
-3. Increments the patch number by the commit count
-4. Outputs the new version number
+1. **Finds Latest Tag**: Locates the latest Git tag (`vMAJOR.MINOR.PATCH`).
+2. **Counts Commits**: Determines the number of commits since the tag.
+3. **Increments Patch**: Updates the patch number by the commit count.
+4. **Outputs Version**: Returns the calculated version.
 
-For example:
+**Example**:
 
-- Latest tag: v1.0.16
-- 3 commits since tag
-- Calculated version: v1.0.19
+- Latest tag: `v1.0.16`
+- Commits since tag: `3`
+- Calculated version: `v1.0.19`
 
-## Implementation Details
+---
+
+## Details
 
 ### Version Format
 
-- Follows semantic versioning (vMAJOR.MINOR.PATCH)
-- Major and Minor versions stay the same
-- Patch version = previous patch + commit count
+- Semantic versioning (`vMAJOR.MINOR.PATCH`)
+- **Major** and **Minor** remain unchanged.
+- **Patch** = Previous patch + Commit count.
 
 ### Git Configuration
 
-- Automatically configures Git safe directory settings
-- Handles repository access in container environments
+- Configures Git safe directory settings.
+- Ensures repository access in container environments.
 
 ### Error Handling
 
-- Validates tag format
-- Handles cases with no existing tags
-- Reports clear error messages
+- Validates tag format.
+- Handles cases with no existing tags.
+- Provides clear error messages for failures.
+
+---
 
 ## Example Workflows
 
-### In Prepare Release Workflow
+### Prepare Release Workflow
 
 ```yaml
 jobs:
@@ -69,7 +78,7 @@ jobs:
         run: echo "Next version will be ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}"
 ```
 
-### In Release Drafter
+### Release Drafter
 
 ```yaml
 jobs:
@@ -83,6 +92,8 @@ jobs:
         with:
           version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
 ```
+
+---
 
 ## Files
 
@@ -101,42 +112,48 @@ runs:
 
 ### version_calculation.py
 
-Core script that:
+- Configures Git environment.
+- Retrieves the latest tag.
+- Calculates the next version.
+- Sets output for GitHub Actions.
 
-- Configures Git environment
-- Retrieves latest tag
-- Calculates next version
-- Sets output for GitHub Actions
+---
 
 ## Requirements
 
-1. Repository must use semantic versioning tags (v*.*.*)
-2. Full Git history must be available (use `fetch-depth: 0` with checkout)
-3. Git must be installed in the environment
+1. Repository must use semantic versioning tags (`v*.*.*`).
+2. Full Git history must be available (`fetch-depth: 0`).
+3. Git must be installed in the environment.
+
+---
 
 ## Error Cases
 
-The action will fail with clear error messages if:
+The action fails with clear error messages if:
 
-1. No version tags exist
-2. Invalid tag format found
-3. Git commands fail
-4. Repository access issues occur
+1. No version tags exist.
+2. Invalid tag format is found.
+3. Git commands fail.
+4. Repository access issues occur.
+
+---
 
 ## Contributing
 
 To modify this action:
 
-1. Update Python script for logic changes
-2. Test with various repository states
-3. Update documentation for any changes
-4. Submit PR for review
+1. Update the Python script for logic changes.
+2. Test with various repository states.
+3. Update documentation for any changes.
+4. Submit a PR for review.
+
+---
 
 ## Future Improvements
 
 Potential enhancements:
 
-1. Support for custom version formats
-2. Configuration for version calculation rules
-3. Support for other versioning schemes
-4. Additional version metadata output
+1. Support custom version formats.
+2. Allow configuration for version calculation rules.
+3. Support alternative versioning schemes.
+4. Output additional version metadata.

@@ -1,125 +1,119 @@
 # Custom Actions
 
-This section documents the custom GitHub Actions created for the Deepworks ecosystem. These actions are designed to be reusable components that handle specific tasks across our workflows.
+This guide explains how to use GitHub Actions—tools that automate tasks in your projects so you don’t have to repeat the same work manually. GitHub Actions make your workflows faster and more reliable.
 
-## Available Actions
+---
+
+## What Actions Can Do
 
 ### Version Calculation
 
-**[View Documentation](version-calculation/index.md)**
+**[Click Here to Learn More](version-calculation/index.md)**  
+This action calculates the next version number by looking at your Git history. It’s useful for:
 
-Calculates the next semantic version number based on Git history and commit count. Used in:
+- Preparing releases  
+- Keeping track of version numbers  
+- Generating changelogs  
 
-- Release preparation
-- Version tracking
-- Changelog management
+**Key Features:**  
 
-**Key Features:**
+- Follows semantic versioning rules (major, minor, patch updates)  
+- Uses your project’s Git history to decide the version  
+- Runs in a containerized environment for consistency  
 
-- Automatic version calculation
-- Semantic versioning support
-- Git history integration
-- Container-based execution
+---
 
-## Using Custom Actions
+## How to Use These Actions
 
-Custom actions can be used in workflows like this:
+You can include an action in your workflow like this:
 
 ```yaml
 steps:
-  - name: Use Custom Action
-    uses: ./actions/action-name
+  - name: Use a GitHub Action
+    uses: ./actions/<action-name>
 ```
 
-### Best Practices
+### Tips for Success
 
-1. **Version Reference**
-    - Use specific commits or tags for production
-    - Use relative paths for local development
+1. **Choose the Right Version**  
+    - Use specific versions (tags or commits) in production to avoid unexpected changes.  
+    - Use relative paths for testing locally.  
 
-2. **Input/Output**
-    - Document all inputs and outputs
-    - Use meaningful step IDs for output references
+2. **Inputs and Outputs**  
+    - Clearly define what inputs the action needs and what outputs it produces.  
+    - Use descriptive names for outputs so they’re easy to reference.  
 
-3. **Error Handling**
-    - Handle action failures gracefully
-    - Provide clear error messages
+3. **Handling Errors**  
+    - Make sure the action can handle errors without breaking the workflow.  
+    - Write clear error messages to make debugging easier.  
 
-## Action Development
+---
 
-### Structure
+## Making New Actions
 
-Each action should follow this structure:
+### Organizing Your Files
 
-```directory
+Store your action files in the correct structure:
+
+```plaintext
 actions/
-└── action-name/
-    ├── action.yml      # Action definition
-    ├── Dockerfile      # If container-based
-    ├── script.ext      # Main logic
-    └── README.md       # Action documentation
+└── <action-name>/
+    ├── action.yml      # Defines what the action does
+    ├── Dockerfile      # Only if the action uses a container
+    ├── script.ext      # The main code for the action
+    └── README.md       # Documentation on how to use it
 ```
 
-### Requirements
+### Important Steps
 
-1. **Documentation**
-    - Clear usage examples
-    - Input/output documentation
-    - Error scenarios
-    - Dependencies
+- **Write Clear Documentation**: Provide examples, explain inputs and outputs, and list any tools or dependencies needed.  
+- **Test Thoroughly**: Test your action by itself, in real workflows, and under failure scenarios.  
+- **Keep It Updated**: Regularly review and update your action to fix bugs and support new features.  
 
-2. **Testing**
-    - Test in isolation
-    - Test in workflows
-    - Test error cases
+---
 
-3. **Maintenance**
-    - Regular updates
-    - Version tracking
-    - Dependency management
+## Adding Actions to Workflows
 
-## Integration with Workflows
+These actions are designed to integrate smoothly with your workflows. For examples of how to use them, check the [Workflows section](../workflows/index.md).
 
-Our custom actions are designed to integrate seamlessly with our workflows. See the [Workflows section](../workflows/index.md) for detailed examples of how these actions are used in practice.
+---
 
-## Contributing
+## Creating Your Own Actions
 
-To contribute a new action:
+If you want to build a new action, follow these steps:
 
-1. Create action directory:
+1. **Set Up**  
+    - Create a folder: `mkdir -p actions/<your-action-name>`  
+    - Add these files:  
+        - `action.yml`  
+        - `README.md`  
+        - Any scripts or files the action needs  
 
-    ```bash
-    mkdir -p actions/your-action-name
-    ```
+2. **Document It**  
+    - Write a guide for using the action in `docs/actions/`.  
+    - Update the navigation menu in `mkdocs.yml` so it’s easy to find.  
 
-2. Required files:
+3. **Submit Your Work**  
+    - Include tests to make sure the action works as expected.  
+    - Follow consistent naming rules for files and folders.  
+    - Ensure your instructions are easy to understand.
 
-    ```git
-    - action.yml
-    - README.md
-    - Implementation files
-    ```
+---
 
-3. Document the action:
-    - Create documentation under docs/actions/
-    - Add to mkdocs.yml navigation
-    - Update this index
+## Future Action Ideas
 
-4. Submit pull request:
-    - Include tests
-    - Update documentation
-    - Follow naming conventions
+Here are some ideas for new actions we might create:
 
-## Future Actions
+1. Automatically generate changelogs from commits  
+2. Validate documentation for errors or missing information  
+3. Manage configuration files across projects  
 
-Planned custom actions:
+---
 
-1. Semantic changelog parsing
-2. Documentation validation
-3. Configuration management
+## Helpful Links
 
-## Related Resources
+- [GitHub Actions Basics](https://docs.github.com/en/actions)  
+- [How to Make Actions](https://docs.github.com/en/actions/creating-actions)  
+- [Actions in Containers](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)  
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Custom Actions Guide](https://docs.github.com/en/actions/creating-actions)
-- [Container Actions](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)
+---
