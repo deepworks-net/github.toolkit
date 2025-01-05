@@ -3,7 +3,7 @@ name: Release Drafter
 on:
   push:
     branches:
-      - develop
+      - staging
   workflow_call:
     inputs:
       tag-name:
@@ -26,13 +26,13 @@ permissions:
 jobs:
   update_release_draft:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/staging'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}  # Ensures the current repository
-          ref: develop  # Explicitly specify the develop branch
+          ref: staging  # Explicitly specify the develop branch
           fetch-depth: 0
 
       - name: Calculate Next Version
