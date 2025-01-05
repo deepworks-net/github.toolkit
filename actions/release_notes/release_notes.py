@@ -15,25 +15,38 @@ def setup_git():
 
 def get_draft_release():
     """Get current draft release content."""
+    token = os.environ.get('INPUT_GITHUB-TOKEN')  # Note: this is how the input is passed
+    if not token:
+        print("Error: github-token input not set")
+        sys.exit(1)
+
     try:
+        # Get repository information from environment
+        repository = os.environ.get('GITHUB_REPOSITORY')
+        if not repository:
+            print("Error: GITHUB_REPOSITORY not set")
+            sys.exit(1)
+
+        # Use curl instead of gh cli
         cmd = [
-            'gh', 'api',
+            'curl', '-s',
+            '-H', f'Authorization: token {token}',
             '-H', 'Accept: application/vnd.github+json',
-            f'repos/{os.environ["GITHUB_REPOSITORY"]}/releases',
-            '--jq', '.[] | select(.draft == true)'
+            f'https://api.github.com/repos/{repository}/releases'
         ]
         
-        # Set both tokens for gh cli
-        env = {
-            'GITHUB_TOKEN': os.environ['GITHUB_TOKEN'],
-            'GH_TOKEN': os.environ['GITHUB_TOKEN']  # Add this line
-        }
+        result = subprocess.check_output(cmd, text=True)
+        releases = json.loads(result)
         
-        result = subprocess.check_output(cmd, text=True, env=env)
-        return json.loads(result) if result else None
+        # Find draft release
+        draft = next((r for r in releases if r.get('draft', False)), None)
+        return draft
         
     except subprocess.CalledProcessError as e:
         print(f"Error fetching draft release: {e}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing API response: {e}")
         sys.exit(1)
 
 def extract_pr_entries(content):
