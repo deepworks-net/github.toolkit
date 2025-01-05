@@ -1,31 +1,40 @@
 # Custom Actions
 
-This guide explains how to use GitHub Actions—tools that automate tasks in your projects so you don’t have to repeat the same work manually. GitHub Actions make your workflows faster and more reliable.
-
----
+This guide explains how to use GitHub Actions—tools that automate tasks in your projects to save time and improve reliability.
 
 ## What Actions Can Do
 
 ### Version Calculation
 
-**[Click Here to Learn More](version-calculation/index.md)**  
-This action calculates the next version number by looking at your Git history. It’s useful for:
+**[Click Here to Learn More](version_calculation/index.md)**
+This action calculates the next version number using your Git history. Ideal for:
 
-- Preparing releases  
-- Keeping track of version numbers  
-- Generating changelogs  
+- Preparing releases
+- Tracking version numbers
+- Generating changelogs
 
-**Key Features:**  
+**Key Features:**
 
-- Follows semantic versioning rules (major, minor, patch updates)  
-- Uses your project’s Git history to decide the version  
-- Runs in a containerized environment for consistency  
+- Adheres to semantic versioning rules (major, minor, patch)
+- Analyzes your Git history to determine the version
+- Operates in a containerized environment for consistent execution
+
+### Changelog Update
+
+**[Click Here to Learn More](changelog_update/index.md)**
+This action synchronizes the repository's `CHANGELOG.md` with content from the draft release. It ensures an "Unreleased" section reflects all recent changes.
+
+**Key Features:**
+
+- Fetches draft release details using the GitHub API
+- Updates or creates an "Unreleased" section with recent changes
+- Maintains consistent formatting aligned with the repository's changelog style
 
 ---
 
 ## How to Use These Actions
 
-You can include an action in your workflow like this:
+You can integrate an action into your workflow with the following syntax:
 
 ```yaml
 steps:
@@ -35,17 +44,17 @@ steps:
 
 ### Tips for Success
 
-1. **Choose the Right Version**  
-    - Use specific versions (tags or commits) in production to avoid unexpected changes.  
-    - Use relative paths for testing locally.  
+1. **Choose the Right Version**
+    - Use specific tags or commit references for production environments to prevent unexpected changes.
+    - Use relative paths when testing actions locally.
 
-2. **Inputs and Outputs**  
-    - Clearly define what inputs the action needs and what outputs it produces.  
-    - Use descriptive names for outputs so they’re easy to reference.  
+2. **Define Inputs and Outputs**
+    - Clearly specify required inputs and produced outputs.
+    - Use descriptive output names for easy referencing.
 
-3. **Handling Errors**  
-    - Make sure the action can handle errors without breaking the workflow.  
-    - Write clear error messages to make debugging easier.  
+3. **Handle Errors Gracefully**
+    - Ensure the action manages errors without breaking the workflow.
+    - Provide clear, actionable error messages to simplify debugging.
 
 ---
 
@@ -53,67 +62,65 @@ steps:
 
 ### Organizing Your Files
 
-Store your action files in the correct structure:
+Store action-related files in the following structure:
 
 ```plaintext
 actions/
 └── <action-name>/
-    ├── action.yml      # Defines what the action does
-    ├── Dockerfile      # Only if the action uses a container
-    ├── script.ext      # The main code for the action
-    └── README.md       # Documentation on how to use it
+    ├── action.yml      # Defines the action's behavior
+    ├── Dockerfile      # Required if using a container
+    ├── script.ext      # The main action logic
+    └── README.md       # Documentation for usage
 ```
 
-### Important Steps
+### Key Steps
 
-- **Write Clear Documentation**: Provide examples, explain inputs and outputs, and list any tools or dependencies needed.  
-- **Test Thoroughly**: Test your action by itself, in real workflows, and under failure scenarios.  
-- **Keep It Updated**: Regularly review and update your action to fix bugs and support new features.  
+- **Write Clear Documentation**: Include usage examples, input/output descriptions, and dependencies.
+- **Thoroughly Test**: Validate your action independently and within workflows, including failure scenarios.
+- **Keep It Updated**: Regularly update your action to fix bugs and support new features.
 
 ---
 
 ## Adding Actions to Workflows
 
-These actions are designed to integrate smoothly with your workflows. For examples of how to use them, check the [Workflows section](../workflows/index.md).
+These actions are designed to integrate seamlessly into workflows. Refer to the [Workflows section](../workflows/index.md) for practical examples.
 
 ---
 
 ## Creating Your Own Actions
 
-If you want to build a new action, follow these steps:
+Follow these steps to build a custom action:
 
-1. **Set Up**  
-    - Create a folder: `mkdir -p actions/<your-action-name>`  
-    - Add these files:  
-        - `action.yml`  
-        - `README.md`  
-        - Any scripts or files the action needs  
+1. **Set Up**
+    - Create a folder: `mkdir -p actions/<your-action-name>`
+    - Add the following files:
+        - `action.yml`
+        - `README.md`
+        - Any additional scripts or assets
 
-2. **Document It**  
-    - Write a guide for using the action in `docs/actions/`.  
-    - Update the navigation menu in `mkdocs.yml` so it’s easy to find.  
+2. **Document Your Action**
+    - Create a usage guide in `docs/actions/`.
+    - Update `mkdocs.yml` to include your new action in the navigation menu.
 
-3. **Submit Your Work**  
-    - Include tests to make sure the action works as expected.  
-    - Follow consistent naming rules for files and folders.  
-    - Ensure your instructions are easy to understand.
+3. **Submit Your Work**
+    - Include tests to validate functionality.
+    - Follow consistent naming conventions for files and folders.
+    - Ensure your documentation is clear and accessible.
 
 ---
 
 ## Future Action Ideas
 
-Here are some ideas for new actions we might create:
+Consider developing these actions to enhance workflows:
 
-1. Automatically generate changelogs from commits  
-2. Validate documentation for errors or missing information  
-3. Manage configuration files across projects  
+1. Automatic changelog generation from commits
+2. Documentation validation for errors or omissions
+3. Configuration file management across projects
 
 ---
 
 ## Helpful Links
 
-- [GitHub Actions Basics](https://docs.github.com/en/actions)  
-- [How to Make Actions](https://docs.github.com/en/actions/creating-actions)  
-- [Actions in Containers](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)  
-
----
+- [GitHub Actions Basics](https://docs.github.com/en/actions)
+- [How to Create Actions](https://docs.github.com/en/actions/creating-actions)
+- [Actions in Containers](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)
