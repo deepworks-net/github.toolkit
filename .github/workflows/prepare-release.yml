@@ -17,103 +17,30 @@ jobs:
           repository: ${{ github.repository }}  # Ensures the current repository
           ref: staging  # Explicitly specify the staging branch
           fetch-depth: 0
-
+          
       - name: Calculate Version
         uses: ./actions/version_calculation
         id: version
 
-      - name: Update Changelog
-        run: |
-          RELEASE_BRANCH="release/${{ steps.version.outputs.next_version }}"
-          TODAY=$(date +"%m/%d/%Y")
-          ORG="${{ github.repository_owner }}"
-          PROJ="${{ github.event.repository.name }}"
-          
-          echo "Creating release branch: $RELEASE_BRANCH"
-          git checkout -b "$RELEASE_BRANCH"  # Create and switch to release branch
-          
-          # Fetch draft release content
-          echo "Fetching draft release content..."
-          RELEASE_CONTENT=$(gh api \
-            -H "Accept: application/vnd.github+json" \
-            repos/$ORG/$PROJ/releases \
-            --jq '.[] | select(.draft == true) | .body' | \
-            sed -n '/^-/p' | \
-            sed 's/See the.*$//')
+      - name: Get Release Content
+        uses: ./actions/release_notes
+        id: notes
+        with:
+          mode: 'prepare-release'
+          version: ${{ steps.version.outputs.next_version }}
 
-          if [ -z "$RELEASE_CONTENT" ]; then
-            echo "Warning: No content found in draft release"
-            RELEASE_CONTENT="No changes recorded"
-          fi
+      - name: Update Changelog File
+        uses: ./actions/changelog
+        with:
+          content: ${{ steps.notes.outputs.content }}
+          mode: 'release'
+          version: ${{ steps.version.outputs.next_version }}
 
-          # Process the changelog
-          TEMP_FILE=$(mktemp)
-          awk -v version="${{ steps.version.outputs.next_version }}" -v today="$TODAY" -v org="$ORG" -v proj="$PROJ" -v release_content="$RELEASE_CONTENT" '
-            BEGIN {
-              found_first_section = 0
-              made_changes = 0
-            }
-            !found_first_section && !/^## / {
-              print
-              next
-            }
-            /^## / {
-              if (!found_first_section) {
-                print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
-                print release_content
-                print ""
-                made_changes = 1
-                found_first_section = 1
-              }
-              print
-              next
-            }
-            { print }
-            END {
-              if (!found_first_section) {
-                if (NR > 0) print ""
-                print "## **[(" today ") - " version "](https://github.com/" org "/" proj "/releases/tag/" version ")**"
-                print release_content
-                made_changes = 1
-              }
-              exit !made_changes
-            }
-          ' CHANGELOG.md > "$TEMP_FILE"
-
-          if [ $? -eq 0 ]; then
-            cat "$TEMP_FILE" > CHANGELOG.md
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git add CHANGELOG.md
-            git commit -m "chore: Prepare changelog for ${{ steps.version.outputs.next_version }} release"
-            
-            # Push the new branch
-            git push origin "$RELEASE_BRANCH"
-            
-            # Delete the prep tag
-            git push origin :refs/tags/prep
-            
-            # Create PR
-            gh pr create \
-              --title "Release ${{ steps.version.outputs.next_version }}" \
-              --body "## Release Preparation
-
-              ### Version Information
-              - Calculated Version: ${{ steps.version.outputs.next_version }}
-              - Based on: latest tag
-              
-              ### Changelog Updates
-              - Added version ${{ steps.version.outputs.next_version }} section with content from draft release
-              
-              ### Next Steps
-              1. Review the changelog
-              2. Merge this PR to develop
-              3. Final release will be created automatically" \
-              --base develop \
-              --head "$RELEASE_BRANCH"
-          else
-            echo "Failed to update CHANGELOG.md"
-            exit 1
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release Branch & PR
+        uses: ./actions/git_ops
+        with:
+          files: 'CHANGELOG.md'
+          commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
+          create-pr: true
+          base: 'staging'
+          pr-title: 'Release ${{ steps.version.outputs.next_version }}' 
