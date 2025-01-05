@@ -14,3 +14,6 @@ runs:
   env:
     GITHUB_TOKEN: ${{ inputs.github-token }}
     VERSION: ${{ inputs.version }}
+branding:
+  icon: "tag"
+  color: "blue"

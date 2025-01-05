@@ -23,8 +23,7 @@ jobs:
         id: version
           
       - name: Update Changelog
-        uses: ./actions/changelog_update
+        uses: ./actions/update_changelog
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.version.outputs.next_version }}
-          
