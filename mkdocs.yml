@@ -69,7 +69,6 @@ theme:
       - 'Release Process': 'release-process.md'
       - 'Repository': 'repo/index.md'
     - 'Workflows':
-      - 'Create Github Release': 'workflows/create-release.md'
       - 'Create Release Tag': 'workflows/create-release-tag.md'
       - 'Publish Github Release': 'workflows/release-drafter.md'
       - 'Prepare Release': 'workflows/prepare-release.md'
