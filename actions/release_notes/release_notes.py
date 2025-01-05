@@ -23,7 +23,13 @@ def get_draft_release():
             '--jq', '.[] | select(.draft == true)'
         ]
         
-        result = subprocess.check_output(cmd, text=True, env={'GITHUB_TOKEN': os.environ['GITHUB_TOKEN']})
+        # Set both tokens for gh cli
+        env = {
+            'GITHUB_TOKEN': os.environ['GITHUB_TOKEN'],
+            'GH_TOKEN': os.environ['GITHUB_TOKEN']  # Add this line
+        }
+        
+        result = subprocess.check_output(cmd, text=True, env=env)
         return json.loads(result) if result else None
         
     except subprocess.CalledProcessError as e:
