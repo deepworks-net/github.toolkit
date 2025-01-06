@@ -38,11 +38,11 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculation
+        uses: deepworks-net/github.actions/actions/version_calculation@main
         id: version
 
       - name: Get Release Content
-        uses: ./actions/release_notes
+        uses: deepworks-net/github.actions/actions/release_notes@main
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -51,17 +51,16 @@ jobs:
           pr-title: ${{ github.event.pull_request.title }}
           
       - name: Update Changelog File
-        uses: ./actions/update_changelog
+        uses: deepworks-net/github.actions/actions/update_changelog@main
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
       
       - name: Commit Changes
-        uses: ./actions/git_ops
+        uses: deepworks-net/github.actions/actions/git_ops@main
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
           commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
           create-pr: false
-        env:
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
