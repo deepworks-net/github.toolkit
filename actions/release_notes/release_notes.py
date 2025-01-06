@@ -111,24 +111,21 @@ def update_draft_release(content):
 
 def handle_pr_merge():
     """Handle PR merge mode."""
-    pr_number = os.environ.get('INPUT_PR_NUMBER')  # Changed from PR_NUMBER
-    pr_title = os.environ.get('INPUT_PR_TITLE')    # Changed from PR_TITLE
+    pr_number = os.environ.get('INPUT_PR_NUMBER')
+    pr_title = os.environ.get('INPUT_PR_TITLE')
     
     if not pr_number or not pr_title:
         print("Missing PR information")
         sys.exit(1)
         
     draft = get_draft_release()
-    current_entries = []
     if draft and draft['body']:
-        current_entries = extract_pr_entries(draft['body'])
+        content = draft['body'].strip()
+    else:
+        print("No draft release content")
+        content = ""
     
-    # Add new PR entry at the beginning
-    new_entry = f"- PR #{pr_number}: {pr_title}"
-    entries = [new_entry] + current_entries
-    
-    content = '\n'.join(entries)
-    update_draft_release(content)
+    # Don't add our own entry - let release-drafter handle it
     print(f"::set-output name=content::{content}")
 
 def handle_prepare_release():
