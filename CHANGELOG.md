@@ -1,6 +1,13 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
+## **[(01/06/2025) - v1.0.122](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.122)**
+### What's Changed
+- Version Update Action Addition @mattbuske (#120)
+- Fixed Update Version Name @mattbuske (#119)
+- Version Update Action @mattbuske (#118)
+#### **Full Changelog**: [v1.0.104...v1.0.117](https://github.com/deepworks-net/github.actions/compare/v1.0.104...v1.0.117)
+
 ## **[(01/06/2025) - v1.0.104](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.104)**
 ### What's Changed
 - Further Workflow Updates @mattbuske (#115)
