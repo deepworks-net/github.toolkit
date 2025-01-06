@@ -1,0 +1,29 @@
+name: Version Calculation
+
+on:
+  push:
+    branches:
+      - main  # or master, depending on your default branch
+  workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    secrets:
+        token:
+          description: 'GitHub Repository Token'
+          required: false
+jobs:
+  calculate-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important: fetch all history and tags
+      
+      - name: Calculate next version
+        id: version
+        uses: deepworks-net/github.actions/actions/version-calculation@develop/122-re-work-actions-structure-for-external-use-and-consistency  # Path to your local action
+      
+      # Optional: You can use the calculated version in subsequent steps
+      - name: Display calculated version
+        run: echo "Next version will be ${{ steps.version.outputs.next_version }}"
