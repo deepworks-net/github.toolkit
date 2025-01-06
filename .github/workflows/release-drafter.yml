@@ -6,6 +6,11 @@ on:
       - staging
   workflow_call:
     inputs:
+      github-action-repo:
+        description: 'The Action Repository (If using a forked repository)'
+        required: false
+        type: string
+        default: 'deepworks-net/github.actions'
       draft:
         description: 'Create as draft release'
         required: false
@@ -34,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ${{ github.action_path }}/actions/version_calculation@main
+        uses: ${{ inputs.github-action-repo }}/github.actions/actions/version_calculation@main
         id: version
 
       - name: Draft Release
