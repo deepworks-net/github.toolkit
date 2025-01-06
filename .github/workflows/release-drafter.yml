@@ -43,10 +43,6 @@ jobs:
         with:
           publish: false
           version: ${{ steps.version.outputs.next_version }}
-          header: |
-            ## Draft Release ${{ steps.version.outputs.next_version }}
-          footer: |
-            See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,9 +56,5 @@ jobs:
         with:
           publish: true
           tag: ${{ github.ref_name }}
-          header: |
-            ## Release ${{ github.ref_name }}
-          footer: |
-            See the [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for more details.
         env:
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
