@@ -33,7 +33,7 @@ def update_changelog(content, mode, version):
             if not found_section and line.startswith('## **['):
                 if mode == 'unreleased':
                     new_lines.append(f'## **{today} - {version} Unreleased**\n')
-                    new_lines.append(content + '\n\n')  # Add extra newline before versioned
+                    new_lines.append(content + '\n\n')  # Add content exactly as is
                 found_section = True
                 new_lines.append(line)
                 continue
@@ -45,7 +45,7 @@ def update_changelog(content, mode, version):
                     new_lines.append(f'## **{today} - {version} Unreleased**\n')
                 else:  # release mode
                     new_lines.append(f'## **[({today}) - {version}](https://github.com/{os.environ["GITHUB_REPOSITORY"]}/releases/tag/{version})**\n')
-                new_lines.append(content + '\n\n')  # Add extra newline
+                new_lines.append(content + '\n\n')
                 skip_old = True
                 continue
             
@@ -53,7 +53,7 @@ def update_changelog(content, mode, version):
             if skip_old:
                 if line.startswith('## '):
                     skip_old = False
-                    new_lines.append(line)  # Don't add extra newline, already added
+                    new_lines.append(line)
                 else:
                     continue
                     
@@ -62,8 +62,9 @@ def update_changelog(content, mode, version):
                 new_lines.append(line)
         
         # If we haven't found a place for the section yet, add it after headers
-        if not found_section:
-            if new_lines and new_lines[-1] != '\n':
+        if not found_section and new_lines:
+            # Make sure we have a blank line after headers
+            if new_lines[-1] != '\n':
                 new_lines.append('\n')
             if mode == 'unreleased':
                 new_lines.append(f'## **{today} - {version} Unreleased**\n')
