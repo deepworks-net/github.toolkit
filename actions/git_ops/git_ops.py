@@ -17,13 +17,21 @@ def setup_git():
 
 def create_branch():
     """Create and checkout branch if specified."""
-    branch_name = os.environ.get('BRANCH_NAME')
-    if branch_name:
-        try:
+    try:
+        branch_name = os.environ.get('BRANCH_NAME')
+        if not branch_name:
+            # If no branch specified and creating PR, generate release branch name
+            if os.environ.get('CREATE_PR', 'false').lower() == 'true':
+                version = os.environ.get('PR_TITLE', '').replace('Release ', '')
+                branch_name = f'release/{version}'
+        
+        if branch_name:
+            print(f"Creating branch: {branch_name}")
             subprocess.check_call(['git', 'checkout', '-b', branch_name])
-        except subprocess.CalledProcessError as e:
-            print(f"Error creating branch: {e}")
-            sys.exit(1)
+            
+    except subprocess.CalledProcessError as e:
+        print(f"Error creating branch: {e}")
+        sys.exit(1)
 
 def commit_changes():
     """Commit specified files."""
@@ -67,10 +75,12 @@ def create_pr():
         base = os.environ.get('BASE_BRANCH', 'staging')
         title = os.environ.get('PR_TITLE', os.environ.get('COMMIT_MESSAGE'))
         body = os.environ.get('PR_BODY', '')
+        branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], text=True).strip()
         
         cmd = ['gh', 'pr', 'create',
                '--fill',
                '--base', base,
+               '--head', branch,  # Explicitly specify the head branch
                '--title', title]
                
         if body:
@@ -87,8 +97,11 @@ def main():
     setup_git()
     create_branch()
     if commit_changes():
-        push_changes()
-        create_pr()
+        push_changes()  # Make sure branch is pushed first
+        if os.environ.get('CREATE_PR', 'false').lower() == 'true':
+            # Add a small delay to ensure branch is available
+            subprocess.run(['sleep', '2'])  # Give GitHub a moment to register the branch
+            create_pr()
 
 if __name__ == "__main__":
     main()
