@@ -33,9 +33,10 @@ def update_changelog(content, mode, version):
                 found_section = True
                 if mode == 'unreleased':
                     new_lines.append(f'## **{today} - {version} Unreleased**\n')
+                    new_lines.append(content + '\n')  # Add complete content from draft
                 else:  # release mode
                     new_lines.append(f'## **[({today}) - {version}](https://github.com/{os.environ["GITHUB_REPOSITORY"]}/releases/tag/{version})**\n')
-                new_lines.append(content + '\n')
+                    new_lines.append(content + '\n')
                 skip_old = True
                 continue
             
@@ -57,9 +58,10 @@ def update_changelog(content, mode, version):
                 new_lines.append('\n')
             if mode == 'unreleased':
                 new_lines.append(f'## **{today} - {version} Unreleased**\n')
+                new_lines.append(content + '\n')
             else:  # release mode
                 new_lines.append(f'## **[({today}) - {version}](https://github.com/{os.environ["GITHUB_REPOSITORY"]}/releases/tag/{version})**\n')
-            new_lines.append(content + '\n')
+                new_lines.append(content + '\n')
         
         # Write updated changelog
         with open('CHANGELOG.md', 'w') as f:
