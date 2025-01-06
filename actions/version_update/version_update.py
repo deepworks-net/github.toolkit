@@ -16,12 +16,27 @@ def update_mkdocs_version(filename, version):
         with open(filename, 'r') as f:
             content = f.read()
             
-        # Use regex to find the version line in extra section
-        pattern = r'(extra:\s+version:\s*)[^\s\n]+'
-        if not re.search(pattern, content):
-            pattern = r'(version:\s*)[^\s\n]+'
-            
-        new_content = re.sub(pattern, f'\\1{version.lstrip("v")}', content)
+        print("DEBUG: Original content:", content)
+        
+        # First find the version line
+        lines = content.split('\n')
+        new_lines = []
+        in_extra = False
+        
+        for line in lines:
+            if line.strip().startswith('extra:'):
+                in_extra = True
+                new_lines.append(line)
+            elif in_extra and line.strip().startswith('version:'):
+                # Replace version while maintaining indentation
+                indent = line[:line.index('version:')]
+                new_lines.append(f"{indent}version: {version.lstrip('v')}")
+            else:
+                new_lines.append(line)
+        
+        new_content = '\n'.join(new_lines)
+        
+        print("DEBUG: New content:", new_content)
         
         with open(filename, 'w') as f:
             f.write(new_content)
