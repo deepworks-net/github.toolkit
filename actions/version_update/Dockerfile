@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 RUN git config --global --add safe.directory /github/workspace
 
-COPY update_version.py /action/
+COPY version_update.py /action/
 COPY action.yml /action/
 
-ENTRYPOINT ["python", "/action/update_version.py"]
+ENTRYPOINT ["python", "/action/version_update.py"]
