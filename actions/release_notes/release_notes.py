@@ -15,19 +15,17 @@ def setup_git():
 
 def get_draft_release():
     """Get current draft release content."""
-    token = os.environ.get('INPUT_GITHUB_TOKEN')  # Note: this is how the input is passed
+    token = os.environ.get('INPUT_GITHUB_TOKEN')
     if not token:
         print("Error: github-token input not set")
         sys.exit(1)
 
     try:
-        # Get repository information from environment
         repository = os.environ.get('GITHUB_REPOSITORY')
         if not repository:
             print("Error: GITHUB_REPOSITORY not set")
             sys.exit(1)
 
-        # Use curl instead of gh cli
         cmd = [
             'curl', '-s',
             '-H', f'Authorization: token {token}',
@@ -38,9 +36,26 @@ def get_draft_release():
         result = subprocess.check_output(cmd, text=True)
         releases = json.loads(result)
         
-        # Find draft release
+        # Find draft release and process content
         draft = next((r for r in releases if r.get('draft', False)), None)
-        return draft
+        
+        if draft:
+            
+            # Get the full content
+            content = draft.get('body', '').strip()
+            lines = content.split('\n')
+            
+            # Keep everything except the header
+            content_lines = []
+            for line in lines:
+                if not line.startswith('## Draft Release'):
+                    if line.strip():  # Keep non-empty lines
+                        content_lines.append(line)
+            
+            content = '\n'.join(content_lines).strip()
+            return {'id': draft['id'], 'body': content}
+            
+        return None
         
     except subprocess.CalledProcessError as e:
         print(f"Error fetching draft release: {e}")
@@ -111,25 +126,21 @@ def update_draft_release(content):
 
 def handle_pr_merge():
     """Handle PR merge mode."""
-    pr_number = os.environ.get('INPUT_PR_NUMBER')  # Changed from PR_NUMBER
-    pr_title = os.environ.get('INPUT_PR_TITLE')    # Changed from PR_TITLE
+    pr_number = os.environ.get('INPUT_PR_NUMBER')
+    pr_title = os.environ.get('INPUT_PR_TITLE')
     
     if not pr_number or not pr_title:
         print("Missing PR information")
         sys.exit(1)
         
     draft = get_draft_release()
-    current_entries = []
     if draft and draft['body']:
-        current_entries = extract_pr_entries(draft['body'])
-    
-    # Add new PR entry at the beginning
-    new_entry = f"- PR #{pr_number}: {pr_title}"
-    entries = [new_entry] + current_entries
-    
-    content = '\n'.join(entries)
-    update_draft_release(content)
-    print(f"::set-output name=content::{content}")
+        content = draft['body'].strip()
+        # Need to properly escape newlines for GitHub Actions set-output
+        escaped_content = content.replace('\n', '%0A')
+        print(f"::set-output name=content::{escaped_content}")
+    else:
+        print("No draft release content")
 
 def handle_prepare_release():
     """Handle prepare-release mode."""
@@ -146,13 +157,12 @@ def handle_prepare_release():
             print("No draft release found")
             sys.exit(1)
         
-        content = draft['body'].strip()
-        if not content:
+        if draft['body']:
+            content = draft['body'].strip()
+            escaped_content = content.replace('\n', '%0A')
+            print(f"::set-output name=content::{escaped_content}")
+        else:
             print("Warning: Draft release is empty")
-            content = ""  # Don't exit, just use empty content
-        
-        # No need to extract entries - pass full content
-        print(f"::set-output name=content::{content}")
         
     except Exception as e:
         print(f"Error in prepare_release mode: {e}")
