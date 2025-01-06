@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculation@main
+        uses: ${{ github.action_path }}/actions/version_calculation@main
         id: version
 
       - name: Draft Release
