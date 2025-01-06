@@ -133,23 +133,30 @@ def handle_pr_merge():
 
 def handle_prepare_release():
     """Handle prepare-release mode."""
-    draft = get_draft_release()
-    if not draft:
-        print("No draft release found")
-        sys.exit(1)
+    try:
+        # Still process PR merge if info is provided
+        pr_number = os.environ.get('INPUT_PR_NUMBER')
+        pr_title = os.environ.get('INPUT_PR_TITLE')
+        if pr_number and pr_title:
+            handle_pr_merge()
         
-    content = draft['body'].strip()
-    if not content:
-        print("Warning: Draft release is empty")
-        sys.exit(1)
+        # Get full draft content
+        draft = get_draft_release()
+        if not draft:
+            print("No draft release found")
+            sys.exit(1)
         
-    entries = extract_pr_entries(content)
-    if not entries:
-        print("Warning: No PR entries found in draft release")
-        sys.exit(1)
+        content = draft['body'].strip()
+        if not content:
+            print("Warning: Draft release is empty")
+            content = ""  # Don't exit, just use empty content
         
-    content = '\n'.join(entries)
-    print(f"::set-output name=content::{content}")
+        # No need to extract entries - pass full content
+        print(f"::set-output name=content::{content}")
+        
+    except Exception as e:
+        print(f"Error in prepare_release mode: {e}")
+        sys.exit(1)
 
 def main():
     """Main function."""

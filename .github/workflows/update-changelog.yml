@@ -3,8 +3,22 @@ name: Update Changelog
 on:
   pull_request:
     branches:
-      - staging  # Updated to new naming convention
+      - staging
     types: [closed]
+  workflow_call:
+    inputs:
+      pr-number:
+        description: 'Pull request number for changelog updates'
+        required: false
+        type: string
+      pr-title:
+        description: 'Pull request title for changelog updates'
+        required: false
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token for release creation'
+        required: true
 
 permissions:
   contents: write  # for modifying changelog

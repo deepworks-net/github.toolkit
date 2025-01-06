@@ -66,6 +66,7 @@ theme:
     - 'Home': 
       - 'index.md'
       - 'Getting Started': 'getting-started.md'
+      - 'Meta Level': 'meta-level.md'
       - 'Release Process': 'release-process.md'
       - 'Repository': 'repo/index.md'
     - 'Workflows':

@@ -6,10 +6,6 @@ on:
       - staging
   workflow_call:
     inputs:
-      tag-name:
-        description: 'Tag name for the release (e.g., v1.0.0)'
-        required: false
-        type: string
       draft:
         description: 'Create as draft release'
         required: false
