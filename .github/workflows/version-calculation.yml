@@ -22,7 +22,7 @@ jobs:
       
       - name: Calculate next version
         id: version
-        uses: deepworks-net/github.actions/actions/version-calculation@develop/122-re-work-actions-structure-for-external-use-and-consistency  # Path to your local action
+        uses: deepworks-net/github.actions/actions/version_calculation@main  # Path to your local action
       
       # Optional: You can use the calculated version in subsequent steps
       - name: Display calculated version
