@@ -1,0 +1,17 @@
+name: "Version Update"
+description: "Updates version numbers in configuration files"
+inputs:
+  version:
+    description: 'Version number to set'
+    required: true
+  files:
+    description: 'Files to update (comma-separated)'
+    required: false
+    default: 'mkdocs.yml'
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    INPUT_VERSION: ${{ inputs.version }}
+    INPUT_FILES: ${{ inputs.files }}
