@@ -1,13 +1,13 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-## **01/06/2025 - v1.0.103 Unreleased**
+## **[(01/06/2025) - v1.0.104](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.104)**
 ### What's Changed
 - Further Workflow Updates @mattbuske (#115)
 - Further Workflow Updates @mattbuske (#110)
 - Workflow Enhancements @mattbuske (#101)
 - Testing Updates @mattbuske (#100)
-#### **Full Changelog**: [v1.0.97...v1.0.103](https://github.com/deepworks-net/github.actions/compare/v1.0.97...v1.0.103)
+#### **Full Changelog**: [v1.0.97...v1.0.104](https://github.com/deepworks-net/github.actions/compare/v1.0.97...v1.0.104)
 
 ## **[(01/05/2025) - v1.0.97](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.97)**
 - Change to Pre-release Mode @mattbuske (#99)
