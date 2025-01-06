@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ${{ inputs.github-action-repo }}/github.actions/actions/version_calculation@main
+        uses: deepworks-net/github.actions/src/version_calculation@main
         id: version
 
       - name: Draft Release
