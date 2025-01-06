@@ -34,9 +34,6 @@ jobs:
       - name: Calculate Next Version
         uses: deepworks-net/github.actions/actions/version_calculation@main
         id: version
-      
-      - name: Set Output for Version
-        run: echo "::set-output name=version::${{ steps.version.outputs.next_version }}"
 
       - name: Draft Release
         uses: release-drafter/release-drafter@v6
@@ -44,7 +41,7 @@ jobs:
           publish: false
           version: ${{ steps.version.outputs.next_version }}
         env:
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish_release:
     runs-on: ubuntu-latest
@@ -57,4 +54,4 @@ jobs:
           publish: true
           tag: ${{ github.ref_name }}
         env:
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
