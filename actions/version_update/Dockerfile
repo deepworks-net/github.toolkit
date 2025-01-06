@@ -2,8 +2,11 @@ FROM python:3.9-slim
 
 WORKDIR /action
 RUN apt-get update && \
-    apt-get install -y git yaml && \
+    apt-get install -y git && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install PyYAML
 
 RUN git config --global --add safe.directory /github/workspace
 
