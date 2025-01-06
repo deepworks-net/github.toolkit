@@ -1,9 +1,6 @@
 name: Version Calculation
 
 on:
-  push:
-    branches:
-      - main  # or master, depending on your default branch
   workflow_dispatch:  # allows manual triggering
   workflow_call:
     secrets:
