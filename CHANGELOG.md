@@ -1,7 +1,6 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-
 ## **01/06/2025 - v1.0.106 Unreleased**
 ### What's Changed
 - Version Update Action @mattbuske (#118)
