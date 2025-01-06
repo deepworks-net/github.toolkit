@@ -5,24 +5,28 @@ import sys
 import yaml
 import re
 
+def custom_yaml_constructor(loader, node):
+    """Custom constructor for handling special YAML tags."""
+    return loader.construct_scalar(node)
+
 def update_mkdocs_version(filename, version):
     """Update version in mkdocs.yml."""
     try:
+        # Read the file
         with open(filename, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        if 'extra' not in config:
-            config['extra'] = {}
-        
-        # Remove 'v' prefix if present for consistency
-        version_num = version.lstrip('v')
-        config['extra']['version'] = version_num
-        
-        # Preserve formatting with dump
-        with open(filename, 'w') as f:
-            yaml.dump(config, f, sort_keys=False)
+            content = f.read()
             
-        print(f"Updated version in {filename} to {version_num}")
+        # Use regex to find the version line in extra section
+        pattern = r'(extra:\s+version:\s*)[^\s\n]+'
+        if not re.search(pattern, content):
+            pattern = r'(version:\s*)[^\s\n]+'
+            
+        new_content = re.sub(pattern, f'\\1{version.lstrip("v")}', content)
+        
+        with open(filename, 'w') as f:
+            f.write(new_content)
+            
+        print(f"Updated version in {filename} to {version.lstrip('v')}")
         return True
             
     except Exception as e:
