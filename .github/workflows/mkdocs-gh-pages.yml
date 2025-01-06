@@ -50,7 +50,7 @@ on:
         type: string
 
 jobs:
-  deploy:
+  deploy_gh_pages:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
