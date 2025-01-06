@@ -1,7 +1,7 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-## **01/06/2025 - v1.0.121 Unreleased**
+## **[(01/06/2025) - v1.0.122](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.122)**
 ### What's Changed
 - Version Update Action Addition @mattbuske (#120)
 - Fixed Update Version Name @mattbuske (#119)
