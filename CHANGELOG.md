@@ -1,6 +1,9 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
+## **01/06/2025 - v1.0.100 Unreleased**
+- PR #101: Workflow Enhancements
+
 ## **[(01/05/2025) - v1.0.97](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.97)**
 - Change to Pre-release Mode @mattbuske (#99)
 
