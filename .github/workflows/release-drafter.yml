@@ -18,6 +18,8 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read  # Added to allow reading PR data for release notes
+  issues: read         # Added as release-drafter often needs this for linking issues
 
 jobs:
   update_release_draft:
