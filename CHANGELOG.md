@@ -1,11 +1,11 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-## **01/07/2025 - v1.0.133 Unreleased**
+## **[(01/07/2025) - v1.0.138](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.138)**
 ### What's Changed
 - Version Updater @mattbuske (#126)
 - Version Calculator @mattbuske (#125)
-#### **Full Changelog**: [v1.0.122...v1.0.133](https://github.com/deepworks-net/github.toolkit/compare/v1.0.122...v1.0.133)
+#### **Full Changelog**: [v1.0.122...v1.0.138](https://github.com/deepworks-net/github.toolkit/compare/v1.0.122...v1.0.138)
 
 ## **[(01/06/2025) - v1.0.122](https://github.com/deepworks-net/github.actions/releases/tag/v1.0.122)**
 ### What's Changed
