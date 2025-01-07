@@ -2,7 +2,11 @@ name: Version Calculation
 
 on:
   workflow_dispatch:  # allows manual triggering
-
+  workflow_call:
+    secrets:
+        token:
+          description: 'GitHub Repository Token'
+          required: false
 jobs:
   calculate-version:
     runs-on: ubuntu-latest
@@ -15,7 +19,7 @@ jobs:
       
       - name: Calculate next version
         id: version
-        uses: ./actions/version_calculation@v1  # Path to your local action
+        uses: deepworks-net/github.toolkit/actions/version_calculation@main  # Path to your local action
       
       # Optional: You can use the calculated version in subsequent steps
       - name: Display calculated version
