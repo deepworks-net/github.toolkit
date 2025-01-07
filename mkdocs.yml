@@ -76,7 +76,9 @@ theme:
       - 'Update Changelog': 'workflows/update-changelog.md'
       - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
       - 'Version Calculator': 'workflows/version_calculator.md'
+      - 'Version Updater': 'workflows/version_updater.md'
     - 'Actions':
       - 'Overview': 'actions/index.md'
       - 'Update Changelog': 'actions/update_changelog/index.md'
       - 'Version Calculator': 'actions/version_calculator/index.md'
+      - 'Version Updater': 'actions/version_updater/index.md'
