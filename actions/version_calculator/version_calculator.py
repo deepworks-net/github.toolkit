@@ -1,4 +1,4 @@
-# version_calculation.py
+# version_calculator.py
 # Reusable script for version calculation
 
 import subprocess
@@ -16,18 +16,17 @@ def setup_git():
 def get_latest_tag():
     """Retrieve the latest version tag."""
     try:
-        output = subprocess.check_output(['git', 'tag', '-l', 'v*', '--sort=-v:refname'], text=True).strip()
+        output = subprocess.check_output(['git', 'tag', '-l', '--sort=-v:refname'], text=True).strip()
         latest_tag = output.splitlines()[0] if output else None
-        if not latest_tag:
-            raise ValueError("No version tags found.")
-        return latest_tag
+        return output.splitlines()[0] if output else None
     except subprocess.CalledProcessError as e:
         print(f"Error fetching tags: {e}")
         sys.exit(1)
 
-def calculate_next_version(latest_tag):
+def calculate_next_version(latest_tag, version_prefix='v'):
     """Calculate the next version based on the latest tag."""
-    match = re.match(r'v(\d+)\.(\d+)\.(\d+)', latest_tag)
+    pattern = f'{version_prefix}(\\d+)\\.(\\d+)\\.(\\d+)'
+    match = re.match(pattern, latest_tag)
     if not match:
         print(f"Invalid version format: {latest_tag}")
         sys.exit(1)

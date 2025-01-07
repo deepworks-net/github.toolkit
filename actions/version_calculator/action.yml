@@ -1,0 +1,29 @@
+name: "Version Calculator"
+description: "Calculate the next version based on the latest Git tag and get statistics based on the Git repo"
+author: "Deepworks"
+inputs:
+  default_version:
+    description: "Default version to use when no tags exist"
+    required: false
+    default: "v0.1.0"
+  version_prefix:
+    description: "Prefix for version tags (e.g., 'v' in v1.0.0)"
+    required: false
+    default: "v"
+  tag_pattern:
+    description: "Pattern to match version tags"
+    required: false
+    default: "v*"
+outputs:
+  next_version:
+    description: "The calculated next version"
+  current_version:
+    description: "Current version (latest tag or default)"
+  commit_count:
+    description: "Number of commits since last tag"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+branding:
+  icon: "tag"
+  color: "blue"

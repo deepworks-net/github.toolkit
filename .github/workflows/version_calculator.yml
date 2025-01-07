@@ -1,4 +1,4 @@
-name: Version Calculation
+name: Version Calculator
 
 on:
   workflow_dispatch:  # allows manual triggering
@@ -15,7 +15,7 @@ jobs:
       
       - name: Calculate next version
         id: version
-        uses: ./actions/version_calculation@v1  # Path to your local action
+        uses: ./actions/version_calculator@v1  # Path to your local action
       
       # Optional: You can use the calculated version in subsequent steps
       - name: Display calculated version
