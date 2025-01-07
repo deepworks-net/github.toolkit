@@ -1,0 +1,22 @@
+name: "Version Updater"
+description: "Updates version numbers in configuration files"
+inputs:
+  version:
+    description: 'Version number to set'
+    required: true
+  files:
+    description: 'Files to update (array of file paths)'
+    required: false
+    default: '[]'
+  strip_v_prefix:
+    description: 'Remove "v" prefix from version when updating files'
+    required: false
+    default: 'true'
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    INPUT_VERSION: ${{ inputs.version }}
+    INPUT_FILES: ${{ inputs.files }}
+    INPUT_STRIP_V_PREFIX: ${{ inputs.strip_v_prefix }}
