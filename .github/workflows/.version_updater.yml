@@ -1,6 +1,9 @@
-# .github/workflows/.priv/version_updater.yml
+# .github/workflows/.version_updater.yml
 # This workflow handles the version updating for this repository specifically
 name: Version Updater
+
+on:
+  workflow_dispatch:  # allows manual triggering
 
 jobs:
   update-version:
