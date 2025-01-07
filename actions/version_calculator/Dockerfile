@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 # Configure git to trust the workspace
 RUN git config --global --add safe.directory /github/workspace
 
-COPY version_calculation.py /action/
+COPY version_calculator.py /action/
 COPY action.yml /action/
 
-ENTRYPOINT ["python", "/action/version_calculation.py"]
+ENTRYPOINT ["python", "/action/version_calculator.py"]

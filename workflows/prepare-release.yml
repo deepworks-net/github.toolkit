@@ -19,17 +19,17 @@ jobs:
           fetch-depth: 0
           
       - name: Calculate Version
-        uses: ./actions/version_calculation@v1
+        uses: deepworks-net/github.toolkit/actions/version_calculation
         id: version
 
       - name: Update Version Numbers
-        uses: ./actions/version_update@v1
+        uses: deepworks-net/github.toolkit/actions/version_update
         with:
           version: ${{ steps.version.outputs.next_version }}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
-        uses: ./actions/release_notes@v1
+        uses: deepworks-net/github.toolkit/actions/release_notes
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,14 +37,14 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: ./actions/update_changelog@v1
+        uses: deepworks-net/github.toolkit/actions/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Create Release Branch & PR
-        uses: ./actions/git_ops@v1
+        uses: deepworks-net/github.toolkit/actions/git_ops
         with:
           files: 'CHANGELOG.md'
           commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'

@@ -5,6 +5,20 @@ on:
     branches:
       - staging
     types: [closed]
+  workflow_call:
+    inputs:
+      pr-number:
+        description: 'Pull request number for changelog updates'
+        required: false
+        type: string
+      pr-title:
+        description: 'Pull request title for changelog updates'
+        required: false
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token for release creation'
+        required: true
 
 permissions:
   contents: write  # for modifying changelog
@@ -24,27 +38,27 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculation@v1
+        uses: deepworks-net/github.toolkit/actions/version_calculation@v1
         id: version
 
       - name: Get Release Content
-        uses: ./actions/release_notes@v1
+        uses: deepworks-net/github.toolkit/actions/release_notes@v1
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'prepare-release'
           pr-number: ${{ github.event.pull_request.number }}
           pr-title: ${{ github.event.pull_request.title }}
-      
+          
       - name: Update Changelog File
-        uses: ./actions/update_changelog@v1
+        uses: deepworks-net/github.toolkit/actions/update_changelog@v1
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
       
       - name: Commit Changes
-        uses: ./actions/git_ops@v1
+        uses: deepworks-net/github.toolkit/actions/git_ops@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'

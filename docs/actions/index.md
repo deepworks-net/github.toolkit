@@ -4,9 +4,9 @@ This guide explains how to use GitHub Actions—tools that automate tasks in you
 
 ## What Actions Can Do
 
-### Version Calculation
+### Version Calculator
 
-**[Click Here to Learn More](version_calculation/index.md)**
+**[Click Here to Learn More](version_calculator/index.md)**
 This action calculates the next version number using your Git history. Ideal for:
 
 - Preparing releases
