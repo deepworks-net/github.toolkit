@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculator@v1
+        uses: ./actions/version_calculator
         id: version
 
       - name: Draft Release

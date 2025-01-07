@@ -17,10 +17,21 @@ def get_latest_tag():
     """Retrieve the latest version tag."""
     try:
         output = subprocess.check_output(['git', 'tag', '-l', '--sort=-v:refname'], text=True).strip()
-        latest_tag = output.splitlines()[0] if output else None
-        return output.splitlines()[0] if output else None
+        return output.splitlines()[0] if output else 'v0.1.0'  # Default to v0.1.0 if no tags
     except subprocess.CalledProcessError as e:
         print(f"Error fetching tags: {e}")
+        sys.exit(1)
+
+def get_commit_count_since_tag(tag):
+    """Count commits since the latest tag."""
+    try:
+        if tag == 'v0.1.0':  # If using default tag, count all commits
+            output = subprocess.check_output(['git', 'rev-list', '--count', 'HEAD'], text=True).strip()
+        else:
+            output = subprocess.check_output(['git', 'rev-list', f'{tag}..HEAD', '--count'], text=True).strip()
+        return int(output)
+    except subprocess.CalledProcessError as e:
+        print(f"Error counting commits: {e}")
         sys.exit(1)
 
 def calculate_next_version(latest_tag, version_prefix='v'):
@@ -35,16 +46,7 @@ def calculate_next_version(latest_tag, version_prefix='v'):
     commit_count = get_commit_count_since_tag(latest_tag)
     next_patch = patch + commit_count
 
-    return f"v{major}.{minor}.{next_patch}"
-
-def get_commit_count_since_tag(tag):
-    """Count commits since the latest tag."""
-    try:
-        output = subprocess.check_output(['git', 'rev-list', f'{tag}..HEAD', '--count'], text=True).strip()
-        return int(output)
-    except subprocess.CalledProcessError as e:
-        print(f"Error counting commits: {e}")
-        sys.exit(1)
+    return f"{version_prefix}{major}.{minor}.{next_patch}"
 
 def main():
     setup_git()  # Configure git before running commands

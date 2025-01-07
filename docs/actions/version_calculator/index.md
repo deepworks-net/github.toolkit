@@ -1,112 +1,191 @@
-# Version Calculator GitHub Action
+# Version Calculator Action Documentation
 
-This GitHub Action calculates the next version of your repository based on the latest Git tag. It is ideal for managing semantic versioning in repositories, ensuring consistent version updates based on commit activity.
+## Overview
 
-## Features
+The **Version Calculator** GitHub Action dynamically calculates the next version for your repository based on the latest Git tag and commit history. It is designed for seamless integration into CI/CD workflows, especially for projects adhering to semantic versioning.
 
-- **Semantic Versioning**: Automatically calculates the next patch version based on commits since the latest tag.
-- **Customizable Tagging**: Supports custom version prefixes and tag patterns.
-- **Commit Tracking**: Outputs the number of commits since the last version tag.
+### Key Features
+
+- Calculates the next version based on the latest Git tag.
+- Outputs the current version, next version, and commit count since the last tag.
+- Supports customizable version prefixes and tag patterns.
+- Fully Dockerized for consistent behavior across environments.
 
 ---
 
 ## Inputs
 
-| Input            | Description                                         | Required | Default  |
-|-------------------|-----------------------------------------------------|----------|----------|
-| `default_version` | Default version used when no tags exist            | No       | `v0.1.0` |
-| `version_prefix`  | Prefix for version tags (e.g., `v` in `v1.0.0`)    | No       | `v`      |
-| `tag_pattern`     | Pattern to match version tags                      | No       | `v*`     |
+### 1. `default_version` (Optional)
+
+- **Description**: Default version to use when no tags exist.
+- **Type**: String
+- **Default**: `v0.1.0`
+
+### 2. `version_prefix` (Optional)
+
+- **Description**: Prefix for version tags (e.g., `v` in `v1.0.0`).
+- **Type**: String
+- **Default**: `v`
+
+### 3. `tag_pattern` (Optional)
+
+- **Description**: Pattern to match version tags.
+- **Type**: String
+- **Default**: `v*`
 
 ---
 
 ## Outputs
 
-| Output            | Description                                      |
-|--------------------|--------------------------------------------------|
-| `next_version`     | The calculated next version                     |
-| `current_version`  | Current version (latest tag or default)         |
-| `commit_count`     | Number of commits since the last version tag    |
+### 1. `next_version`
 
----
+- **Description**: The calculated next version.
 
-## Usage
+### 2. `current_version`
 
-Below is an example workflow that demonstrates how to use the `version_calculator` Action:
+- **Description**: The current version (latest tag or default).
 
-### Example Workflow
+### 3. `commit_count`
 
-```yaml
-name: Version Calculator Workflow
-
-on:
-  workflow_dispatch: # Allows manual triggering of the workflow
-
-jobs:
-  calculate-version:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history and tags for accurate versioning
-
-      - name: Calculate next version
-        id: version
-        uses: deepworks-net/github.toolkit/actions/version_calculator@v1
-        with:
-          default_version: v0.1.0
-          version_prefix: v
-          tag_pattern: v*
-
-      - name: Output version details
-        run: |
-          echo "Next version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}"
-          echo "Current version: ${% raw %}{{ steps.version.outputs.current_version }}{% endraw %}"
-          echo "Commits since last tag: ${% raw %}{{ steps.version.outputs.commit_count }}{% endraw %}"
-```
+- **Description**: The number of commits since the last tag.
 
 ---
 
 ## How It Works
 
-1. **Fetch Git History**:
-    - Ensures all tags and commit history are fetched for accurate calculations.
+### 1. **Git Setup**
 
-2. **Retrieve Latest Tag**:
-    - Finds the latest Git tag using the specified tag pattern.
+The action configures Git to trust the workspace and fetches the repository history to ensure accurate tag and commit detection.
 
-3. **Calculate Next Version**:
-    - Parses the latest tag and calculates the next patch version by incrementing the patch number based on the number of commits since the tag.
+### 2. **Tag Detection**
 
-4. **Set Outputs**:
-    - Outputs the next version, current version, and commit count for use in subsequent workflow steps.
+It retrieves the latest version tag based on a specified pattern and calculates the number of commits since that tag.
 
----
+### 3. **Version Calculation**
 
-## Implementation Details
-
-### Script Details (`version_calculator.py`)
-
-The core logic is implemented in a Python script. Key functions include:
-
-- **`setup_git()`**: Configures Git to trust the workspace.
-- **`get_latest_tag()`**: Retrieves the latest Git tag matching the specified pattern.
-- **`calculate_next_version(latest_tag, version_prefix)`**:
-    - Parses the tag to extract major, minor, and patch components.
-    - Increments the patch number based on the commit count since the tag.
-- **`get_commit_count_since_tag(tag)`**:
-    - Counts commits made since the last tag.
-
-### Action Metadata (`action.yml`)
-
-The action is designed to run as a Docker container and provides customizable inputs for tag matching and version defaults.
+The action increments the patch version number based on the commit count since the latest tag. If no tags exist, it defaults to `default_version`.
 
 ---
 
-## Notes
+## Expected Behavior
 
-- Ensure the `fetch-depth` in the `actions/checkout` step is set to `0` to include all tags and commit history.
-- The action relies on semantic versioning. Ensure your tags follow the expected pattern (e.g., `v1.2.3`).
-- Outputs are set using the `::set-output` command for compatibility with GitHub Actions.
+When the **Version Calculator** action is used:
+
+1. **Initial Run with No Tags**:
+    - If no tags exist in the repository, the action will use the `default_version` input (defaulting to `v0.1.0`).
+    - Outputs:
+        - `current_version`: `v0.1.0`
+        - `next_version`: `v0.1.0`
+        - `commit_count`: Total commits in the repository.
+
+2. **Run with Existing Tags**:
+    - The action identifies the latest tag matching the `tag_pattern`.
+    - It calculates the number of commits since the latest tag and increments the patch version accordingly.
+    - Outputs:
+        - `current_version`: Latest tag.
+        - `next_version`: Incremented patch version.
+        - `commit_count`: Commits since the latest tag.
+
+3. **Edge Cases**:
+    - If the latest tag does not match the `tag_pattern`, the action defaults to `default_version` behavior.
+    - If there are no new commits since the latest tag, the `next_version` will match the `current_version`.
+
+---
+
+## Workflow Integration
+
+### Example Workflow
+
+```yaml
+name: Version Calculation Workflow
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  calculate-version:
+    runs-on: ubuntu-latest
+
+    outputs:
+      next_version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
+      current_version: ${% raw %}{{ steps.version.outputs.current_version }}{% endraw %}
+      commit_count: ${% raw %}{{ steps.version.outputs.commit_count }}{% endraw %}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate next version
+        id: version
+        uses: deepworks-net/github.actions/actions/version_calculator@v1
+        with:
+          default_version: "v0.1.0"
+          version_prefix: "v"
+          tag_pattern: "v*"
+
+      - name: Use calculated version
+        run: echo "Next version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}"
+```
+
+---
+
+## Customizing the Workflow
+
+### Dynamic Repository Referencing
+
+To ensure the workflow can dynamically reference the repository it resides in, use the following:
+
+```yaml
+with:
+  repository: ${% raw %}{{ github.repository }}{% endraw %}
+```
+
+This ensures compatibility even when the repository is forked or reused elsewhere.
+
+---
+
+## Debugging Tips
+
+1. **Ensure Proper Tags Exist**: Verify that version tags in the repository match the specified `tag_pattern`.
+2. **Fetch Entire History**: Set `fetch-depth: 0` when checking out the repository to include all tags and commits.
+3. **Validate Inputs**: Double-check that input parameters match the repository's versioning scheme.
+
+---
+
+## File Structure
+
+### 1. `action.yml`
+
+Defines the inputs, outputs, and execution environment for the action.
+
+### 2. `Dockerfile`
+
+Contains the runtime environment for the action.
+
+### 3. `version_calculator.py`
+
+The main script for calculating the version.
+
+---
+
+## References
+
+### Action Metadata
+
+```yaml
+name: Version Calculator
+runs:
+  using: "docker"
+  image: "Dockerfile"
+branding:
+  icon: "tag"
+  color: "blue"
+```
+
+### Script Highlights
+
+- Retrieves latest tags using `git tag -l --sort=-v:refname`.
+- Calculates commits using `git rev-list`.
+- Outputs results to GitHub Actions using `::set-output` commands.

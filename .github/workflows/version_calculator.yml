@@ -2,21 +2,52 @@ name: Version Calculator
 
 on:
   workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    inputs:
+      default_version:
+        type: string
+        required: false
+        default: 'v0.1.0'
+      version_prefix:
+        type: string
+        required: false
+        default: 'v'
+      tag_pattern:
+        type: string
+        required: false
+        default: 'v*'
+    outputs:
+      next_version:
+        description: "Calculated next version"
+        value: ${{ jobs.calculate-version.outputs.next_version }}
+      current_version:
+        description: "Current version"
+        value: ${{ jobs.calculate-version.outputs.current_version }}
+      commit_count:
+        description: "Commit count since last tag"
+        value: ${{ jobs.calculate-version.outputs.commit_count }}
 
 jobs:
   calculate-version:
     runs-on: ubuntu-latest
-    
+
+    outputs:
+      next_version: ${{ steps.version.outputs.next_version }}
+      current_version: ${{ steps.version.outputs.current_version }}
+      commit_count: ${{ steps.version.outputs.commit_count }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Important: fetch all history and tags
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: main
+          fetch-depth: 0
       
       - name: Calculate next version
         id: version
-        uses: ./actions/version_calculator@v1  # Path to your local action
-      
-      # Optional: You can use the calculated version in subsequent steps
-      - name: Display calculated version
-        run: echo "Next version will be ${{ steps.version.outputs.next_version }}"
+        uses: deepworks-net/github.toolkit/actions/version_calculator@v1
+        with:
+          default_version: ${{ inputs.default_version }}
+          version_prefix: ${{ inputs.version_prefix }}
+          tag_pattern: ${{ inputs.tag_pattern }}

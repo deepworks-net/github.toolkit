@@ -24,11 +24,11 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculator@v1
+        uses: ./actions/version_calculator
         id: version
 
       - name: Get Release Content
-        uses: ./actions/release_notes@v1
+        uses: ./actions/release_notes
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,14 +37,14 @@ jobs:
           pr-title: ${{ github.event.pull_request.title }}
       
       - name: Update Changelog File
-        uses: ./actions/update_changelog@v1
+        uses: ./actions/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
       
       - name: Commit Changes
-        uses: ./actions/git_ops@v1
+        uses: ./actions/git_ops
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
