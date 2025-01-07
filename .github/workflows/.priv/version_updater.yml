@@ -1,0 +1,29 @@
+# .github/workflows/.priv/version_updater.yml
+# This workflow handles the version updating for this repository specifically
+name: Version Updater
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: main
+          fetch-depth: 0
+
+      - name: Calculate next version
+        id: calculate-version
+        uses: deepworks-net/github.toolkit/actions/version_calculator@v1
+
+      - name: Update The Version
+        id: update-version
+        uses: deepworks-net/github.toolkit/actions/version_updater@v1
+        with:
+          version: ${{ steps.calculate-version.outputs.next_version }}
+          files: |
+            "README.md"
+            "CHANGELOG.md"
+            "mkdocs.yml"
