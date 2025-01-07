@@ -23,7 +23,7 @@ jobs:
         id: version
 
       - name: Update Version Numbers
-        uses: ./actions/version_update
+        uses: ./actions/version_updater
         with:
           version: ${{ steps.version.outputs.next_version }}
           files: 'mkdocs.yml'

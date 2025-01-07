@@ -1,0 +1,38 @@
+# .github/workflows/version_updater.yml
+name: Version Updater Implementation
+
+on:
+  workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      files:
+        required: true
+        type: string
+      strip_v_prefix:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: main
+          fetch-depth: 0
+
+      - name: Update The Version
+        id: update-version
+        uses: deepworks-net/github.toolkit/actions/version_updater@v1
+        with:
+          version: ${{ inputs.version }}
+          files: |
+            ["${{ inputs.files }}"]
+          strip_v_prefix: ${{ inputs.strip_v_prefix }}

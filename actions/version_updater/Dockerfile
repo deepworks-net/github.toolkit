@@ -10,7 +10,7 @@ RUN pip install PyYAML
 
 RUN git config --global --add safe.directory /github/workspace
 
-COPY version_update.py /action/
+COPY version_updater.py /action/
 COPY action.yml /action/
 
-ENTRYPOINT ["python", "/action/version_update.py"]
+ENTRYPOINT ["python", "/action/version_updater.py"]
