@@ -2,7 +2,7 @@ site_name: Deepworks Core Github Repository
 site_description: The core repository that contains documentation, actions and templates for Deepworks github repositories.
 site_author: Deepworks
 copyright: Deepworks 2022-2024
-repo_url: https://github.com/deepworks-net/github.actions
+repo_url: https://github.com/deepworks-net/github.toolkit
 docs_dir: docs
 site_dir: site
 extra:

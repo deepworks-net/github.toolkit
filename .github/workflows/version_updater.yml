@@ -1,5 +1,5 @@
 # .github/workflows/version_updater.yml
-name: Version Updater Implementation
+name: Version Updater
 
 on:
   workflow_dispatch:  # allows manual triggering
@@ -28,11 +28,15 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Calculate next version
+        id: calculate-version
+        uses: deepworks-net/github.toolkit/actions/version_calculator@v1
+
       - name: Update The Version
         id: update-version
         uses: deepworks-net/github.toolkit/actions/version_updater@v1
         with:
-          version: ${{ inputs.version }}
+          version: ${{ steps.calculate-version.outputs.next_version }}
           files: |
             ["${{ inputs.files }}"]
           strip_v_prefix: ${{ inputs.strip_v_prefix }}
