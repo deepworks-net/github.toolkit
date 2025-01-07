@@ -97,33 +97,18 @@ def main():
         print("Error: version input not set")
         sys.exit(1)
     
-    # Parse files array from JSON string
+    # Handle GitHub Actions multiline string format
+    files_input = os.environ.get('INPUT_FILES', '[]')
     try:
-        files = json.loads(os.environ.get('INPUT_FILES', '[]'))
+        # First try as JSON
+        files = json.loads(files_input)
     except json.JSONDecodeError:
-        print("Error: Invalid files input format. Expected JSON array.")
-        sys.exit(1)
+        # If that fails, try as multiline string
+        files = [f.strip() for f in files_input.split('\n') if f.strip()]
     
-    strip_v = os.environ.get('INPUT_STRIP_V_PREFIX', 'true').lower() == 'true'
-    
-    success = True
-    
-    for file in files:
-        file = file.strip()
-        if not os.path.exists(file):
-            print(f"Warning: File not found: {file}")
-            continue
-            
-        # Choose update function based on file extension
-        if file.endswith(('.yml', '.yaml')):
-            success = update_yaml_file(file, version, strip_v) and success
-        elif file.endswith('.json'):
-            success = update_json_file(file, version, strip_v) and success
-        else:
-            success = update_generic_file(file, version, strip_v) and success
-    
-    if not success:
-        sys.exit(1)
+    if not files:
+        print("No files specified to update")
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
