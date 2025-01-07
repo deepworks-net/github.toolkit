@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
           
       - name: Calculate Version
-        uses: ./actions/version_calculation@v1
+        uses: ./actions/version_calculator@v1
         id: version
 
       - name: Update Version Numbers

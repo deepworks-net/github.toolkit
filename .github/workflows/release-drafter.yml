@@ -10,7 +10,7 @@ on:
         description: 'The Action Repository (If using a forked repository)'
         required: false
         type: string
-        default: 'deepworks-net/github.actions'
+        default: 'deepworks-net/github.toolkit'
       draft:
         description: 'Create as draft release'
         required: false
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/version_calculation@v1
+        uses: ./actions/version_calculator@v1
         id: version
 
       - name: Draft Release
