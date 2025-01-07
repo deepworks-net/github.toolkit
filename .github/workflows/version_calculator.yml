@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      next_version: ${{ steps.version.outputs.next_version }}
-      current_version: ${{ steps.version.outputs.current_version }}
-      commit_count: ${{ steps.version.outputs.commit_count }}
+      next_version: ${{ steps.calculate-version.outputs.next_version }}
+      current_version: ${{ steps.calculate-version.outputs.current_version }}
+      commit_count: ${{ steps.calculate-version.outputs.commit_count }}
 
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
       
       - name: Calculate next version
-        id: version
+        id: calculate-version
         uses: deepworks-net/github.toolkit/actions/version_calculator@v1
         with:
           default_version: ${{ inputs.default_version }}
