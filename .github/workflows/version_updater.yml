@@ -37,6 +37,5 @@ jobs:
         uses: deepworks-net/github.toolkit/actions/version_updater@v1
         with:
           version: ${{ steps.calculate-version.outputs.next_version }}
-          files: |
-            ["${{ inputs.files }}"]
+          files: ${{ inputs.files }}
           strip_v_prefix: ${{ inputs.strip_v_prefix }}
