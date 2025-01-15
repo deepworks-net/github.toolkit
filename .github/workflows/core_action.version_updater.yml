@@ -1,0 +1,44 @@
+# .github/workflows/core_action.version_updater.yml
+name: Core (Atomic) Action - Version Updater
+
+on:
+  workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      files:
+        required: true
+        type: string
+      strip_v_prefix:
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      files:
+        description: "Outputs a list of files that have been updated"
+        value: ${{ jobs.update-version.outputs.files }}
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest 
+
+    outputs:
+      files: ${{ steps.update-version.outputs.files }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: main
+          fetch-depth: 0
+
+      - name: Update The Version
+        id: update-version
+        uses: deepworks-net/github.toolkit/actions/core/version_updater@v1
+        with:
+          version: ${{ inputs.version }}
+          files: ${{ inputs.files }}
+          strip_v_prefix: ${{ inputs.strip_v_prefix }}

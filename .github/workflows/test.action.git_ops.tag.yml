@@ -1,0 +1,59 @@
+name: Test - Git Tag Operations Tests
+
+on:
+  push:
+    branches: [ main, staging ]
+    paths:
+      - 'actions/core/git-ops/tag/**'
+      - '.github/workflows/test.action.git_ops.tag.yml'
+  pull_request:
+    branches: [ main, staging ]
+    paths:
+      - 'actions/core/git-ops/tag/**'
+      - '.github/workflows/test.action.git_ops.tag.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./actions/composite/git-ops/tag
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v -m "not integration" --cov=. --cov-report=xml
+
+      - name: Run integration tests
+        run: |
+          pytest tests/ -v -m "integration" --cov=. --cov-report=xml --cov-append
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./actions/core/git-ops/tag/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Check coverage threshold
+        run: |
+          coverage report --fail-under=90

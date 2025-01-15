@@ -19,17 +19,17 @@ jobs:
           fetch-depth: 0
           
       - name: Calculate Version
-        uses: ./actions/version_calculator
+        uses: ./actions/core/version_calculator
         id: version
 
       - name: Update Version Numbers
-        uses: ./actions/version_updater
+        uses: ./actions/core/version_updater
         with:
           version: ${{ steps.version.outputs.next_version }}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
-        uses: ./actions/release_notes
+        uses: ./actions/composite/release_notes
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,14 +37,14 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: ./actions/update_changelog
+        uses: ./actions/composite/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Create Release Branch & PR
-        uses: ./actions/git_ops
+        uses: ./actions/composite/git_ops
         with:
           files: 'CHANGELOG.md'
           commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'

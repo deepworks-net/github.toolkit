@@ -1,4 +1,5 @@
-name: Version Calculator
+# .github/workflows/core_action.version_calculator.yml
+name: Core (Atomic) Action - Version Calculator
 
 on:
   workflow_dispatch:  # allows manual triggering
@@ -46,7 +47,7 @@ jobs:
       
       - name: Calculate next version
         id: calculate-version
-        uses: deepworks-net/github.toolkit/actions/version_calculator@v1
+        uses: deepworks-net/github.toolkit/actions/core/version_calculator@v1
         with:
           default_version: ${{ inputs.default_version }}
           version_prefix: ${{ inputs.version_prefix }}
