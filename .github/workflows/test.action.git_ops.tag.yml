@@ -46,7 +46,7 @@ jobs:
           pytest tests/ -v -m "integration" --cov=. --cov-report=xml --cov-append
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./actions/core/git-ops/tag/coverage.xml
           flags: unittests
