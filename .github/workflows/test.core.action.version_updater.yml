@@ -1,0 +1,122 @@
+# .github/workflows/test.core.action.version_updater.yml
+name: Test Core Action - Version Updater
+
+on:
+  pull_request:
+    paths:
+      - 'actions/core/version_updater/**'
+      - '.github/workflows/core.action.version_updater.yml'
+      - '.github/workflows/test.core.action.version_updater.yml'
+  workflow_dispatch:  # Manual trigger for testing
+
+jobs:
+  test-yaml-update:
+    name: Test YAML File Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Create Test YAML
+        run: |
+          echo "version: 1.0.0" > test.yml
+      
+      - name: Test Version Updater
+        id: updater
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v2.0.0'
+          files: |
+            "test.yml"
+          strip_v_prefix: true
+      
+      - name: Verify Output
+        run: |
+          content=$(cat test.yml)
+          if [[ "$content" != "version: 2.0.0" ]]; then
+            echo "Expected 'version: 2.0.0', got '$content'"
+            exit 1
+          fi
+
+  test-json-update:
+    name: Test JSON File Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Create Test JSON
+        run: |
+          echo '{"version": "1.0.0"}' > test.json
+      
+      - name: Test Version Updater
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v2.0.0'
+          files: |
+            "test.json"
+          strip_v_prefix: true
+      
+      - name: Verify Output
+        run: |
+          content=$(cat test.json)
+          if [[ "$content" != '{"version": "2.0.0"}' ]]; then
+            echo "Expected '{\"version\": \"2.0.0\"}', got '$content'"
+            exit 1
+          fi
+
+  test-multiple-files:
+    name: Test Multiple Files Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Create Test Files
+        run: |
+          echo "version: 1.0.0" > test1.yml
+          echo '{"version": "1.0.0"}' > test2.json
+      
+      - name: Test Version Updater
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v2.0.0'
+          files: |
+            "test1.yml"
+            "test2.json"
+          strip_v_prefix: true
+      
+      - name: Verify Outputs
+        run: |
+          yml_content=$(cat test1.yml)
+          json_content=$(cat test2.json)
+          if [[ "$yml_content" != "version: 2.0.0" ]] || \
+             [[ "$json_content" != '{"version": "2.0.0"}' ]]; then
+            echo "Files not updated correctly"
+            echo "YAML: $yml_content"
+            echo "JSON: $json_content"
+            exit 1
+          fi
+
+  test-keep-v-prefix:
+    name: Test Keep V Prefix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Create Test File
+        run: |
+          echo "version: v1.0.0" > test.yml
+      
+      - name: Test Version Updater
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v2.0.0'
+          files: |
+            "test.yml"
+          strip_v_prefix: false
+      
+      - name: Verify Output
+        run: |
+          content=$(cat test.yml)
+          if [[ "$content" != "version: v2.0.0" ]]; then
+            echo "Expected 'version: v2.0.0', got '$content'"
+            exit 1
+          fi

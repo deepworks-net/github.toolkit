@@ -90,25 +90,59 @@ def update_generic_file(filename, version, strip_v=True):
         print(f"Error updating {filename}: {e}")
         return False
 
+def update_file(filename, version, strip_v=True):
+    """Update version in a file based on its type."""
+    ext = os.path.splitext(filename)[1].lower()
+    
+    if ext in ['.yml', '.yaml']:
+        return update_yaml_file(filename, version, strip_v)
+    elif ext == '.json':
+        return update_json_file(filename, version, strip_v)
+    else:
+        return update_generic_file(filename, version, strip_v)
+
 def main():
     """Main function."""
+    # Get required inputs
     version = os.environ.get('INPUT_VERSION')
     if not version:
         print("Error: version input not set")
         sys.exit(1)
     
-    # Handle GitHub Actions multiline string format
-    files_input = os.environ.get('INPUT_FILES', '[]')
-    try:
-        # First try as JSON
-        files = json.loads(files_input)
-    except json.JSONDecodeError:
-        # If that fails, try as multiline string
-        files = [f.strip() for f in files_input.split('\n') if f.strip()]
+    # Process files input
+    files_input = os.environ.get('INPUT_FILES', '')
+    
+    # Split the multiline string into a list of files
+    # Strip quotes and whitespace from each line
+    files = [
+        f.strip().strip('"').strip("'")
+        for f in files_input.splitlines()
+        if f.strip()
+    ]
     
     if not files:
         print("No files specified to update")
+        print("::set-output name=files::[]")
         sys.exit(0)
+    
+    # Get strip_v_prefix option
+    strip_v = os.environ.get('INPUT_STRIP_V_PREFIX', 'true').lower() == 'true'
+    
+    # Keep track of successfully updated files
+    updated_files = []
+    
+    # Process each file
+    for filename in files:
+        if update_file(filename, version, strip_v):
+            updated_files.append(filename)
+    
+    # Output results for GitHub Actions
+    print(f"::set-output name=files::{json.dumps(updated_files)}")
+    
+    # Exit with success only if all files were updated
+    if len(updated_files) != len(files):
+        print(f"Warning: Only updated {len(updated_files)} of {len(files)} files")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

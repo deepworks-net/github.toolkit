@@ -79,6 +79,10 @@ theme:
       - 'Version Updater': 'workflows/version_updater.md'
     - 'Actions':
       - 'Overview': 'actions/index.md'
-      - 'Update Changelog': 'actions/update_changelog/index.md'
-      - 'Version Calculator': 'actions/version_calculator/index.md'
-      - 'Version Updater': 'actions/version_updater/index.md'
+      - 'Core': 
+        - 'actions/core/index.md'
+        - 'Version Calculator': 'actions/core/version_calculator/index.md'
+        - 'Version Updater': 'actions/core/version_updater/index.md'
+      - 'Composite':
+        - 'actions/composite/index.md'
+        - 'Update Changelog': 'actions/composite/update_changelog/index.md'

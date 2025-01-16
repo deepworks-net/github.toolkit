@@ -1,126 +1,91 @@
-# Custom Actions
+# Actions Overview
 
-This guide explains how to use GitHub Actions—tools that automate tasks in your projects to save time and improve reliability.
+## Architecture
 
-## What Actions Can Do
+Our GitHub Actions toolkit follows a layered architecture that promotes reusability, maintainability, and clear separation of concerns.
 
-### Version Calculator
+### Core Actions
 
-**[Click Here to Learn More](version_calculator/index.md)**
-This action calculates the next version number using your Git history. Ideal for:
+- Atomic, self-contained operations
+- Single responsibility principle
+- Highly reusable
+- [Learn more about Core Actions](core/index.md)
 
-- Preparing releases
-- Tracking version numbers
-- Generating changelogs
+### Composite Actions
 
-**Key Features:**
+- Combine core actions
+- Add workflow-specific logic
+- Higher-level operations
+- [Learn more about Composite Actions](composite/index.md)
 
-- Adheres to semantic versioning rules (major, minor, patch)
-- Analyzes your Git history to determine the version
-- Operates in a containerized environment for consistent execution
+## Directory Structure
 
-### Changelog Update
+```FILEDIR
+actions/
+├── core/                  # Atomic operations
+│   ├── version_calculator/
+│   └── version_updater/
+└── composite/            # Combined operations
+    └── update_changelog/
+```
 
-**[Click Here to Learn More](changelog_update/index.md)**
-This action synchronizes the repository's `CHANGELOG.md` with content from the draft release. It ensures an "Unreleased" section reflects all recent changes.
+## Usage Patterns
 
-**Key Features:**
-
-- Fetches draft release details using the GitHub API
-- Updates or creates an "Unreleased" section with recent changes
-- Maintains consistent formatting aligned with the repository's changelog style
-
----
-
-## How to Use These Actions
-
-You can integrate an action into your workflow with the following syntax:
+### Using Core Actions
 
 ```yaml
 steps:
-  - name: Use a GitHub Action
-    uses: ./actions/<action-name>
+  - name: Calculate Version
+    uses: deepworks-net/github.toolkit/actions/core/version_calculator@v1
+    with:
+      default_version: 'v0.1.0'
 ```
 
-### Tips for Success
+### Using Composite Actions
 
-1. **Choose the Right Version**
-    - Use specific tags or commit references for production environments to prevent unexpected changes.
-    - Use relative paths when testing actions locally.
-
-2. **Define Inputs and Outputs**
-    - Clearly specify required inputs and produced outputs.
-    - Use descriptive output names for easy referencing.
-
-3. **Handle Errors Gracefully**
-    - Ensure the action manages errors without breaking the workflow.
-    - Provide clear, actionable error messages to simplify debugging.
-
----
-
-## Making New Actions
-
-### Organizing Your Files
-
-Store action-related files in the following structure:
-
-```plaintext
-actions/
-└── <action-name>/
-    ├── action.yml      # Defines the action's behavior
-    ├── Dockerfile      # Required if using a container
-    ├── script.ext      # The main action logic
-    └── README.md       # Documentation for usage
+```yaml
+steps:
+  - name: Update Changelog
+    uses: deepworks-net/github.toolkit/actions/composite/update_changelog@v1
+    with:
+      content: ${% raw %}{{ steps.notes.outputs.content }}{% endraw %}
 ```
 
-### Key Steps
+## Standards
 
-- **Write Clear Documentation**: Include usage examples, input/output descriptions, and dependencies.
-- **Thoroughly Test**: Validate your action independently and within workflows, including failure scenarios.
-- **Keep It Updated**: Regularly update your action to fix bugs and support new features.
+### Docker Configuration
 
----
+- Standard base image (python:3.9-slim)
+- Consistent dependency management
+- Clear entrypoint configuration
 
-## Adding Actions to Workflows
+### Testing
 
-These actions are designed to integrate seamlessly into workflows. Refer to the [Workflows section](../workflows/index.md) for practical examples.
+- Comprehensive test workflows
+- Standard test structure
+- Clear naming conventions
 
----
+### Documentation
 
-## Creating Your Own Actions
+- Complete API documentation
+- Usage examples
+- Error handling guidance
 
-Follow these steps to build a custom action:
+## Contributing
 
-1. **Set Up**
-    - Create a folder: `mkdir -p actions/<your-action-name>`
-    - Add the following files:
-        - `action.yml`
-        - `README.md`
-        - Any additional scripts or assets
+See our guides for creating:
 
-2. **Document Your Action**
-    - Create a usage guide in `docs/actions/`.
-    - Update `mkdocs.yml` to include your new action in the navigation menu.
+- [New Core Actions](contributing/core-actions.md)
+- [New Composite Actions](contributing/composite-actions.md)
+- [Action Tests](contributing/testing.md)
 
-3. **Submit Your Work**
-    - Include tests to validate functionality.
-    - Follow consistent naming conventions for files and folders.
-    - Ensure your documentation is clear and accessible.
+## Available Actions
 
----
+### Core
 
-## Future Action Ideas
+- [Version Calculator](core/version_calculator/index.md)
+- [Version Updater](core/version_updater/index.md)
 
-Consider developing these actions to enhance workflows:
+### Composite
 
-1. Automatic changelog generation from commits
-2. Documentation validation for errors or omissions
-3. Configuration file management across projects
-
----
-
-## Helpful Links
-
-- [GitHub Actions Basics](https://docs.github.com/en/actions)
-- [How to Create Actions](https://docs.github.com/en/actions/creating-actions)
-- [Actions in Containers](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action)
+- [Update Changelog](composite/update_changelog/index.md)
