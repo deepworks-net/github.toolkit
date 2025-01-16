@@ -2,7 +2,7 @@
 name: Test Core Action - Version Calculator
 
 on:
-  pull_request:
+  pull_request: # When a workflow is triggered
     paths:
       - 'actions/core/version_calculator/**'
       - '.github/workflows/core.action.version_calculator.yml'
