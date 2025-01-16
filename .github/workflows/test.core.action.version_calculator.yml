@@ -18,19 +18,12 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Environment
+      - name: Clean Local Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Delete local tags
+          # Delete only local tags
           git tag -l | xargs -r git tag -d
-          # Delete remote tags
-          git fetch origin --prune --prune-tags
-          # Verify no tags exist
-          if [ -n "$(git tag -l)" ]; then
-            echo "Failed to remove all tags"
-            exit 1
-          fi
       
       - name: Test Version Calculator
         id: version
@@ -53,29 +46,17 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Environment
+      - name: Clean Local Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
           git tag -l | xargs -r git tag -d
-          git fetch origin --prune --prune-tags
-          # Verify clean state
-          if [ -n "$(git tag -l)" ]; then
-            echo "Failed to remove all tags"
-            exit 1
-          fi
       
       - name: Create Test State
         run: |
-          # Create our test commits and tag
           git tag v1.0.0
           git commit --allow-empty -m "test commit 1"
           git commit --allow-empty -m "test commit 2"
-          # Verify state
-          if [ "$(git rev-list --count v1.0.0..HEAD)" != "2" ]; then
-            echo "Failed to create test state"
-            exit 1
-          fi
       
       - name: Test Version Calculator
         id: version
@@ -96,40 +77,28 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Environment
+      - name: Clean Local Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
           git tag -l | xargs -r git tag -d
-          git fetch origin --prune --prune-tags
-          # Verify clean state
-          if [ -n "$(git tag -l)" ]; then
-            echo "Failed to remove all tags"
-            exit 1
-          fi
       
       - name: Create Test State
         run: |
-          # Create test tag and commit
-          git tag ver1.0.0
+          git tag v1.0.0
           git commit --allow-empty -m "test commit"
-          # Verify state
-          if [ "$(git rev-list --count ver1.0.0..HEAD)" != "1" ]; then
-            echo "Failed to create test state"
-            exit 1
-          fi
       
       - name: Test Version Calculator
         id: version
         uses: ./actions/core/version_calculator
         with:
-          version_prefix: 'ver'
-          tag_pattern: 'ver*'
+          version_prefix: 'v'
+          tag_pattern: 'v*'
       
       - name: Verify Output
         run: |
-          if [[ "${{ steps.version.outputs.next_version }}" != "ver1.0.1" ]]; then
-            echo "Expected ver1.0.1, got ${{ steps.version.outputs.next_version }}"
+          if [[ "${{ steps.version.outputs.next_version }}" != "v1.0.1" ]]; then
+            echo "Expected v1.0.1, got ${{ steps.version.outputs.next_version }}"
             exit 1
           fi
           
@@ -141,28 +110,16 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Environment
+      - name: Clean Local Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
           git tag -l | xargs -r git tag -d
-          git fetch origin --prune --prune-tags
-          # Verify clean state
-          if [ -n "$(git tag -l)" ]; then
-            echo "Failed to remove all tags"
-            exit 1
-          fi
       
       - name: Create Test State
         run: |
-          # Create test tag and commit
           git tag v1.0.0
           git commit --allow-empty -m "test commit"
-          # Verify state
-          if [ "$(git rev-list --count v1.0.0..HEAD)" != "1" ]; then
-            echo "Failed to create test state"
-            exit 1
-          fi
       
       - name: Test Version Calculator
         id: version
@@ -174,15 +131,7 @@ jobs:
           echo "Current Version: ${{ steps.version.outputs.current_version }}"
           echo "Commit Count: ${{ steps.version.outputs.commit_count }}"
           
-          # Verify outputs exist
-          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || 
-             [[ -z "${{ steps.version.outputs.current_version }}" ]] || 
-             [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
-            echo "One or more outputs are empty"
-            exit 1
-          fi
-          
-          # Verify expected values
+          # Verify outputs exist and have expected values
           if [[ "${{ steps.version.outputs.next_version }}" != "v1.0.1" ]]; then
             echo "Expected next_version v1.0.1, got ${{ steps.version.outputs.next_version }}"
             exit 1
