@@ -10,13 +10,35 @@ on:
   workflow_dispatch:  # Manual trigger for testing
 
 jobs:
+  setup:
+    name: Setup Clean Test Environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Remove All Tags
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git tag -l | xargs git tag -d
+          git fetch --prune --unshallow --tags
+          
   test-no-tags:
+    needs: setup
     name: Test Default Version (No Tags)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      
+      - name: Remove Existing Tags
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git tag -l | xargs git tag -d
       
       - name: Test Version Calculator
         id: version
@@ -32,6 +54,7 @@ jobs:
           fi
 
   test-with-tag:
+    needs: setup
     name: Test Version Calculation (With Tag)
     runs-on: ubuntu-latest
     steps:
@@ -39,10 +62,14 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Create Test Tag
+      - name: Remove Existing Tags
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
+          git tag -l | xargs git tag -d
+      
+      - name: Create Test Tag and Commits
+        run: |
           git tag v1.0.0
           git commit --allow-empty -m "test commit"
           git commit --allow-empty -m "test commit 2"
@@ -59,6 +86,7 @@ jobs:
           fi
 
   test-custom-prefix:
+    needs: setup
     name: Test Custom Version Prefix
     runs-on: ubuntu-latest
     steps:
@@ -66,10 +94,14 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Create Test Tag
+      - name: Remove Existing Tags
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
+          git tag -l | xargs git tag -d
+      
+      - name: Create Test Tag and Commit
+        run: |
           git tag ver1.0.0
           git commit --allow-empty -m "test commit"
       
@@ -88,6 +120,7 @@ jobs:
           fi
 
   test-all-outputs:
+    needs: setup
     name: Test All Outputs
     runs-on: ubuntu-latest
     steps:
@@ -95,10 +128,14 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Create Test Tag
+      - name: Remove Existing Tags
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
+          git tag -l | xargs git tag -d
+      
+      - name: Create Test Tag and Commit
+        run: |
           git tag v1.0.0
           git commit --allow-empty -m "test commit"
       
