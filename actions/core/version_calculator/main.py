@@ -25,11 +25,11 @@ def get_latest_tag():
 def get_commit_count_since_tag(tag):
     """Count commits since the latest tag."""
     try:
-        if tag == 'v0.1.0':  # If using default tag, count all commits
-            output = subprocess.check_output(['git', 'rev-list', '--count', 'HEAD'], text=True).strip()
+        if tag == 'v0.1.0':  # If using default tag, return 0
+            return 0
         else:
             output = subprocess.check_output(['git', 'rev-list', f'{tag}..HEAD', '--count'], text=True).strip()
-        return int(output)
+            return int(output)
     except subprocess.CalledProcessError as e:
         print(f"Error counting commits: {e}")
         sys.exit(1)
@@ -42,10 +42,13 @@ def calculate_next_version(latest_tag, version_prefix='v'):
         print(f"Invalid version format: {latest_tag}")
         sys.exit(1)
 
+    # If we're using default version, don't add commits
+    if latest_tag == f"{version_prefix}0.1.0":
+        return latest_tag
+
     major, minor, patch = map(int, match.groups())
     commit_count = get_commit_count_since_tag(latest_tag)
     next_patch = patch + commit_count
-
     return f"{version_prefix}{major}.{minor}.{next_patch}"
 
 def main():
