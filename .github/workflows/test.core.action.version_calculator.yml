@@ -92,6 +92,7 @@ jobs:
         id: version
         uses: ./actions/core/version_calculator
         with:
+          default_version: 'ver0.1.0'
           version_prefix: 'ver'
           tag_pattern: 'ver*'
       
@@ -136,15 +137,15 @@ jobs:
             fi
             
             # Verify values
-            if [[ "${{ steps.version.outputs.next_version }}" != "v0.1.0" ]]; then
-              echo "Expected next_version v0.1.0, got ${{ steps.version.outputs.next_version }}"
+            if [[ "${{ steps.version.outputs.next_version }}" != "v0.1.1" ]]; then
+              echo "Expected next_version v0.1.1, got ${{ steps.version.outputs.next_version }}"
               exit 1
             fi
             if [[ "${{ steps.version.outputs.current_version }}" != "v0.1.0" ]]; then
               echo "Expected current_version v0.1.0, got ${{ steps.version.outputs.current_version }}"
               exit 1
             fi
-            if [[ "${{ steps.version.outputs.commit_count }}" != "0" ]]; then
-              echo "Expected commit_count 0, got ${{ steps.version.outputs.commit_count }}"
+            if [[ "${{ steps.version.outputs.commit_count }}" != "1" ]]; then
+              echo "Expected commit_count 1, got ${{ steps.version.outputs.commit_count }}"
               exit 1
             fi
