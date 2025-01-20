@@ -33,8 +33,10 @@ jobs:
 
       - name: Verify Output Existence
         run: |
-          # Check if output exist
-          if [[ -z "${{ steps.version.outputs.next_version }}" ]]; then
+          # Check if outputs exist
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
@@ -43,6 +45,14 @@ jobs:
         run: |
           if [[ "${{ steps.version.outputs.next_version }}" != "v0.1.0" ]]; then
             echo "Expected v0.1.0, got ${{ steps.version.outputs.next_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.current_version }}" != "v0.1.0" ]]; then
+            echo "Expected current_version v0.1.0, got ${{ steps.version.outputs.current_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.commit_count }}" != "0" ]]; then
+            echo "Expected commit_count 0, got ${{ steps.version.outputs.commit_count }}"
             exit 1
           fi
 
@@ -72,8 +82,10 @@ jobs:
     
       - name: Verify Output Existence
         run: |
-          # Check if output exist
-          if [[ -z "${{ steps.version.outputs.next_version }}" ]]; then
+          # Check if outputs exist
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
@@ -82,6 +94,14 @@ jobs:
         run: |
           if [[ "${{ steps.version.outputs.next_version }}" != "v1.0.2" ]]; then
             echo "Expected v1.0.2 (due to 2 commits), got ${{ steps.version.outputs.next_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.current_version }}" != "v0.1.0" ]]; then
+            echo "Expected current_version v0.1.0, got ${{ steps.version.outputs.current_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.commit_count }}" != "2" ]]; then
+            echo "Expected commit_count 2, got ${{ steps.version.outputs.commit_count }}"
             exit 1
           fi
 
@@ -115,7 +135,9 @@ jobs:
       - name: Verify Output Existence
         run: |
           # Check if output exist
-          if [[ -z "${{ steps.version.outputs.next_version }}" ]]; then
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+            [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
@@ -124,6 +146,14 @@ jobs:
         run: |
           if [[ "${{ steps.version.outputs.next_version }}" != "ver1.0.1" ]]; then
             echo "Expected ver1.0.1, got ${{ steps.version.outputs.next_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.current_version }}" != "ver1.0.0" ]]; then
+            echo "Expected current_version ver1.0.0, got ${{ steps.version.outputs.current_version }}"
+            exit 1
+          fi
+          if [[ "${{ steps.version.outputs.commit_count }}" != "1" ]]; then
+            echo "Expected commit_count 1, got ${{ steps.version.outputs.commit_count }}"
             exit 1
           fi
           
