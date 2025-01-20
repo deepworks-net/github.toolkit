@@ -30,6 +30,16 @@ jobs:
         uses: ./actions/core/version_calculator
         with:
           default_version: 'v0.1.0'
+
+      - name: Verify Output Existence
+        run: |
+          # Check all outputs exist
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+              [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+              [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
+              echo "Missing required outputs"
+              exit 1
+          fi   
       
       - name: Verify Output
         run: |
@@ -61,8 +71,18 @@ jobs:
       - name: Test Version Calculator
         id: version
         uses: ./actions/core/version_calculator
+    
+      - name: Verify Output Existence
+        run: |
+          # Check all outputs exist
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+             [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+             [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
       
-      - name: Verify Output
+      - name: Verify Values
         run: |
           if [[ "${{ steps.version.outputs.next_version }}" != "v1.0.2" ]]; then
             echo "Expected v1.0.2 (due to 2 commits), got ${{ steps.version.outputs.next_version }}"
@@ -95,8 +115,18 @@ jobs:
           default_version: 'ver0.1.0'
           version_prefix: 'ver'
           tag_pattern: 'ver*'
+
+      - name: Verify Output Existence
+        run: |
+          # Check all outputs exist
+          if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
+             [[ -z "${{ steps.version.outputs.current_version }}" ]] || \
+             [[ -z "${{ steps.version.outputs.commit_count }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
       
-      - name: Verify Output
+      - name: Verify Output Values
         run: |
           if [[ "${{ steps.version.outputs.next_version }}" != "ver1.0.1" ]]; then
             echo "Expected ver1.0.1, got ${{ steps.version.outputs.next_version }}"
@@ -126,7 +156,7 @@ jobs:
         id: version
         uses: ./actions/core/version_calculator
       
-      - name: Verify All Outputs
+      - name: Verify Output Existence
         run: |
             # Check all outputs exist
             if [[ -z "${{ steps.version.outputs.next_version }}" ]] || \
