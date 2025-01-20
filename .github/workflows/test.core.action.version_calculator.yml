@@ -96,8 +96,8 @@ jobs:
             echo "Expected v1.0.2 (due to 2 commits), got ${{ steps.version.outputs.next_version }}"
             exit 1
           fi
-          if [[ "${{ steps.version.outputs.current_version }}" != "v0.1.0" ]]; then
-            echo "Expected current_version v0.1.0, got ${{ steps.version.outputs.current_version }}"
+          if [[ "${{ steps.version.outputs.current_version }}" != "v1.0.0" ]]; then
+            echo "Expected current_version v1.0.0, got ${{ steps.version.outputs.current_version }}"
             exit 1
           fi
           if [[ "${{ steps.version.outputs.commit_count }}" != "2" ]]; then
