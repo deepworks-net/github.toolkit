@@ -1,158 +1,197 @@
-# Version Updater Workflow Documentation
+# Version Updater Workflow
 
 ## Overview
 
-The **Version Updater Workflow** is a reusable GitHub workflow designed to update version numbers in specified configuration files. It integrates seamlessly into external repositories for consistent version management across various file formats.
+The Version Updater workflow provides a reusable workflow for updating version numbers across multiple files in a repository. It wraps the Version Updater core action, ensuring consistent version updates across different file types.
 
-### Key Features
+## Usage
 
-- Dynamically updates version numbers in YAML, JSON, and text files.
-- Supports version standardization by removing the `v` prefix if specified.
-- Allows external repositories to reuse the workflow by providing inputs for version control.
-
----
+```yaml
+jobs:
+  update:
+    uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_updater.yml@v1
+    with:
+      version: 'v2.0.0'
+      files: |
+        "README.md"
+        "package.json"
+      strip_v_prefix: true
+```
 
 ## Inputs
 
-### 1. `version` (Required)
+### `version`
 
-- **Description**: The version number to set.
-- **Type**: String
+- **Description**: Version number to set
 - **Required**: Yes
+- **Format**: `v1.2.3` or `1.2.3`
+- **Example**: `'v2.0.0'`
 
-### 2. `files` (Required)
+### `files`
 
-- **Description**: List of file paths to update. Accepts a JSON array of file paths.
-- **Type**: String
+- **Description**: Files to update
 - **Required**: Yes
+- **Format**: Multi-line string, one file per line
+- **Example**:
 
-### 3. `strip_v_prefix` (Optional)
+  ```yaml
+  files: |
+    "package.json"
+    "version.yml"
+  ```
 
-- **Description**: Whether to remove the `v` prefix from the version number.
-- **Type**: Boolean
+### `strip_v_prefix`
+
+- **Description**: Remove 'v' prefix when updating files
+- **Required**: No
 - **Default**: `true`
-
----
+- **Type**: boolean
 
 ## Outputs
 
-The **Version Updater Workflow** does not produce explicit outputs but relies on logs and the updated files for verification and validation.
+### `files`
 
----
+- **Description**: JSON array of successfully updated files
+- **Type**: String (JSON array)
+- **Example**: `'["package.json", "version.yml"]'`
 
-## Expected Behavior
+## Examples
 
-When the **Version Updater Workflow** is used:
-
-1. **With Provided Inputs**:
-    - The workflow fetches the repository's code and iterates through the files specified in the `files` input.
-    - It updates the `version` field in each file according to the file type.
-   
-2. **File Types and Behavior**:
-    - **YAML Files**: Updates `version:` fields.
-    - **JSON Files**: Updates the `version` key in JSON objects.
-    - **Generic Text Files**: Uses regex to locate and replace `version` definitions.
-
-3. **Edge Cases**:
-    - If a file does not contain a recognizable `version` field, a warning is logged, and the workflow continues.
-    - Missing or invalid files are skipped with a warning in the logs.
-
----
-
-## Example Usage
-
-### Workflow Call
-
-To use the Version Updater Workflow in an external repository:
+### Basic Usage
 
 ```yaml
 name: Update Version
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version'
+        required: true
+        type: string
 
 jobs:
-  update-version:
-    uses: your-username/github.actions/.github/workflows/version_updater.yml@v1
+  update:
+    uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_updater.yml@v1
     with:
-      version: "v2.0.1"
-      files: '["config.yml", "package.json", "README.md"]'
+      version: ${{ inputs.version }}
+      files: |
+        "package.json"
+        "version.yml"
+```
+
+### Integration with Version Calculator
+
+```yaml
+name: Release Version Update
+
+jobs:
+  calculate:
+    uses: ./.github/workflows/core.action.version_calculator.yml@v1
+    
+  update:
+    needs: calculate
+    uses: ./.github/workflows/core.action.version_updater.yml@v1
+    with:
+      version: ${{ needs.calculate.outputs.next_version }}
+      files: |
+        "package.json"
+        "version.yml"
+```
+
+### Keep Version Prefix
+
+```yaml
+jobs:
+  update:
+    uses: ./.github/workflows/core.action.version_updater.yml@v1
+    with:
+      version: 'v2.0.0'
+      files: |
+        "config.yml"
       strip_v_prefix: false
 ```
 
-### Logs for Validation
+## Error Handling
 
-The workflow provides logs for each file it updates, making it easy to verify changes:
+The workflow handles several error cases:
 
-```text
-Updated version in config.yml to v2.0.1
-Updated version in package.json to v2.0.1
-Warning: No version field found in README.md
-```
+1. **Input Validation**
+    - Invalid version format
+    - Empty files list
+    - Invalid file paths
 
----
+2. **File Operations**
+    - Missing files
+    - Permission issues
+    - Invalid file formats
 
-## Debugging Tips
+3. **Version Updates**
+    - No version fields found
+    - Update failures
 
-1. **Validate Inputs**: Ensure the `version` and `files` inputs are correctly specified.
-2. **Check File Accessibility**: Confirm that all file paths provided are valid and accessible.
-3. **Review Logs**: The workflow logs detailed information about updates and skips, which can help identify issues.
+### Error Outputs
 
----
+- Failed updates result in empty file array
+- Exit code 1 indicates failures
+- Detailed error messages in logs
 
-## File Structure
+## Behavior Matrix
 
-### 1. `version_updater.yml`
-
-Defines the reusable workflow with input specifications and steps to execute the **Version Updater** action.
-
-### 2. `version_updater.py`
-
-The Python script used by the action to update files.
-
----
-
-## References
-
-### Workflow Metadata
+### All Files Updated
 
 ```yaml
-on:
-  workflow_dispatch:  # Allows manual triggering
-  workflow_call:
-    inputs:
-      version:
-        required: true
-        type: string
-      files:
-        required: true
-        type: string
-      strip_v_prefix:
-        required: false
-        type: boolean
-        default: true
+# Input
+version: 'v2.0.0'
+files: |
+  "file1.yml"
+  "file2.json"
 
-jobs:
-  update-version:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          repository: ${% raw %}{{ github.repository }}{% endraw %}
-          ref: main
-          fetch-depth: 0
-
-      - name: Update The Version
-        id: update-version
-        uses: deepworks-net/github.toolkit/actions/version_updater@v1
-        with:
-          version: ${% raw %}{{ inputs.version }}{% endraw %}
-          files: ${% raw %}{{ inputs.files }}{% endraw %}
-          strip_v_prefix: ${% raw %}{{ inputs.strip_v_prefix }}{% endraw %}
+# Output
+files: '["file1.yml", "file2.json"]'
+exit_code: 0
 ```
 
-### Steps in Workflow
+### Partial Update
 
-1. **Checkout Code**: Ensures the repository is available for modification.
-2. **Run Version Updater**: Invokes the `Version Updater` action with provided inputs.
+```yaml
+# Input
+version: 'v2.0.0'
+files: |
+  "exists.json"
+  "missing.yml"
+
+# Output
+files: '["exists.json"]'
+exit_code: 1
+```
+
+### No Files Updated
+
+```yaml
+# Input
+version: 'v2.0.0'
+files: |
+  "missing.json"
+
+# Output
+files: '[]'
+exit_code: 1
+```
+
+## Implementation Details
+
+1. **Checkout**
+    - Fetches repository content
+    - No depth limitation
+    - Main branch checkout
+
+2. **Version Update**
+    - Preserves file formatting
+    - Maintains file structure
+    - Handles multiple file types
+
+3. **Output Handling**
+    - JSON array format
+    - Consistent error reporting
+    - Clear success/failure indication
