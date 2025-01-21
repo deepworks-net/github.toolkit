@@ -1,175 +1,163 @@
-# Version Calculator Workflow Documentation
+# Version Calculator Workflow
 
 ## Overview
 
-The **Version Calculator Workflow** is a reusable GitHub workflow designed to calculate the next version of a repository based on the latest Git tag and commit history. It integrates seamlessly into external repositories for dynamic versioning.
+The Version Calculator workflow provides a reusable workflow for calculating version numbers based on Git tags and commit history. It wraps the Version Calculator core action for easy integration into external repositories.
 
-### Key Features
-
-- Dynamically calculates the next version.
-- Provides the current version and commit count since the last tag.
-- Designed for external repositories to reuse without modifying internal workflows.
-
----
-
-## Inputs
-
-### 1. `default_version` (Optional)
-
-- **Description**: Default version to use when no tags exist.
-- **Type**: String
-- **Default**: `v0.1.0`
-
-### 2. `version_prefix` (Optional)
-
-- **Description**: Prefix for version tags (e.g., `v` in `v1.0.0`).
-- **Type**: String
-- **Default**: `v`
-
-### 3. `tag_pattern` (Optional)
-
-- **Description**: Pattern to match version tags.
-- **Type**: String
-- **Default**: `v*`
-
----
-
-## Outputs
-
-### 1. `next_version`
-
-- **Description**: The calculated next version.
-
-### 2. `current_version`
-
-- **Description**: The current version (latest tag or default).
-
-### 3. `commit_count`
-
-- **Description**: The number of commits since the last tag.
-
----
-
-## Expected Behavior
-
-When the **Version Calculator Workflow** is used:
-
-1. **Initial Run with No Tags**:
-    - If no tags exist in the repository, the workflow uses the `default_version` input (defaulting to `v0.1.0`).
-    - Outputs:
-        - `current_version`: `v0.1.0`
-        - `next_version`: `v0.1.0`
-        - `commit_count`: Total commits in the repository.
-
-2. **Run with Existing Tags**:
-    - The workflow identifies the latest tag matching the `tag_pattern`.
-    - It calculates the number of commits since the latest tag and increments the patch version accordingly.
-    - Outputs:
-        - `current_version`: Latest tag.
-        - `next_version`: Incremented patch version.
-        - `commit_count`: Commits since the latest tag.
-
-3. **Edge Cases**:
-    - If the latest tag does not match the `tag_pattern`, the workflow defaults to `default_version` behavior.
-    - If there are no new commits since the latest tag, the `next_version` will match the `current_version`.
-
----
-
-## Example Usage
-
-### Workflow Call
-
-To use the Version Calculator Workflow in an external repository:
+## Usage
 
 ```yaml
 name: Calculate Version
 
 on:
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:  # Manual trigger
+  push:              # Auto trigger
 
 jobs:
-  calculate-version:
-    uses: your-username/github.actions/.github/workflows/version_calculator.yml@v1
+  get-version:
+    uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_calculator.yml@v1
     with:
-      default_version: "v0.1.0"
-      version_prefix: "v"
-      tag_pattern: "v*"
-
-    outputs:
-      next_version: ${% raw %}{{ jobs.calculate-version.outputs.next_version }}{% endraw %}
-      current_version: ${% raw %}{{ jobs.calculate-version.outputs.current_version }}{% endraw %}
-      commit_count: ${% raw %}{{ jobs.calculate-version.outputs.commit_count }}{% endraw %}
+      default_version: "v0.1.0"  # Optional
+      version_prefix: "v"        # Optional
+      tag_pattern: "v*"         # Optional
 ```
 
-### Using Outputs in Subsequent Steps
+## Inputs
 
-Once the workflow is invoked, its outputs can be used in downstream jobs or steps:
+### `default_version` (Optional)
+
+- **Description**: Default version to use when no tags exist
+- **Type**: String
+- **Default**: `v0.1.0`
+- **Note**: Must match format `{prefix}\d+\.\d+\.\d+`
+
+### `version_prefix` (Optional)
+
+- **Description**: Prefix for version tags
+- **Type**: String
+- **Default**: `v`
+- **Example**: `'v'` for v1.0.0 or `'ver'` for ver1.0.0
+
+### `tag_pattern` (Optional)
+
+- **Description**: Pattern to match version tags
+- **Type**: String
+- **Default**: `v*`
+- **Note**: Should align with version_prefix
+
+## Outputs
+
+### `next_version`
+
+- **Description**: The calculated next version
+- **Type**: String
+- **Format**: `{prefix}\d+\.\d+\.\d+`
+
+### `current_version`
+
+- **Description**: Current version (latest tag or default)
+- **Type**: String
+- **Format**: `{prefix}\d+\.\d+\.\d+`
+
+### `commit_count`
+
+- **Description**: Number of commits since current version
+- **Type**: Number
+- **Note**: Returns 0 when using default_version
+
+## Behavior
+
+### Initial Run (No Tags)
 
 ```yaml
-      - name: Use Calculated Version
+Inputs:
+  default_version: "v0.1.0"
+  version_prefix: "v"
+  tag_pattern: "v*"
+
+Outputs:
+  current_version: "v0.1.0"
+  next_version: "v0.1.0"
+  commit_count: 0
+```
+
+### With Existing Tag
+
+```yaml
+# Repository state:
+# - Latest tag: v1.0.0
+# - 2 new commits
+
+Outputs:
+  current_version: "v1.0.0"
+  next_version: "v1.0.2"
+  commit_count: 2
+```
+
+### Custom Prefix
+
+```yaml
+Inputs:
+  default_version: "ver0.1.0"
+  version_prefix: "ver"
+  tag_pattern: "ver*"
+
+# Repository state:
+# - Latest tag: ver1.0.0
+# - 1 new commit
+
+Outputs:
+  current_version: "ver1.0.0"
+  next_version: "ver1.0.1"
+  commit_count: 1
+```
+
+## Example Implementations
+
+### Basic Usage
+
+```yaml
+jobs:
+  version:
+    uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_calculator.yml@v1
+
+  build:
+    needs: version
+    steps:
+      - name: Use Version
         run: |
-          echo "Next version: ${% raw %}{{ jobs.calculate-version.outputs.next_version }}{% endraw %}"
-          echo "Current version: ${% raw %}{{ jobs.calculate-version.outputs.current_version }}{% endraw %}"
-          echo "Commits since last tag: ${% raw %}{{ jobs.calculate-version.outputs.commit_count }}{% endraw %}"
+          echo "Next version: ${% raw %}{{ needs.version.outputs.next_version }}{% endraw %}"
+          echo "Current version: ${% raw %}{{ needs.version.outputs.current_version }}{% endraw %}"
+          echo "Commit count: ${% raw %}{{ needs.version.outputs.commit_count }}{% endraw %}"
 ```
 
----
-
-## Debugging Tips
-
-1. **Ensure Proper Tags Exist**: Verify that version tags in the repository match the specified `tag_pattern`.
-2. **Fetch Entire History**: Set `fetch-depth: 0` in the `actions/checkout` step to include all tags and commits.
-3. **Validate Inputs**: Double-check that input parameters match the repository's versioning scheme.
-
----
-
-## File Structure
-
-### 1. `version_calculator.yml`
-
-Defines the reusable workflow with input and output specifications.
-
-### 2. `version_calculator.py`
-
-The Python script used for version calculation (referenced within the action).
-
----
-
-## References
-
-### Workflow Highlights
+### Custom Versioning
 
 ```yaml
-on:
-  workflow_dispatch:  # Allows manual triggering
-  workflow_call:
-    inputs:
-      default_version:
-        type: string
-        required: false
-        default: 'v0.1.0'
-      version_prefix:
-        type: string
-        required: false
-        default: 'v'
-      tag_pattern:
-        type: string
-        required: false
-        default: 'v*'
-    outputs:
-      next_version:
-        description: "Calculated next version"
-        value: ${% raw %}{{ jobs.calculate-version.outputs.next_version }}{% endraw %}
-      current_version:
-        description: "Current version"
-        value: ${% raw %}{{ jobs.calculate-version.outputs.current_version }}{% endraw %}
-      commit_count:
-        description: "Commit count since last tag"
-        value: ${% raw %}{{ jobs.calculate-version.outputs.commit_count }}{% endraw %}
+jobs:
+  version:
+    uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_calculator.yml@v1
+    with:
+      default_version: "ver0.1.0"
+      version_prefix: "ver"
+      tag_pattern: "ver*"
 ```
 
-### Workflow Outputs
+## Error Handling
 
-- `next_version`: Computed based on commits since the last tag.
-- `current_version`: The latest tag or default version.
-- `commit_count`: Number of commits since the last tag.
+The workflow handles errors from the core action:
+
+1. **Input Validation**
+   - Invalid version format
+   - Mismatched prefix/default_version
+   - Invalid patterns
+
+2. **Git Operations**
+   - Repository access issues
+   - Tag retrieval failures
+   - Configuration problems
+
+3. **Version Calculation**
+   - Invalid tag formats
+   - Counting errors
+   - Pattern matching failures

@@ -19,11 +19,11 @@ jobs:
 
       - name: Calculate next version
         id: calculate-version
-        uses: deepworks-net/github.toolkit/actions/core/version_calculator@v1
+        uses: ./actions/core/version_calculator@v1
 
       - name: Update The Version
         id: update-version
-        uses: deepworks-net/github.toolkit/actions/core/version_updater@v1
+        uses: ./actions/core/version_updater@v1
         with:
           version: ${{ steps.calculate-version.outputs.next_version }}
           files: |

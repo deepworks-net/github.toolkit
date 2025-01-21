@@ -69,6 +69,8 @@ theme:
       - 'Meta Level': 'meta-level.md'
       - 'Release Process': 'release-process.md'
       - 'Repository': 'repo/index.md'
+    - 'Structure':
+      - 'Core Action': 'structure/core_action.md'
     - 'Workflows':
       - 'Create Release Tag': 'workflows/create-release-tag.md'
       - 'Publish Github Release': 'workflows/release-drafter.md'
