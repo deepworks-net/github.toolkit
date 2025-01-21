@@ -73,6 +73,7 @@ theme:
       - 'Overview': 'actions/index.md'
       - 'Core': 
         - 'actions/core/index.md'
+        - 'Manage Release': 'actions/core/manage_release/index.md'
         - 'Version Calculator': 'actions/core/version_calculator/index.md'
         - 'Version Updater': 'actions/core/version_updater/index.md'
       - 'Composite':

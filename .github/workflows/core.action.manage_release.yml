@@ -1,0 +1,55 @@
+# .github/workflows/core.action.manage_release.yml
+name: Core (Atomic) Action - Manage Release
+
+on:
+  workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    inputs:
+      github-token:
+        required: true
+        type: string
+        description: "GitHub token for API access"
+      mode:
+        required: true
+        type: string
+        description: "Operation mode (pr-merge, prepare-release)"
+      pr-number:
+        required: false
+        type: string
+        description: "PR number for pr-merge mode"
+      pr-title:
+        required: false
+        type: string
+        description: "PR title for pr-merge mode"
+      version:
+        required: false
+        type: string
+        description: "Version for prepare-release mode"
+    outputs:
+      content:
+        description: "Release notes content"
+        value: ${{ jobs.manage-release.outputs.content }}
+
+jobs:
+  manage-release:
+    runs-on: ubuntu-latest
+    outputs:
+      content: ${{ steps.release.outputs.content }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}  # Ensures the current repository
+          ref: main
+          fetch-depth: 0
+      
+      - name: Manage Release
+        id: release
+        uses: deepworks-net/github.toolkit/actions/core/manage_release@v1
+        with:
+          github-token: ${{ inputs.github-token }}
+          mode: ${{ inputs.mode }}
+          pr-number: ${{ inputs.pr-number }}
+          pr-title: ${{ inputs.pr-title }}
+          version: ${{ inputs.version }}

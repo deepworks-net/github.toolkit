@@ -76,6 +76,7 @@ steps:
 ### Core
 
 - [Core Actions](actions/core/index.md)
+    - [Manage Release](actions/core/manage_release.md)
     - [Version Calculator](actions/core/version_calculator/index.md)
     - [Version Updater](actions/core/version_updater/index.md)
 

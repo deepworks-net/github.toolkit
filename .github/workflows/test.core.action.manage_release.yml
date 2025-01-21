@@ -1,0 +1,112 @@
+# .github/workflows/test.core.action.manage_release.yml
+name: Test Core Action - Manage Release
+
+on:
+  pull_request:
+    paths:
+      - 'actions/core/manage_release/**'
+      - '.github/workflows/core.action.manage_release.yml'
+      - '.github/workflows/test.core.action.manage_release.yml'
+  workflow_dispatch:
+
+jobs:
+  test-pr-merge:
+    name: Test PR Merge Mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Manage Release
+        id: release
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'pr-merge'
+          pr-number: '123'
+          pr-title: 'Test PR'
+      
+      - name: Verify Output
+        run: |
+          if [[ -z "${{ steps.release.outputs.content }}" ]]; then
+            echo "Missing content output"
+            exit 1
+          fi
+          if [[ "${{ steps.release.outputs.content }}" != *"PR #123: Test PR"* ]]; then
+            echo "Content doesn't contain PR information"
+            exit 1
+          fi
+
+  test-prepare-release:
+    name: Test Prepare Release Mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Manage Release
+        id: release
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'prepare-release'
+          version: 'v1.0.0'
+      
+      - name: Verify Output Existence
+        run: |
+          if [[ -z "${{ steps.release.outputs.content }}" ]]; then
+            echo "Missing content output"
+            exit 1
+          fi
+
+  test-invalid-mode:
+    name: Test Invalid Mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Invalid Mode
+        id: release
+        continue-on-error: true
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'invalid'
+      
+      - name: Verify Failure
+        if: steps.release.outcome == 'success'
+        run: |
+          echo "Expected action to fail with invalid mode"
+          exit 1
+
+  test-missing-inputs:
+    name: Test Missing Required Inputs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Missing PR Info
+        id: release-pr
+        continue-on-error: true
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'pr-merge'
+      
+      - name: Verify PR Mode Failure
+        if: steps.release-pr.outcome == 'success'
+        run: |
+          echo "Expected action to fail without PR info"
+          exit 1
+      
+      - name: Test Missing Version
+        id: release-version
+        continue-on-error: true
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'prepare-release'
+      
+      - name: Verify Version Mode Failure
+        if: steps.release-version.outcome == 'success'
+        run: |
+          echo "Expected action to fail without version"
+          exit 1
