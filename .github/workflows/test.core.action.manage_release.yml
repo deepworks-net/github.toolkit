@@ -20,7 +20,7 @@ jobs:
         id: draft
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'draft'
           name: 'Test Release'
           body: 'Initial content'
@@ -50,7 +50,7 @@ jobs:
         id: get
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'get'
       
       - name: Verify Output Format
@@ -70,7 +70,7 @@ jobs:
         id: draft
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'draft'
           body: 'Initial content'
       
@@ -78,7 +78,7 @@ jobs:
         id: update-replace
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'update'
           content: 'New content'
           update_mode: 'replace'
@@ -94,7 +94,7 @@ jobs:
         id: update-append
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'update'
           content: 'Additional content'
           update_mode: 'append'
@@ -117,7 +117,7 @@ jobs:
         continue-on-error: true
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'invalid'
       
       - name: Verify Invalid Operation
@@ -131,7 +131,7 @@ jobs:
         continue-on-error: true
         uses: ./actions/core/manage_release
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: 'update'
       
       - name: Verify No Content Error

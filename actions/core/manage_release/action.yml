@@ -3,7 +3,7 @@ description: "Manages GitHub draft releases - create, get, and update operations
 author: "Deepworks"
 
 inputs:
-  github-token:
+  github_token:        # Changed from github-token to github_token
     description: 'GitHub token for API access'
     required: true
   operation:

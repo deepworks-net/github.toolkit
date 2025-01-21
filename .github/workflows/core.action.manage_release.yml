@@ -72,7 +72,7 @@ jobs:
         id: release
         uses: deepworks-net/github.toolkit/actions/core/manage_release@v1
         with:
-          github-token: ${{ inputs.github-token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           operation: ${{ inputs.operation }}
           name: ${{ inputs.name }}
           body: ${{ inputs.body }}

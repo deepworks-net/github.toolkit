@@ -17,7 +17,7 @@ def validate_inputs():
     """Validate required inputs."""
     token = os.environ.get('INPUT_GITHUB_TOKEN')
     if not token:
-        print("Error: github-token input not set")
+        print("Error: github_token input not set")
         sys.exit(1)
         
     operation = os.environ.get('INPUT_OPERATION', 'get')
