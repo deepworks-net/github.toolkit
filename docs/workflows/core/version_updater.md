@@ -74,7 +74,7 @@ jobs:
   update:
     uses: deepworks-net/github.toolkit/.github/workflows/core.action.version_updater.yml@v1
     with:
-      version: ${{ inputs.version }}
+      version: ${% raw %}{{ inputs.version }}{% endraw %}
       files: |
         "package.json"
         "version.yml"
@@ -93,7 +93,7 @@ jobs:
     needs: calculate
     uses: ./.github/workflows/core.action.version_updater.yml@v1
     with:
-      version: ${{ needs.calculate.outputs.next_version }}
+      version: ${% raw %}{{ needs.calculate.outputs.next_version }}{% endraw %}
       files: |
         "package.json"
         "version.yml"

@@ -69,16 +69,6 @@ theme:
       - 'Meta Level': 'meta-level.md'
       - 'Release Process': 'release-process.md'
       - 'Repository': 'repo/index.md'
-    - 'Structure':
-      - 'Core Action': 'structure/core_action.md'
-    - 'Workflows':
-      - 'Create Release Tag': 'workflows/create-release-tag.md'
-      - 'Publish Github Release': 'workflows/release-drafter.md'
-      - 'Prepare Release': 'workflows/prepare-release.md'
-      - 'Update Changelog': 'workflows/update-changelog.md'
-      - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
-      - 'Version Calculator': 'workflows/version_calculator.md'
-      - 'Version Updater': 'workflows/version_updater.md'
     - 'Actions':
       - 'Overview': 'actions/index.md'
       - 'Core': 
@@ -88,3 +78,19 @@ theme:
       - 'Composite':
         - 'actions/composite/index.md'
         - 'Update Changelog': 'actions/composite/update_changelog/index.md'
+    - 'Workflows':
+      - 'Overview': 'workflows/index.md'
+      - 'Core': 
+        - 'Version Calculator': 'workflows/core/version_calculator.md'
+        - 'Version Updater': 'workflows/core/version_updater.md'
+      - 'Composite':
+        - 'Create Release Tag': 'workflows/create-release-tag.md'
+        - 'Publish Github Release': 'workflows/release-drafter.md'
+        - 'Prepare Release': 'workflows/prepare-release.md'
+        - 'Update Changelog': 'workflows/update-changelog.md'
+        - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
+    - 'Tests':
+      - 'Overview': 'tests/index.md'
+      - 'Core': 
+        - 'Version Calculator': 'tests/core/version_calculator.md'
+        - 'Version Updater': 'tests/core/version_updater.md'

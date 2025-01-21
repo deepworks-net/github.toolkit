@@ -71,20 +71,13 @@ steps:
 - Usage examples
 - Error handling guidance
 
-## Contributing
-
-See our guides for creating:
-
-- [New Core Actions](contributing/core-actions.md)
-- [New Composite Actions](contributing/composite-actions.md)
-- [Action Tests](contributing/testing.md)
-
 ## Available Actions
 
 ### Core
 
-- [Version Calculator](core/version_calculator/index.md)
-- [Version Updater](core/version_updater/index.md)
+- [Core Actions](actions/core/index.md)
+    - [Version Calculator](actions/core/version_calculator/index.md)
+    - [Version Updater](actions/core/version_updater/index.md)
 
 ### Composite
 
