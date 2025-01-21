@@ -57,9 +57,10 @@ jobs:
       
       - name: Verify Output
         run: |
-          content=$(cat test.json)
-          if [[ "$content" != '{"version": "2.0.0"}' ]]; then
-            echo "Expected '{\"version\": \"2.0.0\"}', got '$content'"
+          content=$(cat test.json | jq -c '.')  # Compact the JSON
+          expected='{"version":"2.0.0"}'
+          if [[ "$content" != "$expected" ]]; then
+            echo "Expected '$expected', got '$content'"
             exit 1
           fi
 
@@ -85,15 +86,16 @@ jobs:
       
       - name: Verify Outputs
         run: |
-          yml_content=$(cat test1.yml)
-          json_content=$(cat test2.json)
-          if [[ "$yml_content" != "version: 2.0.0" ]] || \
-             [[ "$json_content" != '{"version": "2.0.0"}' ]]; then
-            echo "Files not updated correctly"
-            echo "YAML: $yml_content"
-            echo "JSON: $json_content"
-            exit 1
-          fi
+            yml_content=$(cat test1.yml)
+            json_content=$(cat test2.json | jq -c '.')
+            expected_json='{"version":"2.0.0"}'
+            if [[ "$yml_content" != "version: 2.0.0" ]] || \
+                [[ "$json_content" != "$expected_json" ]]; then
+                echo "Files not updated correctly"
+                echo "YAML: $yml_content"
+                echo "JSON: $json_content"
+                exit 1
+            fi    
 
   test-keep-v-prefix:
     name: Test Keep V Prefix
@@ -212,13 +214,23 @@ jobs:
       
       - name: Verify Output Format
         run: |
-          # Check if output is valid JSON array
-          if ! echo "${{ steps.updater.outputs.files }}" | jq -e . >/dev/null 2>&1; then
-            echo "Invalid JSON array output: ${{ steps.updater.outputs.files }}"
-            exit 1
-          fi
-          # Check if contains both files
-          if [[ $(echo "${{ steps.updater.outputs.files }}" | jq length) != 2 ]]; then
-            echo "Expected 2 files in output, got: ${{ steps.updater.outputs.files }}"
-            exit 1
-          fi
+            output='${{ steps.updater.outputs.files }}'
+            # Check if output is valid JSON array
+            if ! echo "$output" | jq -e . >/dev/null 2>&1; then
+                echo "Invalid JSON array output: $output"
+                exit 1
+            fi
+            # Check if contains both files
+            if [[ $(echo "$output" | jq length) != 2 ]]; then
+                echo "Expected 2 files in output, got: $output"
+                exit 1
+            fi
+            # Verify specific files are present
+            if ! echo "$output" | jq -e 'contains(["test1.yml"])' >/dev/null; then
+                echo "Output missing test1.yml"
+                exit 1
+            fi
+            if ! echo "$output" | jq -e 'contains(["test2.json"])' >/dev/null; then
+                echo "Output missing test2.json"
+                exit 1
+            fi
