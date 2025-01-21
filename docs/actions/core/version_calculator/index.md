@@ -97,19 +97,19 @@ steps:
 The action will fail with clear error messages in these cases:
 
 1. **Invalid Version Format**
-   - Version doesn't match pattern: `{prefix}\d+\.\d+\.\d+`
-   - Default version doesn't match specified prefix
-   - Tag found with invalid format
+    - Version doesn't match pattern: `{prefix}\d+\.\d+\.\d+`
+    - Default version doesn't match specified prefix
+    - Tag found with invalid format
 
 2. **Git Errors**
-   - Unable to access repository
-   - Git configuration issues
-   - Tag retrieval fails
+    - Unable to access repository
+    - Git configuration issues
+    - Tag retrieval fails
 
 3. **Input Validation**
-   - Mismatched prefix and default_version
-   - Invalid version pattern
-   - Invalid tag pattern
+    - Mismatched prefix and default_version
+    - Invalid version pattern
+    - Invalid tag pattern
 
 ## Implementation
 

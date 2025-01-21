@@ -148,16 +148,16 @@ jobs:
 The workflow handles errors from the core action:
 
 1. **Input Validation**
-   - Invalid version format
-   - Mismatched prefix/default_version
-   - Invalid patterns
+    - Invalid version format
+    - Mismatched prefix/default_version
+    - Invalid patterns
 
 2. **Git Operations**
-   - Repository access issues
-   - Tag retrieval failures
-   - Configuration problems
+    - Repository access issues
+    - Tag retrieval failures
+    - Configuration problems
 
 3. **Version Calculation**
-   - Invalid tag formats
-   - Counting errors
-   - Pattern matching failures
+    - Invalid tag formats
+    - Counting errors
+    - Pattern matching failures
