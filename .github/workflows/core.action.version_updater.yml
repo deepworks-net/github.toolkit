@@ -1,4 +1,4 @@
-# .github/workflows/core_action.version_updater.yml
+# .github/workflows/core.action.version_updater.yml
 name: Core (Atomic) Action - Version Updater
 
 on:
@@ -8,21 +8,26 @@ on:
       version:
         required: true
         type: string
+        description: "Version to set (format: v1.2.3 or 1.2.3)"
       files:
         required: true
         type: string
+        description: "Files to update (one per line)"
       strip_v_prefix:
         required: false
         type: boolean
         default: true
+        description: "Remove v prefix when updating files"
     outputs:
       files:
-        description: "Outputs a list of files that have been updated"
+        description: "List of successfully updated files"
         value: ${{ jobs.update-version.outputs.files }}
 
 jobs:
   update-version:
     runs-on: ubuntu-latest 
+    permissions:
+      contents: read
 
     outputs:
       files: ${{ steps.update-version.outputs.files }}
@@ -30,12 +35,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository }}  # Ensures the current repository
-          ref: main
-          fetch-depth: 0
-
-      - name: Update The Version
+      
+      - name: Update Version
         id: update-version
         uses: deepworks-net/github.toolkit/actions/core/version_updater@v1
         with:

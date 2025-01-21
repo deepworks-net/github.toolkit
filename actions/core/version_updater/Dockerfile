@@ -11,7 +11,8 @@ RUN apt-get update && \
 RUN git config --global --add safe.directory /github/workspace
 
 # Install Python dependencies
-RUN pip install PyYAML
+COPY requirements.txt /action/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy action files
 COPY *.py /action/

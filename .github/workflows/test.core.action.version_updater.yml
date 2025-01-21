@@ -120,3 +120,105 @@ jobs:
             echo "Expected 'version: v2.0.0', got '$content'"
             exit 1
           fi
+
+  test-invalid-version:
+    name: Test Invalid Version Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Invalid Version
+        id: updater
+        continue-on-error: true
+        uses: ./actions/core/version_updater
+        with:
+          version: 'invalid'
+          files: |
+            "test.yml"
+      
+      - name: Verify Failure
+        if: steps.updater.outcome == 'success'
+        run: |
+          echo "Expected action to fail with invalid version"
+          exit 1
+
+  test-missing-file:
+    name: Test Missing File
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Missing File
+        id: updater
+        continue-on-error: true
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v1.0.0'
+          files: |
+            "nonexistent.yml"
+      
+      - name: Verify Output
+        run: |
+          if [[ "${{ steps.updater.outputs.files }}" != "[]" ]]; then
+            echo "Expected empty files array, got: ${{ steps.updater.outputs.files }}"
+            exit 1
+          fi
+
+  test-no-version-field:
+    name: Test No Version Field
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Test File
+        run: |
+          echo "key: value" > test.yml
+      
+      - name: Test No Version Field
+        id: updater
+        continue-on-error: true
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v1.0.0'
+          files: |
+            "test.yml"
+      
+      - name: Verify Output
+        run: |
+          if [[ "${{ steps.updater.outputs.files }}" != "[]" ]]; then
+            echo "Expected empty files array, got: ${{ steps.updater.outputs.files }}"
+            exit 1
+          fi
+
+  test-output-format:
+    name: Test Output Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Test Files
+        run: |
+          echo "version: 1.0.0" > test1.yml
+          echo '{"version": "1.0.0"}' > test2.json
+      
+      - name: Test Output Format
+        id: updater
+        uses: ./actions/core/version_updater
+        with:
+          version: 'v2.0.0'
+          files: |
+            "test1.yml"
+            "test2.json"
+      
+      - name: Verify Output Format
+        run: |
+          # Check if output is valid JSON array
+          if ! echo "${{ steps.updater.outputs.files }}" | jq -e . >/dev/null 2>&1; then
+            echo "Invalid JSON array output: ${{ steps.updater.outputs.files }}"
+            exit 1
+          fi
+          # Check if contains both files
+          if [[ $(echo "${{ steps.updater.outputs.files }}" | jq length) != 2 ]]; then
+            echo "Expected 2 files in output, got: ${{ steps.updater.outputs.files }}"
+            exit 1
+          fi

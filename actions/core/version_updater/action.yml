@@ -1,22 +1,27 @@
 name: "Version Updater"
 description: "Updates version numbers in configuration files"
+author: "Deepworks"
+
 inputs:
   version:
-    description: 'Version number to set'
+    description: 'Version number to set (format: v1.2.3 or 1.2.3)'
     required: true
   files:
-    description: 'Files to update (array of file paths)'
-    required: false
-    default: ''
+    description: 'Files to update (one per line)'
+    required: true
   strip_v_prefix:
     description: 'Remove "v" prefix from version when updating files'
     required: false
     default: 'true'
 
+outputs:
+  files:
+    description: 'JSON array of successfully updated files'
+
 runs:
   using: "docker"
   image: "Dockerfile"
-  env:
-    INPUT_VERSION: ${{ inputs.version }}
-    INPUT_FILES: ${{ inputs.files }}
-    INPUT_STRIP_V_PREFIX: ${{ inputs.strip_v_prefix }}
+
+branding:
+  icon: "edit"
+  color: "blue"
