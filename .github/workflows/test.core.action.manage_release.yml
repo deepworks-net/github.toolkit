@@ -10,103 +10,132 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-pr-merge:
-    name: Test PR Merge Mode
+  test-draft-operation:
+    name: Test Draft Operation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Test Manage Release
-        id: release
+      - name: Create Draft Release
+        id: draft
         uses: ./actions/core/manage_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'pr-merge'
-          pr-number: '123'
-          pr-title: 'Test PR'
+          operation: 'draft'
+          name: 'Test Release'
+          body: 'Initial content'
       
-      - name: Verify Output
+      - name: Verify Outputs
         run: |
-          if [[ -z "${{ steps.release.outputs.content }}" ]]; then
-            echo "Missing content output"
+          if [[ "${{ steps.draft.outputs.exists }}" != "true" ]]; then
+            echo "Draft release not created"
             exit 1
           fi
-          if [[ "${{ steps.release.outputs.content }}" != *"PR #123: Test PR"* ]]; then
-            echo "Content doesn't contain PR information"
+          if [[ -z "${{ steps.draft.outputs.id }}" ]]; then
+            echo "Missing release ID"
+            exit 1
+          fi
+          if [[ "${{ steps.draft.outputs.body }}" != "Initial content" ]]; then
+            echo "Incorrect release content"
             exit 1
           fi
 
-  test-prepare-release:
-    name: Test Prepare Release Mode
+  test-get-operation:
+    name: Test Get Operation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Test Manage Release
-        id: release
+      - name: Get Draft Release
+        id: get
         uses: ./actions/core/manage_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'prepare-release'
-          version: 'v1.0.0'
+          operation: 'get'
       
-      - name: Verify Output Existence
+      - name: Verify Output Format
         run: |
-          if [[ -z "${{ steps.release.outputs.content }}" ]]; then
-            echo "Missing content output"
+          if [[ "${{ steps.get.outputs.exists }}" != "true" ]] && [[ "${{ steps.get.outputs.exists }}" != "false" ]]; then
+            echo "Invalid exists output"
             exit 1
           fi
 
-  test-invalid-mode:
-    name: Test Invalid Mode
+  test-update-operation:
+    name: Test Update Operation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Test Invalid Mode
-        id: release
+      - name: Create Initial Draft
+        id: draft
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          operation: 'draft'
+          body: 'Initial content'
+      
+      - name: Update Draft - Replace
+        id: update-replace
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          operation: 'update'
+          content: 'New content'
+          update_mode: 'replace'
+      
+      - name: Verify Replace
+        run: |
+          if [[ "${{ steps.update-replace.outputs.body }}" != "New content" ]]; then
+            echo "Content not replaced"
+            exit 1
+          fi
+      
+      - name: Update Draft - Append
+        id: update-append
+        uses: ./actions/core/manage_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          operation: 'update'
+          content: 'Additional content'
+          update_mode: 'append'
+      
+      - name: Verify Append
+        run: |
+          if [[ "${{ steps.update-append.outputs.body }}" != *"Additional content"* ]]; then
+            echo "Content not appended"
+            exit 1
+          fi
+
+  test-error-cases:
+    name: Test Error Cases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Invalid Operation
+        id: invalid-op
         continue-on-error: true
         uses: ./actions/core/manage_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'invalid'
+          operation: 'invalid'
       
-      - name: Verify Failure
-        if: steps.release.outcome == 'success'
+      - name: Verify Invalid Operation
+        if: steps.invalid-op.outcome == 'success'
         run: |
-          echo "Expected action to fail with invalid mode"
+          echo "Expected failure for invalid operation"
           exit 1
-
-  test-missing-inputs:
-    name: Test Missing Required Inputs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       
-      - name: Test Missing PR Info
-        id: release-pr
+      - name: Test Update Without Content
+        id: no-content
         continue-on-error: true
         uses: ./actions/core/manage_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'pr-merge'
+          operation: 'update'
       
-      - name: Verify PR Mode Failure
-        if: steps.release-pr.outcome == 'success'
+      - name: Verify No Content Error
+        if: steps.no-content.outcome == 'success'
         run: |
-          echo "Expected action to fail without PR info"
-          exit 1
-      
-      - name: Test Missing Version
-        id: release-version
-        continue-on-error: true
-        uses: ./actions/core/manage_release
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'prepare-release'
-      
-      - name: Verify Version Mode Failure
-        if: steps.release-version.outcome == 'success'
-        run: |
-          echo "Expected action to fail without version"
+          echo "Expected failure for update without content"
           exit 1

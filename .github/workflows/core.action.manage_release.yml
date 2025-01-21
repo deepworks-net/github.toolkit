@@ -9,32 +9,56 @@ on:
         required: true
         type: string
         description: "GitHub token for API access"
-      mode:
-        required: true
-        type: string
-        description: "Operation mode (pr-merge, prepare-release)"
-      pr-number:
+      operation:
         required: false
         type: string
-        description: "PR number for pr-merge mode"
-      pr-title:
+        default: 'get'
+        description: "Operation to perform (draft, get, update)"
+      name:
         required: false
         type: string
-        description: "PR title for pr-merge mode"
-      version:
+        default: 'Draft Release'
+        description: "Release name for draft operation"
+      body:
         required: false
         type: string
-        description: "Version for prepare-release mode"
-    outputs:
+        default: ''
+        description: "Initial release body for draft operation"
       content:
-        description: "Release notes content"
-        value: ${{ jobs.manage-release.outputs.content }}
+        required: false
+        type: string
+        description: "Content for update operation"
+      update_mode:
+        required: false
+        type: string
+        default: 'replace'
+        description: "How to update content (replace, append, prepend)"
+    outputs:
+      id:
+        description: "Release ID"
+        value: ${{ jobs.manage-release.outputs.id }}
+      body:
+        description: "Release content"
+        value: ${{ jobs.manage-release.outputs.body }}
+      tag_name:
+        description: "Release tag name"
+        value: ${{ jobs.manage-release.outputs.tag_name }}
+      name:
+        description: "Release name"
+        value: ${{ jobs.manage-release.outputs.name }}
+      exists:
+        description: "Whether draft release exists"
+        value: ${{ jobs.manage-release.outputs.exists }}
 
 jobs:
   manage-release:
     runs-on: ubuntu-latest
     outputs:
-      content: ${{ steps.release.outputs.content }}
+      id: ${{ steps.release.outputs.id }}
+      body: ${{ steps.release.outputs.body }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      name: ${{ steps.release.outputs.name }}
+      exists: ${{ steps.release.outputs.exists }}
 
     steps:
       - name: Checkout code
@@ -49,7 +73,8 @@ jobs:
         uses: deepworks-net/github.toolkit/actions/core/manage_release@v1
         with:
           github-token: ${{ inputs.github-token }}
-          mode: ${{ inputs.mode }}
-          pr-number: ${{ inputs.pr-number }}
-          pr-title: ${{ inputs.pr-title }}
-          version: ${{ inputs.version }}
+          operation: ${{ inputs.operation }}
+          name: ${{ inputs.name }}
+          body: ${{ inputs.body }}
+          content: ${{ inputs.content }}
+          update_mode: ${{ inputs.update_mode }}

@@ -1,32 +1,47 @@
 name: "Manage Release"
-description: "Manages release notes content in draft releases"
+description: "Manages GitHub draft releases - create, get, and update operations"
 author: "Deepworks"
 
 inputs:
   github-token:
     description: 'GitHub token for API access'
     required: true
-  mode:
-    description: 'Operation mode (pr-merge, prepare-release)'
-    required: true
-  pr-number:
-    description: 'PR number for pr-merge mode'
+  operation:
+    description: 'Operation to perform (draft, get, update)'
     required: false
-  pr-title:
-    description: 'PR title for pr-merge mode'
+    default: 'get'
+  name:
+    description: 'Release name for draft operation'
     required: false
-  version:
-    description: 'Version for prepare-release mode'
+    default: 'Draft Release'
+  body:
+    description: 'Initial release body for draft operation'
     required: false
+    default: ''
+  content:
+    description: 'Content for update operation'
+    required: false
+  update_mode:
+    description: 'How to update content (replace, append, prepend)'
+    required: false
+    default: 'replace'
 
 outputs:
-  content:
-    description: 'Release notes content'
+  id:
+    description: 'Release ID'
+  body:
+    description: 'Release content'
+  tag_name:
+    description: 'Release tag name'
+  name:
+    description: 'Release name'
+  exists:
+    description: 'Whether draft release exists (true/false)'
 
 runs:
   using: "docker"
   image: "Dockerfile"
 
 branding:
-  icon: "tag"
+  icon: "edit"
   color: "blue"
