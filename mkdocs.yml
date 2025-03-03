@@ -71,7 +71,6 @@ theme:
       - 'Repository': 'repo/index.md'
     - 'Strategies':
       - 'Branching': 'strategies/branching.md'
-      - 'Versioning': 'strategies/versioning.md'
     - 'Actions':
       - 'Overview': 'actions/index.md'
       - 'Core': 

@@ -1,117 +1,292 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 950">
-  <!-- Vertical timeline lines -->
-  <line x1="150" y1="50" x2="150" y2="900" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="300" y1="100" x2="300" y2="900" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="450" y1="150" x2="450" y2="500" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="450" y1="550" x2="450" y2="650" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="600" y1="650" x2="600" y2="750" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="450" y1="800" x2="450" y2="900" stroke="#e0e0e0" stroke-width="2"/>
-  <line x1="750" y1="700" x2="750" y2="800" stroke="#e0e0e0" stroke-width="2"/>
-  
-  <!-- Branch labels -->
-  <text x="150" y="30" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">main</text>
-  <text x="300" y="80" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">staging</text>
-  <text x="450" y="130" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">develop/feature-a</text>
-  <text x="450" y="530" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">develop/feature-b</text>
-  <text x="600" y="630" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">release/v1.0.0</text>
-  <text x="450" y="780" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">develop/feature-c</text>
-  <text x="750" y="680" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">hotfix/critical-bug</text>
-  
-  <!-- Initial commit -->
-  <circle cx="150" cy="50" r="10" fill="#4CAF50"/>
-  
-  <!-- Branch to staging -->
-  <line x1="150" y1="50" x2="300" y2="100" stroke="#2196F3" stroke-width="2"/>
-  <circle cx="300" cy="100" r="10" fill="#2196F3"/>
-  
-  <!-- Branch to develop feature-a -->
-  <line x1="300" y1="100" x2="450" y2="150" stroke="#FF9800" stroke-width="2"/>
-  <circle cx="450" cy="150" r="10" fill="#FF9800"/>
-  
-  <!-- Work on feature-a -->
-  <circle cx="450" cy="180" r="10" fill="#FF9800"/>
-  <circle cx="450" cy="210" r="10" fill="#FF9800"/>
-  <line x1="450" y1="150" x2="450" y2="210" stroke="#FF9800" stroke-width="2"/>
-  
-  <!-- Merge feature-a back to staging -->
-  <line x1="450" y1="210" x2="300" y2="240" stroke="#2196F3" stroke-width="2"/>
-  <circle cx="300" cy="240" r="10" fill="#2196F3"/>
-  
-  <!-- Branch to develop feature-b -->
-  <line x1="300" y1="240" x2="450" y2="270" stroke="#FF9800" stroke-width="2"/>
-  <circle cx="450" cy="270" r="10" fill="#FF9800"/>
-  
-  <!-- Work on feature-b -->
-  <circle cx="450" cy="300" r="10" fill="#FF9800"/>
-  <circle cx="450" cy="330" r="10" fill="#FF9800"/>
-  <line x1="450" y1="270" x2="450" y2="330" stroke="#FF9800" stroke-width="2"/>
-  
-  <!-- Merge feature-b back to staging -->
-  <line x1="450" y1="330" x2="300" y2="360" stroke="#2196F3" stroke-width="2"/>
-  <circle cx="300" cy="360" r="10" fill="#2196F3"/>
-  
-  <!-- Branch to release v1.0.0 -->
-  <line x1="300" y1="360" x2="600" y2="390" stroke="#9C27B0" stroke-width="2"/>
-  <circle cx="600" cy="390" r="10" fill="#9C27B0"/>
-  <text x="620" y="395" font-family="Arial" font-size="12">Prepare release</text>
-  
-  <!-- Merge release to main with tag -->
-  <line x1="600" y1="390" x2="150" y2="420" stroke="#4CAF50" stroke-width="2"/>
-  <circle cx="150" cy="420" r="10" fill="#4CAF50"/>
-  <text x="100" y="420" text-anchor="end" font-family="Arial" font-size="12" font-weight="bold">v1.0.0</text>
-  
-  <!-- Additional work on staging -->
-  <circle cx="300" cy="450" r="10" fill="#2196F3"/>
-  <line x1="300" y1="360" x2="300" y2="450" stroke="#2196F3" stroke-width="2"/>
-  
-  <!-- Branch to develop feature-c -->
-  <line x1="300" y1="450" x2="450" y2="480" stroke="#FF9800" stroke-width="2"/>
-  <circle cx="450" cy="480" r="10" fill="#FF9800"/>
-  
-  <!-- Merge feature-c back to staging -->
-  <line x1="450" y1="480" x2="300" y2="510" stroke="#2196F3" stroke-width="2"/>
-  <circle cx="300" cy="510" r="10" fill="#2196F3"/>
-  
-  <!-- Create hotfix branch -->
-  <line x1="150" y1="420" x2="750" y2="540" stroke="#E91E63" stroke-width="2"/>
-  <circle cx="750" cy="540" r="10" fill="#E91E63"/>
-  <text x="770" y="545" font-family="Arial" font-size="12">Fix critical issue</text>
-  
-  <!-- Merge hotfix to main with tag -->
-  <line x1="750" y1="540" x2="150" y2="570" stroke="#4CAF50" stroke-width="2"/>
-  <circle cx="150" cy="570" r="10" fill="#4CAF50"/>
-  <text x="100" y="570" text-anchor="end" font-family="Arial" font-size="12" font-weight="bold">v1.0.1</text>
-  
-  <!-- Merge hotfix to staging as well -->
-  <line x1="750" y1="540" x2="300" y2="600" stroke="#2196F3" stroke-width="2"/>
-  <circle cx="300" cy="600" r="10" fill="#2196F3"/>
-  
-  <!-- Branch to release v1.1.0 -->
-  <line x1="300" y1="600" x2="600" y2="630" stroke="#9C27B0" stroke-width="2"/>
-  <circle cx="600" cy="630" r="10" fill="#9C27B0"/>
-  <text x="620" y="635" font-family="Arial" font-size="12">Prepare next release</text>
-  
-  <!-- Merge release to main with tag -->
-  <line x1="600" y1="630" x2="150" y2="660" stroke="#4CAF50" stroke-width="2"/>
-  <circle cx="150" cy="660" r="10" fill="#4CAF50"/>
-  <text x="100" y="660" text-anchor="end" font-family="Arial" font-size="12" font-weight="bold">v1.1.0</text>
-  
-  <!-- Legend -->
-  <rect x="50" y="800" width="800" height="100" rx="10" ry="10" fill="#f8f8f8" stroke="#ccc"/>
-  <text x="60" y="820" font-family="Arial" font-size="14" font-weight="bold">Legend:</text>
-  
-  <circle cx="80" cy="840" r="8" fill="#4CAF50"/>
-  <text x="100" y="845" font-family="Arial" font-size="14">main branch (Production)</text>
-  
-  <circle cx="300" cy="840" r="8" fill="#2196F3"/>
-  <text x="320" y="845" font-family="Arial" font-size="14">staging branch (Pre-production)</text>
-  
-  <circle cx="80" cy="870" r="8" fill="#FF9800"/>
-  <text x="100" y="875" font-family="Arial" font-size="14">develop/* branches</text>
-  
-  <circle cx="300" cy="870" r="8" fill="#9C27B0"/>
-  <text x="320" y="875" font-family="Arial" font-size="14">release/* branches</text>
-  
-  <circle cx="550" cy="870" r="8" fill="#E91E63"/>
-  <text x="570" y="875" font-family="Arial" font-size="14">hotfix/* branches</text>
-</svg>
+# Git Branching Strategy
+
+This document outlines the Git branching strategy used across our projects. This approach is designed to support both continuous integration and structured releases while maintaining a clear, predictable workflow.
+
+## Visual Overview
+
+![Git Branching Strategy](../assets/branching-strategy.svg)
+
+## Core Branches
+
+Our workflow revolves around five types of branches, each with a specific purpose:
+
+### 1. `main` (Production)
+
+- **Purpose**: Represents the production-ready state
+- **Protection**: Locked down - no direct commits allowed
+- **Creation**: Initial repository setup only
+- **Lifetime**: Permanent
+- **Merges From**: Only `release/*` and `hotfix/*` branches
+- **Naming**: Always `main`
+
+### 2. `staging` (Pre-production)
+
+- **Purpose**: Integration branch for all development work
+- **Protection**: Limited - requires PR review
+- **Creation**: Initial repository setup only
+- **Lifetime**: Permanent
+- **Merges From**: `develop/*` branches, `hotfix/*` branches
+- **Naming**: Always `staging`
+
+### 3. `develop/*` (Development)
+
+- **Purpose**: Implementation of specific features, fixes, or improvements
+- **Protection**: None
+- **Creation**: Branch from `staging`
+- **Lifetime**: Temporary - deleted after merging
+- **Merges To**: `staging` via pull request
+- **Naming**: `develop/descriptive-name`
+
+### 4. `release/*` (Release Preparation)
+
+- **Purpose**: Prepare and finalize a specific release
+- **Protection**: Limited - requires PR review
+- **Creation**: Branch from `staging` when ready to release
+- **Lifetime**: Temporary - deleted after merging
+- **Merges To**: Both `main` and `staging`
+- **Naming**: `release/vX.Y.Z` (using semantic versioning)
+
+### 5. `hotfix/*` (Emergency Fixes)
+
+- **Purpose**: Address critical issues in production
+- **Protection**: Limited - requires PR review
+- **Creation**: Branch from `main`
+- **Lifetime**: Temporary - deleted after merging
+- **Merges To**: Both `main` and `staging`
+- **Naming**: `hotfix/brief-description`
+
+## Workflow Process
+
+### Development Workflow
+
+1. Create a development branch from `staging`:
+   ```bash
+   git checkout staging
+   git pull
+   git checkout -b develop/my-feature
+   ```
+
+2. Implement changes, committing regularly:
+   ```bash
+   git add .
+   git commit -m "Descriptive message"
+   ```
+
+3. Push branch to remote:
+   ```bash
+   git push -u origin develop/my-feature
+   ```
+
+4. Create pull request to merge into `staging`
+5. After review and approval, merge the PR
+6. Delete the development branch when no longer needed
+
+### Release Workflow
+
+1. Create a release branch from `staging`:
+   ```bash
+   git checkout staging
+   git pull
+   git checkout -b release/v1.0.0
+   ```
+
+2. Make any final adjustments and version updates:
+   ```bash
+   # Update version numbers in relevant files
+   git add .
+   git commit -m "Prepare release v1.0.0"
+   ```
+
+3. Push branch to remote:
+   ```bash
+   git push -u origin release/v1.0.0
+   ```
+
+4. Create pull request to merge into `main`
+5. After review and approval, merge the PR
+6. Tag the release on `main`:
+   ```bash
+   git checkout main
+   git pull
+   git tag -a v1.0.0 -m "Release v1.0.0"
+   git push origin v1.0.0
+   ```
+
+7. Merge the release back to `staging`:
+   ```bash
+   git checkout staging
+   git pull
+   git merge --no-ff release/v1.0.0
+   git push
+   ```
+
+### Hotfix Workflow
+
+1. Create a hotfix branch from `main`:
+   ```bash
+   git checkout main
+   git pull
+   git checkout -b hotfix/critical-bug
+   ```
+
+2. Implement the fix:
+   ```bash
+   git add .
+   git commit -m "Fix critical bug"
+   ```
+
+3. Push branch to remote:
+   ```bash
+   git push -u origin hotfix/critical-bug
+   ```
+
+4. Create pull request to merge into `main`
+5. After review and approval, merge the PR
+6. Tag the hotfix on `main`:
+   ```bash
+   git checkout main
+   git pull
+   git tag -a v1.0.1 -m "Hotfix v1.0.1"
+   git push origin v1.0.1
+   ```
+
+7. Merge the hotfix back to `staging`:
+   ```bash
+   git checkout staging
+   git pull
+   git merge --no-ff hotfix/critical-bug
+   git push
+   ```
+
+## Using GitFlow with GitKraken
+
+If using GitKraken with GitFlow, the workflow is simplified:
+
+1. Initialize GitFlow in the repository
+2. Select `develop` as your `staging` branch
+3. Use GitFlow buttons to:
+   - Start Feature (creates `develop/*` branch)
+   - Finish Feature (merges to `staging`)
+   - Start Release (creates `release/*` branch)
+   - Finish Release (merges to `main` and back to `staging`)
+   - Start Hotfix (creates `hotfix/*` from `main`)
+   - Finish Hotfix (merges to `main` and `staging`)
+
+## Integration with CI/CD
+
+This branching strategy integrates with our CI/CD pipelines:
+
+- **Push to `develop/*`**: Triggers tests and code quality checks
+- **PR to `staging`**: Triggers comprehensive test suite and deploys to staging environment
+- **PR to `main`**: Triggers production deployment preparation
+- **Tag on `main`**: Triggers production deployment
+
+## Versioning Strategy
+
+We follow semantic versioning (MAJOR.MINOR.PATCH):
+
+- **MAJOR**: Incompatible API changes
+- **MINOR**: New functionality in a backward-compatible manner
+- **PATCH**: Backward-compatible bug fixes
+
+Version bumps are determined by:
+- Regular releases: Planned MAJOR or MINOR version increases
+- Hotfixes: PATCH version increases
+
+## Fork-Based Workflow
+
+While the above strategy works within a single repository, many team members may prefer to use a fork-based workflow. This approach provides additional isolation and can be integrated with our branching strategy as follows:
+
+### Setting Up a Fork
+
+1. Fork the main repository to your personal GitHub account
+2. Clone your fork locally:
+   ```bash
+   git clone https://github.com/your-username/repository-name.git
+   ```
+3. Add the original repository as an upstream remote:
+   ```bash
+   git remote add upstream https://github.com/organization/repository-name.git
+   ```
+
+### Development Using Forks
+
+1. Sync your fork's `staging` branch with upstream:
+   ```bash
+   git checkout staging
+   git fetch upstream
+   git merge upstream/staging
+   git push origin staging
+   ```
+
+2. Create a development branch in your fork:
+   ```bash
+   git checkout -b develop/my-feature
+   ```
+
+3. Implement changes, committing regularly:
+   ```bash
+   git add .
+   git commit -m "Descriptive message"
+   ```
+
+4. Push branch to your fork:
+   ```bash
+   git push -u origin develop/my-feature
+   ```
+
+5. Create pull request from your fork's `develop/my-feature` branch to the upstream repository's `staging` branch
+
+6. After the PR is merged, you can delete your feature branch and sync your fork again
+
+### Maintainer Workflow with Forks
+
+If you're a maintainer who reviews and merges PRs from forked repositories:
+
+1. Review PR from contributor's fork to the main repository's `staging` branch
+2. After approval, merge the PR using the GitHub interface
+3. For release management, follow the same release workflow described earlier, working directly in the main repository
+
+### Advantages of Fork-Based Workflow
+
+- Clearer separation between personal and shared work
+- Ability to experiment without affecting the main repository
+- Reduced risk of accidentally pushing to protected branches
+- More controlled review process through cross-repository PRs
+
+### Synchronizing Forks
+
+To keep your fork up-to-date with the main repository:
+
+```bash
+# Ensure you're on your local staging branch
+git checkout staging
+
+# Fetch changes from the upstream repository
+git fetch upstream
+
+# Merge changes from upstream/staging into your local staging branch
+git merge upstream/staging
+
+# Push the updated staging branch to your fork
+git push origin staging
+```
+
+Perform this synchronization regularly to prevent your fork from getting too far behind.
+
+## Best Practices
+
+1. **Keep branches current**: Regularly pull changes from `staging` into development branches
+2. **Descriptive naming**: Use clear, descriptive names for branches
+3. **Clean commits**: Make focused, atomic commits with clear messages
+4. **Pull requests**: Always use PRs for merging to `staging` and `main`
+5. **Code reviews**: Ensure all PRs receive proper review
+6. **Clean up**: Delete branches after they're merged
+7. **Sync forks regularly**: Keep your fork in sync with the upstream repository
+8. **Reference issues**: Link commits and PRs to relevant issues
+
+## References
+
+- [Semantic Versioning 2.0.0](https://semver.org/)
+- [GitHub Flow](https://guides.github.com/introduction/flow/)
+- [GitFlow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
