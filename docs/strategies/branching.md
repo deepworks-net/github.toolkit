@@ -158,19 +158,64 @@ Our workflow revolves around five types of branches, each with a specific purpos
    git push
    ```
 
-## Using GitFlow with GitKraken
+## Using Git Clients
+
+Team members may use different Git clients to interact with our repositories. Here's guidance for popular clients that team members currently use:
+
+### Using GitKraken with GitFlow
 
 If using GitKraken with GitFlow, the workflow is simplified:
 
 1. Initialize GitFlow in the repository
 2. Select `develop` as your `staging` branch
 3. Use GitFlow buttons to:
-   - Start Feature (creates `develop/*` branch)
-   - Finish Feature (merges to `staging`)
-   - Start Release (creates `release/*` branch)
-   - Finish Release (merges to `main` and back to `staging`)
-   - Start Hotfix (creates `hotfix/*` from `main`)
-   - Finish Hotfix (merges to `main` and `staging`)
+    - Start Feature (creates `develop/*` branch)
+    - Finish Feature (merges to `staging`)
+    - Start Release (creates `release/*` branch)
+    - Finish Release (merges to `main` and back to `staging`)
+    - Start Hotfix (creates `hotfix/*` from `main`)
+    - Finish Hotfix (merges to `main` and `staging`)
+
+### Using Fork Git Client
+
+For team members who prefer the Fork Git client:
+
+1. **Repository Setup**:
+
+    - Clone the repository using Fork's clone button
+    - Switch to the Repository settings to ensure the correct remotes are set up
+
+2. **Branch Management**:
+
+    - Create branches by right-clicking on the source branch (e.g., `staging`) and selecting "Create Branch"
+    - Use our naming conventions: `develop/feature-name`, `release/vX.Y.Z`, `hotfix/issue-name`
+
+3. **Development Workflow**:
+
+    - Use Fork's commit interface with stage/unstage functionality
+    - View changes with Fork's diff viewer
+    - Use the "Fetch" and "Pull" buttons regularly to stay up-to-date
+
+4. **Pull Requests**:
+
+    - Push your branch using the "Push" button
+    - Use Fork's "Create Pull Request" feature (Repository → Create Pull Request) to create PRs to `staging` or `main`
+
+5. **Viewing History**:
+
+    - Use Fork's graph view to visualize branches and commits
+    - Filter branches in the sidebar to focus on specific work
+
+6. **Stashing Changes**:
+
+    - Use Fork's stash functionality (Repository → Stash Changes) when you need to switch branches with uncommitted work
+
+### Using Command Line Git
+
+For those who prefer the Git command line:
+
+1. Follow the workflow process steps outlined earlier in this document
+2. Use standard Git commands for branching, committing, and pushing
 
 ## Integration with CI/CD
 
@@ -190,89 +235,9 @@ We follow semantic versioning (MAJOR.MINOR.PATCH):
 - **PATCH**: Backward-compatible bug fixes
 
 Version bumps are determined by:
+
 - Regular releases: Planned MAJOR or MINOR version increases
 - Hotfixes: PATCH version increases
-
-## Fork-Based Workflow
-
-While the above strategy works within a single repository, many team members may prefer to use a fork-based workflow. This approach provides additional isolation and can be integrated with our branching strategy as follows:
-
-### Setting Up a Fork
-
-1. Fork the main repository to your personal GitHub account
-2. Clone your fork locally:
-   ```bash
-   git clone https://github.com/your-username/repository-name.git
-   ```
-3. Add the original repository as an upstream remote:
-   ```bash
-   git remote add upstream https://github.com/organization/repository-name.git
-   ```
-
-### Development Using Forks
-
-1. Sync your fork's `staging` branch with upstream:
-   ```bash
-   git checkout staging
-   git fetch upstream
-   git merge upstream/staging
-   git push origin staging
-   ```
-
-2. Create a development branch in your fork:
-   ```bash
-   git checkout -b develop/my-feature
-   ```
-
-3. Implement changes, committing regularly:
-   ```bash
-   git add .
-   git commit -m "Descriptive message"
-   ```
-
-4. Push branch to your fork:
-   ```bash
-   git push -u origin develop/my-feature
-   ```
-
-5. Create pull request from your fork's `develop/my-feature` branch to the upstream repository's `staging` branch
-
-6. After the PR is merged, you can delete your feature branch and sync your fork again
-
-### Maintainer Workflow with Forks
-
-If you're a maintainer who reviews and merges PRs from forked repositories:
-
-1. Review PR from contributor's fork to the main repository's `staging` branch
-2. After approval, merge the PR using the GitHub interface
-3. For release management, follow the same release workflow described earlier, working directly in the main repository
-
-### Advantages of Fork-Based Workflow
-
-- Clearer separation between personal and shared work
-- Ability to experiment without affecting the main repository
-- Reduced risk of accidentally pushing to protected branches
-- More controlled review process through cross-repository PRs
-
-### Synchronizing Forks
-
-To keep your fork up-to-date with the main repository:
-
-```bash
-# Ensure you're on your local staging branch
-git checkout staging
-
-# Fetch changes from the upstream repository
-git fetch upstream
-
-# Merge changes from upstream/staging into your local staging branch
-git merge upstream/staging
-
-# Push the updated staging branch to your fork
-git push origin staging
-```
-
-Perform this synchronization regularly to prevent your fork from getting too far behind.
 
 ## Best Practices
 
@@ -282,8 +247,7 @@ Perform this synchronization regularly to prevent your fork from getting too far
 4. **Pull requests**: Always use PRs for merging to `staging` and `main`
 5. **Code reviews**: Ensure all PRs receive proper review
 6. **Clean up**: Delete branches after they're merged
-7. **Sync forks regularly**: Keep your fork in sync with the upstream repository
-8. **Reference issues**: Link commits and PRs to relevant issues
+7. **Use client tools effectively**: Leverage features of your preferred Git client that support this workflow
 
 ## References
 
