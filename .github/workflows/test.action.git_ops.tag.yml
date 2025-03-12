@@ -1,4 +1,4 @@
-name: Test - Git Tag Operations Tests
+name: Test Git Tag Operations Tests
 
 on:
   push:

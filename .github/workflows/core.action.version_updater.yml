@@ -1,5 +1,5 @@
 # .github/workflows/core.action.version_updater.yml
-name: Core (Atomic) Action - Version Updater
+name: Core - Version Updater
 
 on:
   workflow_dispatch:  # allows manual triggering

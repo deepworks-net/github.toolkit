@@ -1,4 +1,4 @@
-name: Git Tag Operations Docker Build
+name: Test Git Tag Operations Docker Build
 
 on:
   push:

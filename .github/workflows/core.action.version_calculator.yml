@@ -1,5 +1,5 @@
 # .github/workflows/core_action.version_calculator.yml
-name: Core (Atomic) Action - Version Calculator
+name: Core - Version Calculator
 
 on:
   workflow_dispatch:  # allows manual triggering
