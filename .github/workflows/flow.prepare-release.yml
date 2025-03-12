@@ -4,10 +4,26 @@ on:
   push:
     tags:
       - 'prep'  # Simple trigger
+  workflow_call:
+    inputs:
+      base-branch:
+        description: 'Base branch to create release from'
+        required: false
+        type: string
+        default: 'staging'
+      version-prefix:
+        description: 'Prefix for version tags'
+        required: false
+        type: string
+        default: 'v'
+    secrets:
+      github-token:
+        description: 'GitHub token for API access'
+        required: true
 
 jobs:
   create-release-branch:
-    if: github.ref_type == 'tag' && github.ref == 'refs/tags/prep'
+    if: (github.event_name == 'push' && github.ref_type == 'tag' && github.ref == 'refs/tags/prep') || github.event_name == 'workflow_call'
     runs-on: ubuntu-latest
 
     steps:
@@ -15,40 +31,41 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}  # Ensures the current repository
-          ref: staging  # Explicitly specify the staging branch
+          ref: ${{ inputs.base-branch || 'staging' }}  # Use input or default to staging
           fetch-depth: 0
           
       - name: Calculate Version
-        uses: ./actions/core/version_calculator
+        uses: ./actions/core/version_calculator@v1
         id: version
+        with:
+          version_prefix: ${{ inputs.version-prefix || 'v' }}
 
       - name: Update Version Numbers
-        uses: ./actions/core/version_updater
+        uses: ./actions/core/version_updater@v1
         with:
           version: ${{ steps.version.outputs.next_version }}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
-        uses: ./actions/composite/release_notes
+        uses: ./actions/composite/release_notes@v1
         id: notes
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           mode: 'prepare-release'
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: ./actions/composite/update_changelog
+        uses: ./actions/composite/update_changelog@v1
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Create Release Branch & PR
-        uses: ./actions/composite/git_ops
+        uses: ./actions/composite/git_ops@v1
         with:
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
           commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
           create-pr: true
           pr-title: 'Release ${{ steps.version.outputs.next_version }}'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

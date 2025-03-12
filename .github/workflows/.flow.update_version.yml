@@ -1,4 +1,4 @@
-# .github/workflows/.version_updater.yml
+# .github/workflows/.flow.update_version.yml
 # This workflow handles the version updating for this repository specifically
 name: Update Version
 
