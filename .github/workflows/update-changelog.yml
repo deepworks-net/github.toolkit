@@ -28,7 +28,7 @@ jobs:
   update_changelog:
     # Only run if the PR was merged (not just closed)
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_call'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -38,29 +38,29 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/core/version_calculator
+        uses: ./actions/core/version_calculator@v1
         id: version
 
       - name: Get Release Content
-        uses: ./actions/composite/release_notes
+        uses: ./actions/composite/release_notes@v1
         id: notes
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           mode: 'prepare-release'
-          pr-number: ${{ github.event.pull_request.number }}
-          pr-title: ${{ github.event.pull_request.title }}
+          pr-number: ${{ inputs.pr-number || github.event.pull_request.number }}
+          pr-title: ${{ inputs.pr-title || github.event.pull_request.title }}
           
       - name: Update Changelog File
-        uses: ./actions/composite/update_changelog
+        uses: ./actions/composite/update_changelog@v1
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
       
       - name: Commit Changes
-        uses: ./actions/composite/git_ops
+        uses: ./actions/composite/git_ops@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
-          commit-message: 'Update changelog for PR #${{ github.event.pull_request.number }}'
+          commit-message: 'Update changelog for PR #${{ inputs.pr-number || github.event.pull_request.number }}'
           create-pr: false
