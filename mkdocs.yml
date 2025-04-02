@@ -75,6 +75,7 @@ theme:
       - 'Overview': 'actions/index.md'
       - 'Core': 
         - 'actions/core/index.md'
+        - 'Branch Operations': 'actions/core/branch_operations/index.md'
         - 'Manage Release': 'actions/core/manage_release/index.md'
         - 'Version Calculator': 'actions/core/version_calculator/index.md'
         - 'Version Updater': 'actions/core/version_updater/index.md'
@@ -95,5 +96,6 @@ theme:
     - 'Tests':
       - 'Overview': 'tests/index.md'
       - 'Core': 
+        - 'Branch Operations': 'tests/core/branch_operations.md'
         - 'Version Calculator': 'tests/core/version_calculator.md'
         - 'Version Updater': 'tests/core/version_updater.md'

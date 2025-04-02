@@ -1,0 +1,44 @@
+name: 'Branch Operations'
+description: 'Perform Git branch operations'
+author: 'Deepworks'
+inputs:
+  action:
+    description: 'Branch operation to perform (create, delete, list, checkout, merge)'
+    required: true
+  branch_name:
+    description: 'Name of the branch to operate on'
+    required: false
+  base_branch:
+    description: 'Base branch for creating or merging (defaults to main)'
+    required: false
+    default: 'main'
+  force:
+    description: 'Force operation (used with delete, checkout, or merge)'
+    required: false
+    default: 'false'
+  message:
+    description: 'Commit message for merge operations'
+    required: false
+  pattern:
+    description: 'Pattern for listing branches (e.g. "feature/*")'
+    required: false
+  remote:
+    description: 'Include remote operations (push/delete remote branch)'
+    required: false
+    default: 'false'
+
+outputs:
+  branches:
+    description: 'Comma-separated list of branches (when using list action)'
+  result:
+    description: 'Operation result (success/failure)'
+  current_branch:
+    description: 'Current branch after operation'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  
+branding:
+  icon: 'git-branch'
+  color: 'blue'
