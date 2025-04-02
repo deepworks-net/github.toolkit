@@ -1,12 +1,29 @@
 # GitHub Actions Collection
 
-A collection of reusable GitHub Actions workflows for standardizing development processes across repositories.
+A collection of reusable GitHub Actions workflows and core actions for standardizing development processes across repositories.
 
-## Available Workflows
+## Available Components
 
-### Release Management
+### Core Actions
 
-Two workflows that work together to manage the release process:
+Atomic operations that can be combined to build custom workflows:
+
+- **Version Calculator**: Calculate version numbers based on git tags
+- **Version Updater**: Update version references in code and documentation
+- **Branch Operations**: Create, delete, checkout, list, and merge branches
+- **Tag Operations**: Create, delete, push, and list git tags
+
+### Composite Actions
+
+Workflows that combine multiple operations for common tasks:
+
+- **Git Operations**: Handle git operations including branch and tag management
+- **Release Notes**: Generate release notes from PRs and commits
+- **Update Changelog**: Update changelog based on merged PRs
+
+### Workflows
+
+Ready-to-use GitHub workflows for common development processes:
 
 #### 1. Prepare Release Branch (`prep-release.yml`)
 
@@ -63,7 +80,8 @@ The workflows maintain the following changelog format:
 ## Setup Instructions
 
 1. Copy the desired workflow files to your repository's `.github/workflows/` directory
-2. No additional configuration needed - workflows use repository context for variables
+2. For core actions, reference them in your workflows using the `uses` syntax
+3. No additional configuration needed - workflows use repository context for variables
 
 ## Requirements
 
@@ -78,12 +96,9 @@ The workflows maintain the following changelog format:
 3. Create a PR to develop
 4. Changelog will be automatically updated upon merge
 
-## Support
+## Documentation
 
-For issues, questions, or contributions:
-
-1. Open an issue in this repository
-2. Include workflow name and description of need
+See the [documentation site](https://deepworks-net.github.io/github.toolkit/) for detailed usage examples and API references for all actions and workflows.
 
 ## License
 

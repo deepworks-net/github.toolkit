@@ -1,0 +1,116 @@
+name: Test Framework
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'actions/**/*.py'
+      - '.github/workflows/test.framework.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'actions/**/*.py'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        action-path:
+          - actions/core/branch_operations
+          - actions/core/version_calculator
+          - actions/core/version_updater
+          - actions/core/manage_release
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+        
+      - name: Install dependencies
+        working-directory: ${{ matrix.action-path }}
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        working-directory: ${{ matrix.action-path }}
+        run: |
+          pytest --cov=. --cov-report=xml --cov-report=term-missing
+      
+      - name: Verify coverage threshold
+        working-directory: ${{ matrix.action-path }}
+        run: |
+          COVERAGE=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(root.attrib['line-rate'])")
+          COVERAGE_PCT=$(echo "$COVERAGE * 100" | bc)
+          echo "Code coverage: ${COVERAGE_PCT}%"
+          if (( $(echo "$COVERAGE_PCT < 80" | bc -l) )); then
+            echo "Error: Code coverage is below 80%"
+            exit 1
+          fi
+
+  test-framework:
+    name: Test Framework
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          
+      - name: Validate test templates
+        run: |
+          python -c "import sys; import os; sys.path.append(os.path.join(os.getcwd(), 'actions/test_framework')); from test_templates import test_unit_template, test_integration_template; print('Test templates are valid')"
+          
+      - name: Verify test documentation
+        run: |
+          if [ ! -f "actions/test_framework/README.md" ]; then
+            echo "Error: Test framework documentation is missing"
+            exit 1
+          fi
+          
+          if [ ! -f "actions/test_framework/conftest.py" ]; then
+            echo "Error: Test fixtures are missing"
+            exit 1
+          fi
+
+  lint:
+    name: Lint Python Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 actions/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings
+          flake8 actions/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics

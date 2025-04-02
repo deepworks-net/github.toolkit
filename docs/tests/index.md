@@ -1,216 +1,155 @@
-# Testing Overview
+# Testing in GitHub Actions Toolkit
 
-## Test Structure and Organization
+This section describes the testing approach, standards, and tools used across the repository.
 
-### File Structure
+## Testing Framework
 
-```markdown
-.github/workflows/
-├── core.action.*.yml               # Core action workflows
-├── test.core.action.*.yml         # Core action tests
-└── test.composite.action.*.yml    # Composite action tests
+All actions in this repository use a standardized testing framework for consistent testing.
 
-docs/tests/                        # Test documentation
-├── index.md                       # This overview
-├── core/                          # Core action test docs
-│   ├── version_calculator.md
-│   └── version_updater.md
-└── composite/                     # Composite action test docs
+### Test Structure
+
+Tests are organized into three categories:
+
+1. **Unit Tests** - Test individual functions and classes in isolation
+2. **Integration Tests** - Test interactions between components
+3. **End-to-End Tests** - Test complete workflows in a realistic environment
+
+### Coverage Requirements
+
+All code must maintain a minimum of 80% test coverage. This is enforced by automated checks in the CI pipeline.
+
+## Running Tests
+
+Tests can be run using pytest:
+
+```bash
+# Navigate to an action directory
+cd actions/core/branch_operations
+
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=. --cov-report=term-missing
+
+# Run only unit tests
+pytest -m unit
+
+# Run only integration tests
+pytest -m integration
 ```
 
-## Test Naming Convention
+## CI/CD Pipeline
 
-- `test.core.action.<name>.yml` - Tests for core (atomic) actions
-- `test.composite.action.<name>.yml` - Tests for composite actions
+A GitHub Actions workflow automatically runs tests on:
+- Pull requests to main and develop branches
+- Pushes to main and develop branches
+
+The workflow:
+1. Runs tests for each action
+2. Verifies minimum 80% code coverage
+3. Runs linting to ensure code quality
+
+## Test Templates
+
+Standardized test templates are available to maintain consistency:
+
+```bash
+# Copy unit test template
+cp actions/test_framework/test_templates/test_unit_template.py your_action/tests/test_unit.py
+
+# Copy integration test template
+cp actions/test_framework/test_templates/test_integration_template.py your_action/tests/test_integration.py
+```
+
+## Available Fixtures
+
+The test framework provides fixtures for common testing scenarios:
+
+- `mock_subprocess` - Mocks subprocess calls to git
+- `mock_git_env` - Sets up GitHub Actions environment variables
+- `mock_git_repo` - Simulates a git repository structure
+- `git_outputs` - Provides sample git command outputs
 
 ## Common Test Patterns
 
 ### 1. Input Validation Tests
 
-```yaml
-test-invalid-input:
-  steps:
-    - Run action with invalid input
-    - Verify appropriate error
-    - Check error messaging
+```python
+def test_invalid_input(mock_git_env):
+    # Arrange
+    os.environ['INPUT_INVALID'] = 'invalid-value'
+    
+    # Act & Assert
+    with pytest.raises(SystemExit):
+        main()
 ```
 
-### 2. Output Format Tests
+### 2. Output Verification Tests
 
-```yaml
-test-output-format:
-  steps:
-    - Run action
-    - Verify all outputs exist
-    - Validate output format
-    - Check output values
+```python
+def test_output_format(mock_subprocess, mock_git_env):
+    # Arrange
+    os.environ['INPUT_ACTION'] = 'list'
+    mock_subprocess['check_output'].return_value = 'branch1\nbranch2'
+    
+    # Act
+    main()
+    
+    # Assert
+    with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+        output = f.read()
+    assert 'branches=branch1,branch2' in output
 ```
 
-### 3. Error Cases
+### 3. Error Handling Tests
 
-```yaml
-test-error-handling:
-  steps:
-    - Create error condition
-    - Run action with continue-on-error
-    - Verify failure behavior
-    - Check error messaging
+```python
+def test_error_handling(mock_subprocess, mock_git_env):
+    # Arrange
+    mock_subprocess['check_call'].side_effect = subprocess.CalledProcessError(1, 'git')
+    
+    # Act & Assert
+    with pytest.raises(SystemExit):
+        main()
 ```
 
-## Standard Test Components
+## Test File Structure
 
-### Environment Setup
-
-```yaml
-steps:
-  - uses: actions/checkout@v4
-  - name: Clean Environment
-    run: |
-      # Setup steps
 ```
-
-### Output Verification
-
-```yaml
-- name: Verify Outputs
-  run: |
-    # Check output existence
-    if [[ -z "${% raw %}{{ steps.action.outputs.output_name }}{% endraw %}" ]]; then
-      echo "Missing required output"
-      exit 1
-    fi
-    # Verify output value
-    if [[ "${% raw %}{{ steps.action.outputs.output_name }}{% endraw %}" != "expected" ]]; then
-      echo "Expected 'expected', got '${% raw %}{{ steps.action.outputs.output_name }}{% endraw %}'"
-      exit 1
-    fi
+actions/
+├── core/
+│   ├── branch_operations/
+│   │   ├── tests/
+│   │   │   ├── __init__.py
+│   │   │   ├── conftest.py
+│   │   │   ├── test_unit.py
+│   │   │   └── test_integration.py
+│   │   ├── Dockerfile
+│   │   ├── action.yml
+│   │   ├── main.py
+│   │   └── pytest.ini
+│   └── ...
+└── test_framework/
+    ├── conftest.py
+    ├── pytest.ini
+    ├── README.md
+    └── test_templates/
+        ├── test_unit_template.py
+        └── test_integration_template.py
 ```
-
-## Test Categories
-
-### 1. Core Action Tests
-
-- Focus on atomic functionality
-- Verify input/output contract
-- Test error conditions
-- Example: [Version Calculator Tests](core/version_calculator.md)
-
-### 2. Composite Action Tests
-
-- Test integration of core actions
-- Verify workflow logic
-- Test end-to-end scenarios
-- Handle workflow outputs
-
-## Test Documentation
-
-Each test workflow should have corresponding documentation that includes:
-
-1. **Overview**
-    - Purpose of tests
-    - Test categories
-    - Required setup
-
-2. **Test Cases**
-    - Individual test descriptions
-    - Expected inputs/outputs
-    - Error scenarios
-
-3. **Implementation Details**
-    - Environment setup
-    - Verification methods
-    - Clean-up procedures
-
-4. **Local Testing**
-    - Setup instructions
-    - Required tools
-    - Execution steps
-
-## Local Test Execution
-
-To run tests locally:
-
-```bash
-# Install act
-brew install act  # or equivalent for your OS
-
-# Run specific test workflow
-act pull_request -W .github/workflows/test.core.action.version_calculator.yml
-
-# Run all tests
-act pull_request
-```
-
-## Adding New Tests
-
-When adding new tests:
-
-1. **Follow Naming Convention**
-
-   ```markdown
-   test.core.action.<name>.yml
-   test.composite.action.<name>.yml
-   ```
-
-2. **Include Standard Sections**
-    - Environment setup
-    - Test cases
-    - Output verification
-    - Error handling
-
-3. **Document Tests**
-    - Create test documentation
-    - Update index if needed
-    - Include local testing instructions
-
-4. **Test Categories**
-    - Input validation
-    - Output verification
-    - Error handling
-    - Edge cases
-
-## Best Practices
-
-1. **Test Independence**
-    - Each test should be self-contained
-    - Clean up after tests
-    - Don't rely on other test results
-
-2. **Clear Error Messages**
-    - Descriptive failure outputs
-    - Expected vs actual values
-    - Clear error conditions
-
-3. **Comprehensive Coverage**
-    - Test all inputs
-    - Verify all outputs
-    - Include error cases
-    - Test edge conditions
-
-4. **Documentation**
-    - Document test purpose
-    - Include example usage
-    - Provide troubleshooting tips
 
 ## Available Test Suites
 
-### Core Actions
-
+- [Branch Operations Tests](core/branch_operations.md)
 - [Version Calculator Tests](core/version_calculator.md)
 - [Version Updater Tests](core/version_updater.md)
 
-### Composite Actions
+## Best Practices
 
-- [Update Changelog Tests](composite/update_changelog.md)
-
-## Contributing
-
-When contributing new tests:
-
-1. Follow existing patterns
-2. Include documentation
-3. Test error cases
-4. Provide local test instructions
-5. Update this index
-
-See [Contributing Guide](../contributing.md) for more details.
+1. Use descriptive test names that explain what is being tested
+2. Follow the Arrange-Act-Assert pattern
+3. Keep unit tests focused on a single function
+4. Use the provided fixtures to minimize test setup code
+5. Mock external dependencies and API calls
+6. Always test error handling and edge cases
