@@ -74,11 +74,24 @@ class TestGitCommitOperations:
         """Test handling commit failure."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_call'].side_effect = [
-            0,  # git config successful
-            0,  # git add successful
-            subprocess.CalledProcessError(1, ['git', 'commit', '-m', 'Message'])  # git commit fails
-        ]
+        
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt"
+            return "mocked output"
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Configure check_call to fail on commit
+        def check_call_side_effect(*args, **kwargs):
+            if args[0][0:2] == ['git', 'commit']:
+                raise subprocess.CalledProcessError(1, ['git', 'commit', '-m', 'Message'])
+            return 0
+        
+        mock_subprocess['check_call'].side_effect = check_call_side_effect
         
         # Act
         result, commit_hash = commit_ops.create_commit("Add new feature")
@@ -204,6 +217,8 @@ class TestGitCommitOperations:
                 return commit_outputs['get_commit_date']
             elif args[0] == ['git', 'show', '-s', '--format=%s', 'abc1234']:
                 return commit_outputs['get_commit_message']
+            elif args[0] == ['git', 'rev-parse', 'abc1234']:  # For hash_cmd
+                return commit_outputs['get_commit_hash']
             return ""
         
         mock_subprocess['check_output'].side_effect = check_output_side_effect
@@ -238,6 +253,11 @@ class TestGitCommitOperations:
         """Test cherry-pick with conflict."""
         # Arrange
         commit_ops = GitCommitOperations()
+        
+        # Reset all mocks to ensure we're starting fresh
+        mock_subprocess['check_call'].reset_mock()
+        mock_subprocess['check_output'].reset_mock()
+        
         # Set up responses for different commands
         def check_output_side_effect(*args, **kwargs):
             if args[0] == ['git', '--version']:
@@ -248,20 +268,19 @@ class TestGitCommitOperations:
         
         mock_subprocess['check_output'].side_effect = check_output_side_effect
         
-        # Set up check_call to fail on cherry-pick
-        check_call_count = 0
+        # Make cherry-pick fail
         def check_call_side_effect(*args, **kwargs):
-            nonlocal check_call_count
-            check_call_count += 1
-            # First call is for safe.directory configuration
-            if check_call_count > 1 and args[0][0:3] == ['git', 'cherry-pick', 'abc1234']:
-                raise subprocess.CalledProcessError(1, ['git', 'cherry-pick', 'abc1234'])
+            if len(args[0]) >= 3 and args[0][0:3] == ['git', 'cherry-pick', 'abc1234']:
+                error = subprocess.CalledProcessError(1, ['git', 'cherry-pick', 'abc1234'])
+                error.output = "error: could not apply abc1234..."
+                raise error
             return 0
-            
+        
         mock_subprocess['check_call'].side_effect = check_call_side_effect
         
         # Act
-        result = commit_ops.cherry_pick_commit('abc1234')
+        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
+            result = commit_ops.cherry_pick_commit('abc1234')
         
         # Assert
         assert result is False
@@ -295,6 +314,11 @@ class TestGitCommitOperations:
         """Test revert with conflict."""
         # Arrange
         commit_ops = GitCommitOperations()
+        
+        # Reset all mocks to ensure we're starting fresh
+        mock_subprocess['check_call'].reset_mock()
+        mock_subprocess['check_output'].reset_mock()
+        
         # Set up responses for different commands
         def check_output_side_effect(*args, **kwargs):
             if args[0] == ['git', '--version']:
@@ -305,20 +329,19 @@ class TestGitCommitOperations:
         
         mock_subprocess['check_output'].side_effect = check_output_side_effect
         
-        # Set up check_call to fail on revert
-        check_call_count = 0
+        # Make revert fail
         def check_call_side_effect(*args, **kwargs):
-            nonlocal check_call_count
-            check_call_count += 1
-            # First call is for safe.directory configuration
-            if check_call_count > 1 and args[0][0:3] == ['git', 'revert', '--no-edit', 'abc1234']:
-                raise subprocess.CalledProcessError(1, ['git', 'revert', '--no-edit', 'abc1234'])
+            if len(args[0]) >= 4 and args[0][0:4] == ['git', 'revert', '--no-edit', 'abc1234']:
+                error = subprocess.CalledProcessError(1, ['git', 'revert', '--no-edit', 'abc1234'])
+                error.output = "error: could not revert abc1234..."
+                raise error
             return 0
-            
+        
         mock_subprocess['check_call'].side_effect = check_call_side_effect
         
         # Act
-        result, revert_hash = commit_ops.revert_commit('abc1234')
+        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
+            result, revert_hash = commit_ops.revert_commit('abc1234')
         
         # Assert
         assert result is False
