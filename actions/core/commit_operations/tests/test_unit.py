@@ -755,14 +755,28 @@ class TestExtraOperations:
         # Arrange
         commit_ops = GitCommitOperations()
         
-        # Override validator method
-        with patch.object(commit_ops.git_validator, 'is_valid_commit_message', return_value=False):
+        # Configure mock to cause validation to be checked
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return b'git version 2.30.0'
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Mock the validator to reject the message
+        original_validator = commit_ops.git_validator.is_valid_commit_message
+        try:
+            commit_ops.git_validator.is_valid_commit_message = lambda x: False
+            
             # Act
             result, commit_hash = commit_ops.amend_commit(message="")
             
-            # Assert
+            # Assert - message should fail validation
             assert result is False
             assert commit_hash is None
+        finally:
+            # Restore original validator
+            commit_ops.git_validator.is_valid_commit_message = original_validator
     
     def test_handle_missing_validator_method(self, mock_subprocess, mock_git_env):
         """Test handling when validator method is missing."""
