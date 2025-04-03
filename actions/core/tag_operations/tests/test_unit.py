@@ -394,9 +394,9 @@ class TestGitTagOperations:
         tag_ops = GitTagOperations()
         
         # Act & Assert
-        assert tag_ops._validate_tag_name('v1.0.0') is True
-        assert tag_ops._validate_tag_name('release/1.0.0') is True
-        assert tag_ops._validate_tag_name('feature_tag') is True
+        assert tag_ops.git_validator.is_valid_tag_name('v1.0.0') is True
+        assert tag_ops.git_validator.is_valid_tag_name('release/1.0.0') is True
+        assert tag_ops.git_validator.is_valid_tag_name('feature_tag') is True
     
     def test_validate_tag_name_invalid(self, mock_subprocess, mock_git_env):
         """Test tag name validation with invalid names."""
@@ -404,11 +404,11 @@ class TestGitTagOperations:
         tag_ops = GitTagOperations()
         
         # Act & Assert
-        assert tag_ops._validate_tag_name('invalid tag') is False  # Contains space
-        assert tag_ops._validate_tag_name('-badstart') is False    # Starts with dash
-        assert tag_ops._validate_tag_name('bad^char') is False     # Contains ^
-        assert tag_ops._validate_tag_name('') is False             # Empty
-        assert tag_ops._validate_tag_name('path..with..dots') is False  # Contains double dots
+        assert tag_ops.git_validator.is_valid_tag_name('invalid tag') is False  # Contains space
+        assert tag_ops.git_validator.is_valid_tag_name('-badstart') is False    # Starts with dash
+        assert tag_ops.git_validator.is_valid_tag_name('bad^char') is False     # Contains ^
+        assert tag_ops.git_validator.is_valid_tag_name('') is False             # Empty
+        assert tag_ops.git_validator.is_valid_tag_name('path..with..dots') is False  # Contains double dots
     
     def test_pattern_to_regex(self, mock_subprocess, mock_git_env):
         """Test pattern to regex conversion."""
@@ -418,21 +418,21 @@ class TestGitTagOperations:
         # Act & Assert
         # Test simple pattern
         pattern = "v1.0.*"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("v1.0.0") is not None
         assert regex.match("v1.0.10") is not None
         assert regex.match("v1.1.0") is None
         
         # Test pattern with question mark
         pattern = "v1.?.0"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("v1.1.0") is not None
         assert regex.match("v1.2.0") is not None
         assert regex.match("v1.10.0") is None
         
         # Test pattern with special regex chars
         pattern = "release+1.0"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("release+1.0") is not None
         assert regex.match("release1.0") is None
     
@@ -681,6 +681,39 @@ class TestMainFunction:
         assert 'result=success' in output
         assert 'tags=v1.0.0,v1.1.0' in output
     
+    def test_list_action_github_actions(self, mock_subprocess, mock_git_env, tag_outputs):
+        """Test list action behavior in GitHub Actions environment."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'list'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'  # Set tag_name but no pattern
+        os.environ['GITHUB_ACTIONS'] = 'true'    # Simulate GitHub Actions environment
+        
+        # Configure specific responses for different git commands
+        def list_action_github_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return b"git version 2.30.0"
+            elif args[0][0:2] == ['git', 'config'] and len(args[0]) > 2 and args[0][2] == 'user.name':
+                raise subprocess.CalledProcessError(128, 'git config user.name')
+            elif args[0] == ['git', 'tag', '-l', 'v1.0.0'] and kwargs.get('text', False):
+                return "v1.0.0"  # Return just the one tag
+            return "unexpected command"
+            
+        mock_subprocess['check_output'].side_effect = list_action_github_side_effect
+        
+        # Act
+        main()
+        
+        # Clean up
+        if 'GITHUB_ACTIONS' in os.environ:
+            del os.environ['GITHUB_ACTIONS']
+        
+        # Assert
+        with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+            output = f.read()
+        
+        assert 'result=success' in output
+        assert 'tags=v1.0.0' in output
+        
     def test_check_action(self, mock_subprocess, mock_git_env, tag_outputs):
         """Test check action in main function."""
         # Arrange

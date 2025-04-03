@@ -1,0 +1,27 @@
+name: "Update Changelog"
+description: "Manages CHANGELOG.md file content and formatting"
+inputs:
+  content:
+    description: 'Content to add to changelog'
+    required: true
+  mode:
+    description: 'Operation mode (unreleased, release)'
+    required: true
+  version:
+    description: 'Version number'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Run Update Changelog
+      uses: ./actions/composite/update_changelog
+      with:
+        content: ${{ inputs.content }}
+        mode: ${{ inputs.mode }}
+        version: ${{ inputs.version }}

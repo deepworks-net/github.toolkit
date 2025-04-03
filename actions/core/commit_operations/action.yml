@@ -1,0 +1,66 @@
+name: 'Commit Operations'
+description: 'Perform Git commit operations'
+author: 'Deepworks'
+inputs:
+  action:
+    description: 'Commit operation to perform (create, amend, list, get, cherry-pick, revert)'
+    required: true
+  message:
+    description: 'Commit message'
+    required: false
+  files:
+    description: 'Comma-separated list of files to include in the commit'
+    required: false
+  commit_hash:
+    description: 'Hash of the commit for get, cherry-pick, and revert operations'
+    required: false
+  limit:
+    description: 'Number of commits to list'
+    required: false
+    default: '10'
+  author:
+    description: 'Filter commits by author'
+    required: false
+  since:
+    description: 'List commits since date (ISO format)'
+    required: false
+  until:
+    description: 'List commits until date (ISO format)'
+    required: false
+  path:
+    description: 'Filter commits affecting a specific path'
+    required: false
+  format:
+    description: 'Output format for list/get (oneline, short, medium, full)'
+    required: false
+    default: 'medium'
+  no_verify:
+    description: 'Skip pre-commit hooks'
+    required: false
+    default: 'false'
+
+outputs:
+  commits:
+    description: 'Commit information in requested format (for list/get actions)'
+  commit_hash:
+    description: 'Hash of the created or amended commit (for create/amend actions)'
+  result:
+    description: 'Operation result (success/failure)'
+  author:
+    description: 'Author of the commit (for get action)'
+  date:
+    description: 'Date of the commit (for get action)'
+  message:
+    description: 'Message of the commit (for get action)'
+  hash:
+    description: 'Full hash of the commit (for get action)'
+  body:
+    description: 'Body of the commit message (for get action with full format)'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  
+branding:
+  icon: 'git-commit'
+  color: 'blue'

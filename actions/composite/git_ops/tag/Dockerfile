@@ -1,9 +1,17 @@
 FROM python:3.9-slim
 
 WORKDIR /action
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-COPY git_tag_operations.py /action/
-COPY action.yml /action/
+RUN mkdir -p /action/tag/src
 
-ENTRYPOINT ["python", "/action/git_tag_operations.py"]
+COPY src/ /action/tag/src/
+COPY requirements.txt /action/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["python", "/action/tag/src/git_tag_operations.py"]

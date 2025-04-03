@@ -4,13 +4,43 @@ import os
 import sys
 import subprocess
 from datetime import datetime
+import importlib.util
+from pathlib import Path
+
+# Dynamic imports for git operations modules
+def import_module(module_path, module_name):
+    """Dynamically import a module from a specific path."""
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+# Set paths
+current_dir = Path(__file__).parent
+branch_module_path = current_dir / "branch" / "src" / "git_branch_operations.py"
+commit_module_path = current_dir / "commit" / "src" / "git_commit_operations.py"
+tag_module_path = current_dir / "tag" / "src" / "git_tag_operations.py"
+
+# Import modules
+try:
+    branch_module = import_module(branch_module_path, "git_branch_operations")
+    commit_module = import_module(commit_module_path, "git_commit_operations")
+    tag_module = import_module(tag_module_path, "git_tag_operations")
+    
+    # Create operation objects
+    branch_ops = branch_module.GitBranchOperations()
+    commit_ops = commit_module.GitCommitOperations()
+    tag_ops = tag_module.GitTagOperations()
+except Exception as e:
+    print(f"Error importing git operation modules: {e}")
+    sys.exit(1)
 
 def setup_git():
     """Configure git settings."""
     try:
         subprocess.check_call(['git', 'config', '--local', 'user.email', 'action@github.com'])
         subprocess.check_call(['git', 'config', '--local', 'user.name', 'GitHub Action'])
-        subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
+        # The individual modules already handle safe.directory configuration
     except subprocess.CalledProcessError as e:
         print(f"Error configuring git: {e}")
         sys.exit(1)
@@ -19,8 +49,8 @@ def delete_prep_tag():
     """Delete the prep tag as it's no longer needed."""
     try:
         print("Deleting prep tag...")
-        subprocess.check_call(['git', 'push', 'origin', ':refs/tags/prep'])
-    except subprocess.CalledProcessError as e:
+        tag_ops.delete_tag('prep', remote=True)
+    except Exception as e:
         print(f"Warning: Failed to delete prep tag: {e}")
         # Don't exit with error as this is not critical
 
@@ -37,36 +67,37 @@ def create_branch():
         if branch_name:
             print(f"Creating branch: {branch_name}")
             # First ensure we have latest staging
-            subprocess.check_call(['git', 'checkout', 'staging'])
+            branch_ops.checkout_branch('staging')
             subprocess.check_call(['git', 'pull', 'origin', 'staging'])
             # Create release branch from staging
-            subprocess.check_call(['git', 'checkout', '-b', branch_name])
+            branch_ops.checkout_branch(branch_name, create=True)
             
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(f"Error creating branch: {e}")
         sys.exit(1)
 
 def commit_changes():
     """Commit specified files."""
     try:
-        files = os.environ.get('FILES', '').split()
+        files = os.environ.get('FILES', '').split() if os.environ.get('FILES') else None
         message = os.environ.get('COMMIT_MESSAGE', 'Update from GitHub Action')
-        
-        # Add files
-        for file in files:
-            subprocess.check_call(['git', 'add', file])
         
         # Check if there are changes to commit
         result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
-        if not result.stdout:
+        if not result.stdout and not files:
             print("No changes to commit")
             return False
-            
-        # Commit changes
-        subprocess.check_call(['git', 'commit', '-m', message])
-        return True
         
-    except subprocess.CalledProcessError as e:
+        # Use commit operations to create commit
+        result = commit_ops.create_commit(
+            message=message,
+            files=files,
+            all_changes=not files  # If no files specified, commit all changes
+        )
+        
+        return result
+        
+    except Exception as e:
         print(f"Error committing changes: {e}")
         sys.exit(1)
 

@@ -23,10 +23,16 @@ Our GitHub Actions toolkit follows a layered architecture that promotes reusabil
 ```FILEDIR
 actions/
 ├── core/                  # Atomic operations
+│   ├── branch_operations/
+│   ├── commit_operations/
+│   ├── tag_operations/
 │   ├── version_calculator/
 │   └── version_updater/
-└── composite/            # Combined operations
-    └── update_changelog/
+├── composite/            # Combined operations
+│   ├── release_operations/
+│   └── update_changelog/
+└── shared/               # Shared utilities
+    └── git_utils/        # Common Git functions
 ```
 
 ## Usage Patterns
@@ -59,27 +65,46 @@ steps:
 - Consistent dependency management
 - Clear entrypoint configuration
 
+### Core/Composite Pattern
+
+- Atomic core actions with single responsibilities
+- Shared utilities for common functions
+- Composite actions that combine core actions
+- Clear separation of concerns
+
 ### Testing
 
 - Comprehensive test workflows
 - Standard test structure
 - Clear naming conventions
+- Unit tests for atomic functions
+- Integration tests for real-world scenarios
 
 ### Documentation
 
 - Complete API documentation
 - Usage examples
 - Error handling guidance
+- Migration guides for new patterns
 
 ## Available Actions
 
 ### Core
 
-- [Core Actions](actions/core/index.md)
-    - [Manage Release](actions/core/manage_release.md)
-    - [Version Calculator](actions/core/version_calculator/index.md)
-    - [Version Updater](actions/core/version_updater/index.md)
+- [Core Actions](core/index.md)
+    - [Branch Operations](core/branch_operations/index.md)
+    - [Commit Operations](core/commit_operations/index.md)
+    - [Manage Release](core/manage_release/index.md)
+    - [Tag Operations](core/tag_operations/index.md)
+    - [Version Calculator](core/version_calculator/index.md)
+    - [Version Updater](core/version_updater/index.md)
 
 ### Composite
 
-- [Update Changelog](composite/update_changelog/index.md)
+- [Composite Actions](composite/index.md)
+    - [Release Operations](composite/release_operations/index.md)
+    - [Update Changelog](composite/update_changelog/index.md)
+
+### Shared Utilities
+
+- [Git Utilities](../guides/git-utilities.md) - Common git operation utilities

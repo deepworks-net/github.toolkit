@@ -11,7 +11,12 @@ RUN apt-get update && \
 
 RUN git config --global --add safe.directory /github/workspace
 
+RUN mkdir -p /action/branch/src /action/commit/src /action/tag/src
+
 COPY git_ops.py /action/
 COPY action.yml /action/
+COPY branch/src/git_branch_operations.py /action/branch/src/
+COPY commit/src/git_commit_operations.py /action/commit/src/
+COPY tag/src/git_tag_operations.py /action/tag/src/
 
 ENTRYPOINT ["python", "/action/git_ops.py"]

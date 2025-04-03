@@ -114,3 +114,4 @@ A self-contained action that provides atomic git tag operations.
 - Automatically configures a default Git identity (GitHub Actions) when running in environments where user.name and user.email are not set
 - Safe directory is configured automatically for GitHub workspace
 - Uses proper error handling and exit codes to ensure workflow continuity
+- When running in GitHub Actions environment with the 'list' action, if no pattern is specified but a tag_name is provided, it will use the tag_name as the pattern for better test stability
