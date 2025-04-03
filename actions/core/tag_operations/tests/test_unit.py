@@ -306,8 +306,9 @@ class TestGitTagOperations:
         # Non-standard tags
         tags = ["latest", "stable", "v1.0", "release"]
         sorted_tags = tag_ops._sort_tags_by_version(tags)
-        # Non-standard tags should be sorted lexicographically
-        assert "v1.0" in sorted_tags
+        # Version tags should be sorted first, then non-version tags lexicographically
+        assert sorted_tags[0] == "v1.0"  # Version tag comes first
+        assert set(sorted_tags[1:]) == set(["latest", "stable", "release"])  # Non-version tags follow
 
 
 @pytest.mark.unit

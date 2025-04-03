@@ -132,15 +132,20 @@ class GitTagOperations:
                 cmd.extend(['-l', pattern])
                 
             if sort == 'date':
-                # Use a different approach to get tags sorted by date
-                cmd = ['git', 'for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', 'refs/tags/']
-                if pattern:
-                    # Apply pattern filtering through grep since for-each-ref doesn't support -l
+                try:
+                    # Use a different approach to get tags sorted by date
+                    cmd = ['git', 'for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', 'refs/tags/']
                     output = subprocess.check_output(cmd, text=True)
                     # Filter tags manually
                     tags = [tag for tag in output.strip().split('\n') if tag]
-                    pattern_regex = self._pattern_to_regex(pattern)
-                    return [tag for tag in tags if pattern_regex.match(tag)]
+                    if pattern:
+                        pattern_regex = self._pattern_to_regex(pattern)
+                        return [tag for tag in tags if pattern_regex.match(tag)]
+                    return tags
+                except subprocess.CalledProcessError as e:
+                    print(f"Error getting date-sorted tags: {e}")
+                    # Fall back to normal listing
+                    pass
             
             output = subprocess.check_output(cmd, text=True)
             tags = [tag for tag in output.strip().split('\n') if tag]
@@ -254,6 +259,11 @@ class GitTagOperations:
             if tag.startswith('v'):
                 tag = tag[1:]
                 
+            # Check if tag contains any digits for version-like sorting
+            if not any(c.isdigit() for c in tag):
+                # For non-version tags, return a tuple with string to ensure consistent comparison
+                return (0, tag)
+                
             # Split by dots and convert to integers where possible
             parts = []
             for part in tag.split('.'):
@@ -261,7 +271,9 @@ class GitTagOperations:
                     parts.append(int(part))
                 except ValueError:
                     parts.append(part)
-            return parts
+            
+            # Return a tuple with priority 1 (higher than non-version tags)
+            return (1, *parts)
         
         # Sort tags by their version components
         return sorted(tags, key=extract_version, reverse=True)

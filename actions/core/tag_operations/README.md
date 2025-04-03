@@ -9,7 +9,7 @@ A self-contained action that provides atomic git tag operations.
 - Push tags to remote
 - List tags with pattern filtering
 - Check if tags exist
-- Sort tags by alphabetic order, semantic versioning, or creation date
+- Sort tags by alphabetic order, semantic versioning (prioritizing version tags), or creation date
 - Tag name validation
 - Comprehensive error handling
 

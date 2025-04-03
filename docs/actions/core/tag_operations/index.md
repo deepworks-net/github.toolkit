@@ -146,4 +146,4 @@ The tag operations action follows the single-responsibility principle, focusing 
 
 Tag name validation follows Git's rules, rejecting names with spaces, control characters, and certain special characters like `~^:?*[]\`.
 
-For tag listing with sorting by version, the action implements semantic versioning-aware sorting that can handle tags like `v1.10.0` correctly (sorted after `v1.9.0`).
+For tag listing with sorting by version, the action implements semantic versioning-aware sorting that can handle tags like `v1.10.0` correctly (sorted after `v1.9.0`). Version-like tags are prioritized over non-version tags in the sorting order, making it easy to find the most recent versions first.
