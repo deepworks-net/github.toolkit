@@ -71,12 +71,29 @@ class GitCommitOperations:
                 staged_changes = [line for line in status_output.split('\n') 
                                  if line and not line.startswith('??') and not line.startswith(' ')]
                 
+                unstaged_changes = [line for line in status_output.split('\n') 
+                                  if line and (line.startswith(' ') or line.startswith('??'))]
+                
                 if not staged_changes:
-                    print("No staged changes detected, staging all changes")
-                    subprocess.check_call(['git', 'add', '.'])
+                    if unstaged_changes:
+                        print("No staged changes detected, staging all changes")
+                        subprocess.check_call(['git', 'add', '.'])
+                    else:
+                        # In CI environments or when there are no changes, get the current HEAD
+                        print("No changes detected. In CI environments, changes are typically already committed.")
+                        # Return the current HEAD commit instead of failing
+                        head_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+                        return True, head_commit
                 else:
                     print(f"Found {len(staged_changes)} staged changes: {staged_changes}")
             
+            # Check again if there are any changes to commit
+            status_after_staging = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
+            if not status_after_staging.strip():
+                print("No changes to commit after staging operation")
+                head_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+                return True, head_commit
+                
             # Create the commit
             cmd = ['git', 'commit', '-m', message]
             if no_verify:
@@ -90,6 +107,14 @@ class GitCommitOperations:
             
         except subprocess.CalledProcessError as e:
             print(f"Error creating commit: {e}")
+            # If the error is due to "nothing to commit", still return success with the HEAD commit
+            if "nothing to commit" in str(e) or "working tree clean" in str(e):
+                print("No changes to commit - this is normal in CI environments where changes are already committed")
+                try:
+                    head_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+                    return True, head_commit
+                except subprocess.CalledProcessError:
+                    return False, None
             return False, None
     
     def amend_commit(self, message: Optional[str] = None, files: Optional[List[str]] = None,
