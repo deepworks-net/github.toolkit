@@ -169,6 +169,18 @@ class TestGitTagOperations:
         assert 'v2.0.0' in result
         # Check if 'git tag' command was called, not just once
         mock_subprocess['check_output'].assert_any_call(['git', 'tag'], text=True)
+        
+    def test_list_tags_error(self, mock_subprocess, mock_git_env):
+        """Test listing tags when git command fails."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        mock_subprocess['check_output'].side_effect = subprocess.CalledProcessError(1, 'git tag')
+        
+        # Act
+        result = tag_ops.list_tags()
+        
+        # Assert
+        assert result == []  # Should return empty list on error
     
     def test_list_tags_with_pattern(self, mock_subprocess, mock_git_env, tag_outputs):
         """Test listing tags with pattern."""
@@ -202,6 +214,43 @@ class TestGitTagOperations:
         assert result[2] == 'v1.0.0'
         mock_subprocess['check_output'].assert_called_with(['git', 'for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', 'refs/tags/'], text=True)
     
+    def test_list_tags_date_sorted_with_pattern(self, mock_subprocess, mock_git_env, tag_outputs):
+        """Test listing tags sorted by date with pattern."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        # First call for for-each-ref, second call would be fallback if it fails
+        mock_subprocess['check_output'].side_effect = [
+            tag_outputs['date_sorted'],
+            tag_outputs['list_all']
+        ]
+        
+        # Act
+        result = tag_ops.list_tags(pattern='v1.*', sort='date')
+        
+        # Assert
+        # We should see filtering of date-sorted tags
+        assert len(result) == 2
+        assert 'v1.1.0' in result
+        assert 'v1.0.0' in result
+        assert 'v2.0.0' not in result
+    
+    def test_list_tags_date_sorted_error_fallback(self, mock_subprocess, mock_git_env, tag_outputs):
+        """Test listing tags with date sorting falling back on error."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        # First call raises exception to test fallback code path
+        mock_subprocess['check_output'].side_effect = [
+            subprocess.CalledProcessError(1, 'git for-each-ref'),
+            tag_outputs['list_all']
+        ]
+        
+        # Act
+        result = tag_ops.list_tags(sort='date')
+        
+        # Assert
+        # Should fall back to normal listing
+        assert len(result) == 3
+    
     def test_check_tag_exists(self, mock_subprocess, mock_git_env, tag_outputs):
         """Test checking if tag exists."""
         # Arrange
@@ -229,6 +278,29 @@ class TestGitTagOperations:
         assert result is False
         # Check if specific call was made
         mock_subprocess['check_output'].assert_any_call(['git', 'tag', '-l', 'v9.9.9'], text=True)
+        
+    def test_check_tag_exists_error(self, mock_subprocess, mock_git_env):
+        """Test checking if tag exists when git command fails."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        mock_subprocess['check_output'].side_effect = subprocess.CalledProcessError(1, 'git tag -l')
+        
+        # Act
+        result = tag_ops.check_tag_exists('v1.0.0')
+        
+        # Assert
+        assert result is False  # Should return False on error
+        
+    def test_check_tag_exists_invalid_name(self, mock_subprocess, mock_git_env):
+        """Test checking if tag exists with invalid tag name."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        
+        # Act
+        result = tag_ops.check_tag_exists('invalid tag')
+        
+        # Assert
+        assert result is False  # Should return False for invalid tag name
     
     def test_get_tag_message(self, mock_subprocess, mock_git_env, tag_outputs):
         """Test getting tag message."""
@@ -243,6 +315,29 @@ class TestGitTagOperations:
         assert "v1.0.0        Release v1.0.0" in result
         # Check if specific call was made
         mock_subprocess['check_output'].assert_any_call(['git', 'tag', '-n', 'v1.0.0'], text=True)
+        
+    def test_get_tag_message_error(self, mock_subprocess, mock_git_env):
+        """Test getting tag message when git command fails."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        mock_subprocess['check_output'].side_effect = subprocess.CalledProcessError(1, 'git tag -n')
+        
+        # Act
+        result = tag_ops.get_tag_message('v1.0.0')
+        
+        # Assert
+        assert result == ""  # Should return empty string on error
+        
+    def test_get_tag_message_invalid_name(self, mock_subprocess, mock_git_env):
+        """Test getting tag message with invalid tag name."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        
+        # Act
+        result = tag_ops.get_tag_message('invalid tag')
+        
+        # Assert
+        assert result == ""  # Should return empty string for invalid tag name
     
     def test_validate_tag_name_valid(self, mock_subprocess, mock_git_env):
         """Test tag name validation with valid names."""
@@ -314,11 +409,36 @@ class TestGitTagOperations:
         # Version tags should be sorted first, then non-version tags lexicographically
         assert sorted_tags[0] == "v1.0"  # Version tag comes first
         assert set(sorted_tags[1:]) == set(["latest", "stable", "release"])  # Non-version tags follow
+        
+        # Tags with non-integer parts in version
+        tags = ["v1.0.0", "v1.0.beta", "v1.0.alpha"]
+        sorted_tags = tag_ops._sort_tags_by_version(tags)
+        assert "v1.0.0" in sorted_tags
+        assert "v1.0.beta" in sorted_tags
+        assert "v1.0.alpha" in sorted_tags
 
 
 @pytest.mark.unit
 class TestMainFunction:
     """Unit tests for main function."""
+    
+    def test_no_github_output_env(self, mock_subprocess, mock_git_env):
+        """Test main function when GITHUB_OUTPUT is not set."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'list'
+        os.environ['INPUT_PATTERN'] = 'v1.*'
+        
+        # Remove GITHUB_OUTPUT to test that branch
+        github_output = os.environ.pop('GITHUB_OUTPUT', None)
+        
+        mock_subprocess['check_output'].return_value = "v1.0.0\nv1.1.0"
+        
+        # Act
+        main()  # Should print to stdout
+        
+        # Clean up
+        if github_output:
+            os.environ['GITHUB_OUTPUT'] = github_output
     
     def test_create_action(self, mock_subprocess, mock_git_env):
         """Test create action in main function."""
