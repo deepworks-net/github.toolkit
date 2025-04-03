@@ -22,7 +22,10 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          git branch | grep -v "main" | xargs -r git branch -D
+          # Safely clean branches without trying to delete current HEAD
+          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
+            git branch -D "$branch" || true
+          done
       
       - name: Test Branch Creation
         id: branch-ops
@@ -69,7 +72,10 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          git branch | grep -v "main" | xargs -r git branch -D
+          # Safely clean branches without trying to delete current HEAD
+          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
+            git branch -D "$branch" || true
+          done
       
       - name: Create Test Branches
         run: |
@@ -121,7 +127,10 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          git branch | grep -v "main" | xargs -r git branch -D
+          # Safely clean branches without trying to delete current HEAD
+          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
+            git branch -D "$branch" || true
+          done
       
       - name: Create Test Branch
         run: |
@@ -168,7 +177,10 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          git branch | grep -v "main" | xargs -r git branch -D
+          # Safely clean branches without trying to delete current HEAD
+          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
+            git branch -D "$branch" || true
+          done
       
       - name: Create Test Branch with Changes
         run: |
@@ -220,7 +232,10 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          git branch | grep -v "main" | xargs -r git branch -D
+          # Safely clean branches without trying to delete current HEAD
+          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
+            git branch -D "$branch" || true
+          done
       
       - name: Create Test Branch
         run: |
@@ -248,4 +263,4 @@ jobs:
           if git branch | grep -q "feature/force-test"; then
             echo "Branch still exists after force deletion"
             exit 1
-          }
+          fi
