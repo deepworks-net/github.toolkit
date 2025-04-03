@@ -1,7 +1,6 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
-
 ## **[(04/03/2025) - v1.0.192](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.192)**
 ### What's Changed
 - 130 Create Core Branch Operations Action @mattbuske (#154)
@@ -18,7 +17,7 @@
 - Release v1.0.138 @[github-actions[bot]](https://github.com/apps/github-actions) (#127)
 - Version Updater @mattbuske (#126)
 - Version Calculator @mattbuske (#125)
-#### **Full Changelog**: [v1.0.122...v1.0.191](https://github.com/deepworks-net/github.toolkit/compare/v1.0.122...v1.0.191)
+#### **Full Changelog**: [v1.0.122...v1.0.192](https://github.com/deepworks-net/github.toolkit/compare/v1.0.122...v1.0.192)
 
 ## **[(01/07/2025) - v1.0.138](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.138)**
 ### What's Changed
