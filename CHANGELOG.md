@@ -3,7 +3,7 @@
 
 
 
-## **04/03/2025 - v1.0.260 Unreleased**
+## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
 - Bump actions/setup-python from 4 to 5 @mattbuske (#162)
 - 128 Modularize git ops @mattbuske (#160)
