@@ -79,6 +79,26 @@ The Branch Operations action is a core (atomic) action that provides a complete 
 - Supports force push with `force: true`
 - Defaults to current branch if branch_name not specified
 
+## Error Cases
+
+The action will fail with clear error messages in these cases:
+
+1. **Invalid Action**
+   - Action parameter is missing or not one of: create, delete, list, checkout, merge, push
+
+2. **Missing Branch Name**
+   - Branch name not provided for operations that require it
+
+3. **Git Errors**
+   - Branch already exists (when creating)
+   - Branch doesn't exist (when deleting, checking out, merging)
+   - Merge conflicts (when not using force)
+
+4. **Remote Operation Failures**
+   - Remote push/delete errors
+   - Authentication issues
+   - Network problems
+
 ## Examples
 
 ### Create and Push Feature Branch
@@ -124,6 +144,38 @@ The Branch Operations action is a core (atomic) action that provides a complete 
     action: delete
     branch_name: feature/completed-feature
     remote: true
+```
+
+### Feature Branch Workflow Example
+
+```yaml
+jobs:
+  feature-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Create a new feature branch
+      - name: Create Feature Branch
+        id: create-branch
+        uses: deepworks-net/github.toolkit/actions/core/branch_operations@v1
+        with:
+          action: create
+          branch_name: feature/new-feature
+          base_branch: develop
+          remote: true
+
+      # Make changes and commit them...
+
+      # Push the feature branch
+      - name: Push Feature Branch
+        uses: deepworks-net/github.toolkit/actions/core/branch_operations@v1
+        with:
+          action: push
+          branch_name: feature/new-feature
 ```
 
 ## Implementation
