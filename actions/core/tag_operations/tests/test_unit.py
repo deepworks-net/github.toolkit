@@ -5,13 +5,13 @@ import os
 import sys
 import subprocess
 import re
-from unittest.mock import call
+from unittest.mock import call, patch
 
 # Add parent directory to path to import module under test
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import the module under test
-from main import GitTagOperations
+from main import GitTagOperations, main
 
 
 @pytest.mark.unit
@@ -260,6 +260,54 @@ class TestGitTagOperations:
         assert tag_ops._validate_tag_name('bad^char') is False     # Contains ^
         assert tag_ops._validate_tag_name('') is False             # Empty
         assert tag_ops._validate_tag_name('path..with..dots') is False  # Contains double dots
+    
+    def test_pattern_to_regex(self, mock_subprocess, mock_git_env):
+        """Test pattern to regex conversion."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        
+        # Act & Assert
+        # Test simple pattern
+        pattern = "v1.0.*"
+        regex = tag_ops._pattern_to_regex(pattern)
+        assert regex.match("v1.0.0") is not None
+        assert regex.match("v1.0.10") is not None
+        assert regex.match("v1.1.0") is None
+        
+        # Test pattern with question mark
+        pattern = "v1.?.0"
+        regex = tag_ops._pattern_to_regex(pattern)
+        assert regex.match("v1.1.0") is not None
+        assert regex.match("v1.2.0") is not None
+        assert regex.match("v1.10.0") is None
+        
+        # Test pattern with special regex chars
+        pattern = "release+1.0"
+        regex = tag_ops._pattern_to_regex(pattern)
+        assert regex.match("release+1.0") is not None
+        assert regex.match("release1.0") is None
+    
+    def test_sort_tags_by_version(self, mock_subprocess, mock_git_env):
+        """Test sorting tags by version."""
+        # Arrange
+        tag_ops = GitTagOperations()
+        
+        # Act & Assert
+        # Simple version sorting
+        tags = ["v1.0.0", "v1.10.0", "v1.2.0", "v2.0.0"]
+        sorted_tags = tag_ops._sort_tags_by_version(tags)
+        assert sorted_tags == ["v2.0.0", "v1.10.0", "v1.2.0", "v1.0.0"]
+        
+        # Mixed version formats
+        tags = ["v1.0", "1.0.5", "v1.0.10", "1.1"]
+        sorted_tags = tag_ops._sort_tags_by_version(tags)
+        assert sorted_tags == ["1.1", "v1.0.10", "1.0.5", "v1.0"]
+        
+        # Non-standard tags
+        tags = ["latest", "stable", "v1.0", "release"]
+        sorted_tags = tag_ops._sort_tags_by_version(tags)
+        # Non-standard tags should be sorted lexicographically
+        assert "v1.0" in sorted_tags
 
 
 @pytest.mark.unit
@@ -275,9 +323,6 @@ class TestMainFunction:
         
         mock_subprocess['check_output'].return_value = ""  # Tag doesn't exist
         
-        # Import main here to ensure env vars are set
-        from main import main
-        
         # Act
         main()  # Should not raise an exception
         
@@ -288,19 +333,134 @@ class TestMainFunction:
         assert 'result=success' in output
         assert 'tag_exists=false' in output
     
+    def test_create_existing_tag(self, mock_subprocess, mock_git_env):
+        """Test creating a tag that already exists."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        
+        # Tag exists but force is not set
+        mock_subprocess['check_output'].return_value = "v1.0.0"  # Tag exists
+        
+        # Act
+        with pytest.raises(SystemExit):
+            main()  # Should exit with error
+    
+    def test_create_force_tag(self, mock_subprocess, mock_git_env):
+        """Test force creating a tag."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        os.environ['INPUT_FORCE'] = 'true'
+        os.environ['INPUT_REF'] = 'main'
+        
+        # Tag exists and force is set
+        mock_subprocess['check_output'].return_value = "v1.0.0"  # Tag exists
+        
+        # Act
+        main()  # Should succeed with force
+        
+        # Assert
+        with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+            output = f.read()
+        
+        assert 'result=success' in output
+        assert 'tag_exists=true' in output
+    
+    def test_create_with_remote(self, mock_subprocess, mock_git_env):
+        """Test creating a tag and pushing to remote."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        os.environ['INPUT_REMOTE'] = 'true'
+        
+        mock_subprocess['check_output'].return_value = ""  # Tag doesn't exist
+        
+        # Act
+        main()
+        
+        # Assert
+        expected_calls = [
+            call(['git', 'tag', 'v1.0.0']),
+            call(['git', 'push', 'origin', 'refs/tags/v1.0.0'])
+        ]
+        mock_subprocess['check_call'].assert_has_calls(expected_calls[0:2], any_order=False)
+    
+    def test_delete_action(self, mock_subprocess, mock_git_env):
+        """Test delete action in main function."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'delete'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        os.environ['INPUT_REMOTE'] = 'true'
+        
+        # Tag exists
+        mock_subprocess['check_output'].return_value = "v1.0.0"
+        
+        # Act
+        main()
+        
+        # Assert
+        with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+            output = f.read()
+        
+        assert 'result=success' in output
+        
+        expected_calls = [
+            call(['git', 'tag', '-d', 'v1.0.0']),
+            call(['git', 'push', 'origin', ':refs/tags/v1.0.0'])
+        ]
+        mock_subprocess['check_call'].assert_has_calls(expected_calls[0:2], any_order=False)
+    
+    def test_delete_nonexistent_tag(self, mock_subprocess, mock_git_env):
+        """Test deleting a tag that doesn't exist."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'delete'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        
+        # Tag doesn't exist
+        mock_subprocess['check_output'].return_value = ""
+        
+        # Act
+        main()
+        
+        # Assert
+        with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+            output = f.read()
+        
+        assert 'result=success' in output
+    
+    def test_push_action(self, mock_subprocess, mock_git_env):
+        """Test push action in main function."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'push'
+        os.environ['INPUT_TAG_NAME'] = 'v1.0.0'
+        os.environ['INPUT_FORCE'] = 'true'
+        
+        # Act
+        main()
+        
+        # Assert
+        with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+            output = f.read()
+        
+        assert 'result=success' in output
+        
+        expected_calls = [
+            call(['git', 'push', 'origin', '--force', 'refs/tags/v1.0.0'])
+        ]
+        mock_subprocess['check_call'].assert_has_calls(expected_calls[0:1], any_order=False)
+    
     def test_list_action(self, mock_subprocess, mock_git_env, tag_outputs):
         """Test list action in main function."""
         # Arrange
         os.environ['INPUT_ACTION'] = 'list'
         os.environ['INPUT_PATTERN'] = 'v1.*'
+        os.environ['INPUT_SORT'] = 'alphabetic'
         
         mock_subprocess['check_output'].return_value = tag_outputs['list_pattern']
         
-        # Import main here to ensure env vars are set
-        from main import main
-        
         # Act
-        main()  # Should not raise an exception
+        main()
         
         # Assert
         with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
@@ -320,11 +480,8 @@ class TestMainFunction:
             tag_outputs['tag_message']    # get_tag_message
         ]
         
-        # Import main here to ensure env vars are set
-        from main import main
-        
         # Act
-        main()  # Should not raise an exception
+        main()
         
         # Assert
         with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
@@ -333,3 +490,24 @@ class TestMainFunction:
         assert 'result=success' in output
         assert 'tag_exists=true' in output
         assert 'tag_message=v1.0.0        Release v1.0.0' in output
+    
+    def test_invalid_action(self, mock_subprocess, mock_git_env):
+        """Test invalid action."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'invalid'
+        
+        # Act & Assert
+        with pytest.raises(SystemExit):
+            main()
+    
+    def test_missing_tag_name(self, mock_subprocess, mock_git_env):
+        """Test missing tag_name for actions that require it."""
+        for action in ['create', 'delete', 'push', 'check']:
+            # Arrange
+            os.environ['INPUT_ACTION'] = action
+            if 'INPUT_TAG_NAME' in os.environ:
+                del os.environ['INPUT_TAG_NAME']
+            
+            # Act & Assert
+            with pytest.raises(SystemExit):
+                main()

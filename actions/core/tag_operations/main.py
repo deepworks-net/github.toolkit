@@ -136,7 +136,6 @@ class GitTagOperations:
                 cmd = ['git', 'for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', 'refs/tags/']
                 if pattern:
                     # Apply pattern filtering through grep since for-each-ref doesn't support -l
-                    cmd = ['git', 'for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', 'refs/tags/']
                     output = subprocess.check_output(cmd, text=True)
                     # Filter tags manually
                     tags = [tag for tag in output.strip().split('\n') if tag]
@@ -165,6 +164,9 @@ class GitTagOperations:
         Returns:
             bool: True if tag exists, False otherwise
         """
+        if not self._validate_tag_name(tag_name):
+            return False
+            
         try:
             output = subprocess.check_output(['git', 'tag', '-l', tag_name], text=True).strip()
             return output == tag_name
@@ -181,6 +183,9 @@ class GitTagOperations:
         Returns:
             str: The tag message or empty string if not found or not annotated
         """
+        if not self._validate_tag_name(tag_name):
+            return ""
+            
         try:
             return subprocess.check_output(['git', 'tag', '-n', tag_name], text=True).strip()
         except subprocess.CalledProcessError:
@@ -249,18 +254,14 @@ class GitTagOperations:
             if tag.startswith('v'):
                 tag = tag[1:]
                 
-            try:
-                # Split by dots and convert to integers where possible
-                parts = []
-                for part in tag.split('.'):
-                    try:
-                        parts.append(int(part))
-                    except ValueError:
-                        parts.append(part)
-                return parts
-            except:
-                # If we can't parse as version, return original for lexicographic sort
-                return [tag]
+            # Split by dots and convert to integers where possible
+            parts = []
+            for part in tag.split('.'):
+                try:
+                    parts.append(int(part))
+                except ValueError:
+                    parts.append(part)
+            return parts
         
         # Sort tags by their version components
         return sorted(tags, key=extract_version, reverse=True)
@@ -285,20 +286,17 @@ def main():
     tag_exists = False
     tag_message = ""
     
-    # Validate inputs
-    if action in ['create', 'delete', 'push'] and not tag_name:
+    # Validate required inputs
+    if action in ['create', 'delete', 'push', 'check'] and not tag_name:
         print(f"Error: tag_name is required for {action} action")
         sys.exit(1)
     
     # Execute requested operation
     if action == 'create':
-        if tag_ops.check_tag_exists(tag_name):
-            tag_exists = True
-            if not force:
-                print(f"Tag {tag_name} already exists. Use force=true to overwrite.")
-                result = False
-            else:
-                result = tag_ops.create_tag(tag_name, message, ref, force)
+        tag_exists = tag_ops.check_tag_exists(tag_name)
+        if tag_exists and not force:
+            print(f"Tag {tag_name} already exists. Use force=true to overwrite.")
+            result = False
         else:
             result = tag_ops.create_tag(tag_name, message, ref, force)
             
@@ -306,7 +304,8 @@ def main():
             result = tag_ops.push_tag(tag_name, force)
     
     elif action == 'delete':
-        if not tag_ops.check_tag_exists(tag_name) and not remote:
+        tag_exists = tag_ops.check_tag_exists(tag_name)
+        if not tag_exists and not remote:
             print(f"Tag {tag_name} doesn't exist locally.")
             result = True  # Consider it success if tag doesn't exist
         else:
@@ -321,12 +320,8 @@ def main():
         result = True
     
     elif action == 'check':
-        if not tag_name:
-            print("Error: tag_name is required for check action")
-            sys.exit(1)
-        
         tag_exists = tag_ops.check_tag_exists(tag_name)
-        tag_message = tag_ops.get_tag_message(tag_name)
+        tag_message = tag_ops.get_tag_message(tag_name) if tag_exists else ""
         result = True
     
     else:
