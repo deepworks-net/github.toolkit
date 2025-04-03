@@ -84,8 +84,29 @@ class GitCommitOperations:
         self.git_errors = GitErrors()
         
         # Configure git environment
-        self.git_config.setup_identity()
-        self.git_config.configure_safe_directory()
+        self._configure_git()
+    
+    def _configure_git(self) -> None:
+        """Configure git for safe directory operations."""
+        try:
+            # Check if git is available
+            subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
+            
+            # Configure git environment using GitConfig utilities
+            safe_dir_result = self.git_config.configure_safe_directory()
+            identity_result = self.git_config.setup_identity()
+            
+            # Exit if configuration failed
+            if not safe_dir_result or not identity_result:
+                print("Error: Git configuration failed.")
+                sys.exit(1)
+                
+        except FileNotFoundError:
+            print("Error: Git is not installed. Please ensure git is available in the container.")
+            sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            print(f"Error configuring git: {e}")
+            sys.exit(1)
     
     def create_commit(self, message: str, files: Optional[List[str]] = None, 
                      no_verify: bool = False) -> Tuple[bool, Optional[str]]:
@@ -414,20 +435,34 @@ class GitCommitOperations:
 
 def main():
     """Main entry point for the action."""
-    commit_ops = GitCommitOperations()
-    
-    # Get inputs
-    action = os.environ.get('INPUT_ACTION')
-    message = os.environ.get('INPUT_MESSAGE')
-    files_str = os.environ.get('INPUT_FILES', '')
-    commit_hash = os.environ.get('INPUT_COMMIT_HASH')
-    limit_str = os.environ.get('INPUT_LIMIT', '10')
-    author = os.environ.get('INPUT_AUTHOR')
-    since = os.environ.get('INPUT_SINCE')
-    until = os.environ.get('INPUT_UNTIL')
-    path = os.environ.get('INPUT_PATH')
-    format = os.environ.get('INPUT_FORMAT', 'medium')
-    no_verify = os.environ.get('INPUT_NO_VERIFY', 'false').lower() == 'true'
+    try:
+        # Check if git is available before initializing
+        try:
+            subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
+        except FileNotFoundError:
+            print("Error: Git is not installed. Please ensure git is available in the container.")
+            sys.exit(1)
+        except subprocess.CalledProcessError as e:
+            print(f"Error checking git version: {e}")
+            sys.exit(1)
+            
+        commit_ops = GitCommitOperations()
+        
+        # Get inputs
+        action = os.environ.get('INPUT_ACTION')
+        message = os.environ.get('INPUT_MESSAGE')
+        files_str = os.environ.get('INPUT_FILES', '')
+        commit_hash = os.environ.get('INPUT_COMMIT_HASH')
+        limit_str = os.environ.get('INPUT_LIMIT', '10')
+        author = os.environ.get('INPUT_AUTHOR')
+        since = os.environ.get('INPUT_SINCE')
+        until = os.environ.get('INPUT_UNTIL')
+        path = os.environ.get('INPUT_PATH')
+        format = os.environ.get('INPUT_FORMAT', 'medium')
+        no_verify = os.environ.get('INPUT_NO_VERIFY', 'false').lower() == 'true'
+    except Exception as e:
+        print(f"Error initializing commit operations: {e}")
+        sys.exit(1)
     
     # Parse file list
     files = [f.strip() for f in files_str.split(',')] if files_str else None
