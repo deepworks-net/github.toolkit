@@ -74,12 +74,16 @@ class GitErrors:
     
     def handle_commit_error(self, error, action, message=None):
         """Handle commit-related errors."""
+        error_msg = ""
         if message:
-            print(f"Error {action} commit '{message[:50]}...': {error}")
+            truncated_message = message[:50] + "..." if len(message) > 50 else message
+            error_msg = f"Error {action} commit '{truncated_message}': {error}"
+            print(error_msg)
         else:
-            print(f"Error {action} commit: {error}")
+            error_msg = f"Error {action} commit: {error}"
+            print(error_msg)
         print("You may need to resolve conflicts manually if they exist.")
-        return str(error)
+        return error_msg
     
     def handle_tag_error(self, error, action, tag):
         """Handle tag-related errors."""
