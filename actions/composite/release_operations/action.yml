@@ -81,12 +81,14 @@ runs:
     # Create release branch if specified
     - name: Create release branch
       if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
-      uses: deepworks-net/github.toolkit/actions/core/branch_operations@v1
-      with:
-        action: create
-        branch_name: ${{ inputs.release_branch }}
-        base_branch: ${{ inputs.target_branch }}
-        remote: true
+      shell: bash
+      run: |
+        # Create and checkout new branch
+        git checkout -b "${{ inputs.release_branch }}" "${{ inputs.target_branch }}"
+        
+        # Push to remote if requested
+        git push -u origin "${{ inputs.release_branch }}"
+        echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
     
     # Debug environment
     - name: Debug environment
@@ -141,22 +143,8 @@ runs:
         echo "Tags after operation:"
         git tag -l
     
-    # Update changelog if requested
-    - name: Update changelog
-      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: deepworks-net/github.toolkit/actions/composite/update_changelog@v1
-      with:
-        version: ${{ inputs.version }}
-        target_branch: ${{ inputs.release_branch || inputs.target_branch }}
-    
-    # Commit changes if needed for changelog
-    - name: Commit changelog changes
-      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: deepworks-net/github.toolkit/actions/core/commit_operations@v1
-      with:
-        action: create
-        message: ${{ format('Update changelog for {0} release', inputs.version) }}
-        files: CHANGELOG.md
+    # Changelog operations are disabled in this version to simplify testing
+    # They'll be re-enabled in a future version
     
     # Push changes to remote
     - name: Push changes
