@@ -2,7 +2,7 @@
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
 
-## **04/03/2025 - v1.0.209 Unreleased**
+## **[(04/03/2025) - v1.0.210](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.210)**
 ### What's Changed
 - 129 Create Core Tag Operations Action @mattbuske (#156)
 - Bump mkdocs-git-authors-plugin from 0.9.3 to 0.9.4 @[dependabot[bot]](https://github.com/apps/dependabot) (#148)
