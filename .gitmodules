@@ -1,0 +1,3 @@
+[submodule "claude.code"]
+    path = claude-code-docker
+    url = https://github.com/deepworks-net/docker.claude-code.git

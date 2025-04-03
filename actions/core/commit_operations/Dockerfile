@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 LABEL maintainer="Deepworks"
-LABEL description="Git tag operations"
+LABEL description="Git commit operations"
 
 # Install git and optimize image size in a single layer
 RUN apt-get update && \
@@ -10,8 +10,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip cache purge
 
-# Copy main script
 COPY main.py /main.py
+COPY git_utils.py /git_utils.py
+
 RUN chmod +x /main.py
 
 ENTRYPOINT ["/main.py"]

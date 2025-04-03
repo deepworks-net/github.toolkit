@@ -394,9 +394,9 @@ class TestGitTagOperations:
         tag_ops = GitTagOperations()
         
         # Act & Assert
-        assert tag_ops._validate_tag_name('v1.0.0') is True
-        assert tag_ops._validate_tag_name('release/1.0.0') is True
-        assert tag_ops._validate_tag_name('feature_tag') is True
+        assert tag_ops.git_validator.is_valid_tag_name('v1.0.0') is True
+        assert tag_ops.git_validator.is_valid_tag_name('release/1.0.0') is True
+        assert tag_ops.git_validator.is_valid_tag_name('feature_tag') is True
     
     def test_validate_tag_name_invalid(self, mock_subprocess, mock_git_env):
         """Test tag name validation with invalid names."""
@@ -404,11 +404,11 @@ class TestGitTagOperations:
         tag_ops = GitTagOperations()
         
         # Act & Assert
-        assert tag_ops._validate_tag_name('invalid tag') is False  # Contains space
-        assert tag_ops._validate_tag_name('-badstart') is False    # Starts with dash
-        assert tag_ops._validate_tag_name('bad^char') is False     # Contains ^
-        assert tag_ops._validate_tag_name('') is False             # Empty
-        assert tag_ops._validate_tag_name('path..with..dots') is False  # Contains double dots
+        assert tag_ops.git_validator.is_valid_tag_name('invalid tag') is False  # Contains space
+        assert tag_ops.git_validator.is_valid_tag_name('-badstart') is False    # Starts with dash
+        assert tag_ops.git_validator.is_valid_tag_name('bad^char') is False     # Contains ^
+        assert tag_ops.git_validator.is_valid_tag_name('') is False             # Empty
+        assert tag_ops.git_validator.is_valid_tag_name('path..with..dots') is False  # Contains double dots
     
     def test_pattern_to_regex(self, mock_subprocess, mock_git_env):
         """Test pattern to regex conversion."""
@@ -418,21 +418,21 @@ class TestGitTagOperations:
         # Act & Assert
         # Test simple pattern
         pattern = "v1.0.*"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("v1.0.0") is not None
         assert regex.match("v1.0.10") is not None
         assert regex.match("v1.1.0") is None
         
         # Test pattern with question mark
         pattern = "v1.?.0"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("v1.1.0") is not None
         assert regex.match("v1.2.0") is not None
         assert regex.match("v1.10.0") is None
         
         # Test pattern with special regex chars
         pattern = "release+1.0"
-        regex = tag_ops._pattern_to_regex(pattern)
+        regex = tag_ops.git_validator.pattern_to_regex(pattern)
         assert regex.match("release+1.0") is not None
         assert regex.match("release1.0") is None
     
