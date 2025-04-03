@@ -15,7 +15,15 @@ def mock_subprocess():
         
         # Configure default successful behavior
         mock_check_call.return_value = 0
-        mock_check_output.return_value = "mocked output"
+        
+        # Set up different responses based on the command
+        def mock_check_output_side_effect(*args, **kwargs):
+            if args[0][0:2] == ['git', 'config'] and args[0][2] == 'user.name':
+                # Simulate user.name not configured
+                raise subprocess.CalledProcessError(128, 'git config user.name')
+            return "mocked output"
+            
+        mock_check_output.side_effect = mock_check_output_side_effect
         
         mock_run_instance = MagicMock()
         mock_run_instance.stdout = "mocked stdout"

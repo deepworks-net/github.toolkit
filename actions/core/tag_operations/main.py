@@ -20,6 +20,17 @@ class GitTagOperations:
             
             # Configure safe directory
             subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
+            
+            # Set default Git identity if not configured
+            try:
+                # Try to get current user.name
+                subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError:
+                # If not set, configure a default identity for the action
+                subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
+                subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
+                print("Configured default Git identity for tag operations")
+                
         except FileNotFoundError:
             print("Error: Git is not installed. Please ensure git is available in the container.")
             sys.exit(1)
