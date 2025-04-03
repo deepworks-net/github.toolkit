@@ -10,8 +10,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip cache purge
 
+# Copy main script
 COPY main.py /main.py
-
 RUN chmod +x /main.py
 
 ENTRYPOINT ["/main.py"]

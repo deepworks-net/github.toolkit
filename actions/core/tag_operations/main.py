@@ -6,9 +6,65 @@ import subprocess
 import re
 from typing import Optional, List, Dict, Union, Tuple, Pattern
 
-# Import shared git utilities
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../shared')))
-from git_utils import GitConfig, GitValidator, GitErrors
+# Add current directory to path to find git_utils
+# The Docker build will copy these utilities directly with the script
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+try:
+    # Try importing directly
+    from git_utils import GitConfig, GitValidator, GitErrors
+except ImportError:
+    # Fall back to older implementation if git_utils are not available
+    print("Warning: git_utils module not found, falling back to internal implementation")
+    class GitConfig:
+        def __init__(self, workspace_path=None):
+            self.workspace_path = workspace_path or os.environ.get('GITHUB_WORKSPACE', '/github/workspace')
+        
+        def setup_identity(self):
+            try:
+                subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
+                subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
+                return True
+            except subprocess.CalledProcessError:
+                return False
+        
+        def configure_safe_directory(self):
+            try:
+                subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', self.workspace_path])
+                return True
+            except subprocess.CalledProcessError:
+                return False
+    
+    class GitValidator:
+        def is_valid_tag_name(self, tag_name):
+            if not tag_name:
+                return False
+            if tag_name.startswith('-'):
+                return False
+            if '..' in tag_name:
+                return False
+            invalid_chars = r'[\s~^:?*[\]\\]'
+            if re.search(invalid_chars, tag_name):
+                return False
+            return True
+        
+        def pattern_to_regex(self, pattern):
+            regex = re.escape(pattern)
+            regex = regex.replace('\\*', '.*').replace('\\?', '.')
+            regex = f'^{regex}$'
+            return re.compile(regex)
+    
+    class GitErrors:
+        def handle_git_error(self, error, context=None):
+            print(f"Error: {error}")
+            return str(error)
+        
+        def handle_tag_error(self, error, action, tag):
+            print(f"Error {action} tag {tag}: {error}")
+            return str(error)
+        
+        def handle_push_error(self, error, ref):
+            print(f"Error pushing {ref}: {error}")
+            return str(error)
 
 
 class GitTagOperations:
