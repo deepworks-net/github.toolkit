@@ -1,0 +1,124 @@
+name: Test Core Commit Operations
+
+on:
+  push:
+    paths:
+      - 'actions/core/commit_operations/**'
+      - '.github/workflows/test.core.action.commit_operations.yml'
+  pull_request:
+    paths:
+      - 'actions/core/commit_operations/**'
+      - '.github/workflows/test.core.action.commit_operations.yml'
+  workflow_dispatch:
+
+jobs:
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install test dependencies
+        run: |
+          cd actions/core/commit_operations
+          pip install pytest pytest-cov
+      
+      - name: Run unit tests
+        run: |
+          cd actions/core/commit_operations
+          python -m pytest tests/test_unit.py -v --cov=main --cov-report=term
+      
+      - name: Check code coverage
+        run: |
+          cd actions/core/commit_operations
+          python -m pytest tests/test_unit.py --cov=main --cov-fail-under=80
+  
+  test-action:
+    runs-on: ubuntu-latest
+    needs: [test-unit]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup test environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          
+          # Initialize a clean environment
+          git checkout -b test-commits || true
+          
+          # Create a test file
+          echo "Test content" > test.txt
+          git add test.txt
+          git commit -m "Initial commit"
+      
+      # Test create commit action
+      - name: Test create commit
+        id: create-commit
+        uses: ./actions/core/commit_operations
+        with:
+          action: create
+          message: "Add new feature"
+          files: "README.md"
+      
+      # Verify outputs
+      - name: Verify commit was created
+        run: |
+          if [[ "${{ steps.create-commit.outputs.result }}" != "success" ]]; then
+            echo "Commit creation failed"
+            exit 1
+          fi
+          if [[ -z "${{ steps.create-commit.outputs.commit_hash }}" ]]; then
+            echo "No commit hash returned"
+            exit 1
+          fi
+      
+      # Test amend commit action
+      - name: Test amend commit
+        id: amend-commit
+        uses: ./actions/core/commit_operations
+        with:
+          action: amend
+          message: "Add new feature with improvements"
+      
+      # Test list commits action
+      - name: Test list commits
+        id: list-commits
+        uses: ./actions/core/commit_operations
+        with:
+          action: list
+          limit: 5
+      
+      # Verify list output
+      - name: Verify commit list
+        run: |
+          if [[ "${{ steps.list-commits.outputs.result }}" != "success" ]]; then
+            echo "List commits failed"
+            exit 1
+          fi
+          if [[ -z "${{ steps.list-commits.outputs.commits }}" ]]; then
+            echo "No commits returned"
+            exit 1
+          fi
+      
+      # Test get commit info
+      - name: Test get commit info
+        id: get-commit
+        uses: ./actions/core/commit_operations
+        with:
+          action: get
+          commit_hash: ${{ steps.amend-commit.outputs.commit_hash }}
+      
+      # Test revert commit
+      - name: Test revert commit
+        id: revert-commit
+        uses: ./actions/core/commit_operations
+        with:
+          action: revert
+          commit_hash: ${{ steps.amend-commit.outputs.commit_hash }}

@@ -6,41 +6,26 @@ import subprocess
 import re
 from typing import Optional, List, Dict, Union, Tuple, Pattern
 
+# Import shared git utilities
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../shared')))
+from git_utils import GitConfig, GitValidator, GitErrors
+
+
 class GitTagOperations:
     """Handles atomic Git tag operations."""
     
     def __init__(self):
-        self._configure_git()
-    
-    def _configure_git(self) -> None:
-        """Configure git for safe directory operations."""
-        try:
-            # Check if git is available
-            subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
-            
-            # Configure safe directory
-            subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
-            
-            # Set default Git identity if not configured
-            try:
-                # Try to get current user.name
-                subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError:
-                # If not set, configure a default identity for the action
-                # This is essential for creating annotated tags, as Git requires an identity
-                subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
-                subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
-                print("Configured default Git identity for tag operations")
-                
-        except FileNotFoundError:
-            print("Error: Git is not installed. Please ensure git is available in the container.")
-            sys.exit(1)
-        except subprocess.CalledProcessError as e:
-            print(f"Error configuring git: {e}")
-            sys.exit(1)
+        """Initialize with git configuration."""
+        self.git_config = GitConfig()
+        self.git_validator = GitValidator()
+        self.git_errors = GitErrors()
+        
+        # Configure git environment
+        self.git_config.setup_identity()
+        self.git_config.configure_safe_directory()
     
     def create_tag(self, tag_name: str, message: Optional[str] = None, 
-                   ref: Optional[str] = None, force: bool = False) -> bool:
+                  ref: Optional[str] = None, force: bool = False) -> bool:
         """
         Create a new git tag.
         
@@ -53,7 +38,7 @@ class GitTagOperations:
         Returns:
             bool: True if successful, False otherwise
         """
-        if not self._validate_tag_name(tag_name):
+        if not self.git_validator.is_valid_tag_name(tag_name):
             print(f"Invalid tag name: {tag_name}")
             return False
             
@@ -74,7 +59,7 @@ class GitTagOperations:
             subprocess.check_call(cmd)
             return True
         except subprocess.CalledProcessError as e:
-            print(f"Error creating tag {tag_name}: {e}")
+            self.git_errors.handle_tag_error(e, 'create', tag_name)
             return False
     
     def delete_tag(self, tag_name: str, remote: bool = False) -> bool:
@@ -88,7 +73,7 @@ class GitTagOperations:
         Returns:
             bool: True if successful, False otherwise
         """
-        if not self._validate_tag_name(tag_name):
+        if not self.git_validator.is_valid_tag_name(tag_name):
             print(f"Invalid tag name: {tag_name}")
             return False
             
@@ -101,7 +86,7 @@ class GitTagOperations:
                 subprocess.check_call(['git', 'push', 'origin', f':refs/tags/{tag_name}'])
             return True
         except subprocess.CalledProcessError as e:
-            print(f"Error deleting tag {tag_name}: {e}")
+            self.git_errors.handle_tag_error(e, 'delete', tag_name)
             return False
     
     def push_tag(self, tag_name: str, force: bool = False) -> bool:
@@ -115,7 +100,7 @@ class GitTagOperations:
         Returns:
             bool: True if successful, False otherwise
         """
-        if not self._validate_tag_name(tag_name):
+        if not self.git_validator.is_valid_tag_name(tag_name):
             print(f"Invalid tag name: {tag_name}")
             return False
             
@@ -130,7 +115,7 @@ class GitTagOperations:
             subprocess.check_call(cmd)
             return True
         except subprocess.CalledProcessError as e:
-            print(f"Error pushing tag {tag_name}: {e}")
+            self.git_errors.handle_push_error(e, f'refs/tags/{tag_name}')
             return False
     
     def list_tags(self, pattern: Optional[str] = None, sort: str = 'alphabetic') -> List[str]:
@@ -158,7 +143,7 @@ class GitTagOperations:
                     # Filter tags manually
                     tags = [tag for tag in output.strip().split('\n') if tag]
                     if pattern:
-                        pattern_regex = self._pattern_to_regex(pattern)
+                        pattern_regex = self.git_validator.pattern_to_regex(pattern)
                         return [tag for tag in tags if pattern_regex.match(tag)]
                     return tags
                 except subprocess.CalledProcessError as e:
@@ -175,7 +160,7 @@ class GitTagOperations:
                 
             return tags
         except subprocess.CalledProcessError as e:
-            print(f"Error listing tags: {e}")
+            self.git_errors.handle_git_error(e, "Error listing tags")
             return []
     
     def check_tag_exists(self, tag_name: str) -> bool:
@@ -188,7 +173,7 @@ class GitTagOperations:
         Returns:
             bool: True if tag exists, False otherwise
         """
-        if not self._validate_tag_name(tag_name):
+        if not self.git_validator.is_valid_tag_name(tag_name):
             return False
             
         try:
@@ -207,60 +192,13 @@ class GitTagOperations:
         Returns:
             str: The tag message or empty string if not found or not annotated
         """
-        if not self._validate_tag_name(tag_name):
+        if not self.git_validator.is_valid_tag_name(tag_name):
             return ""
             
         try:
             return subprocess.check_output(['git', 'tag', '-n', tag_name], text=True).strip()
         except subprocess.CalledProcessError:
             return ""
-    
-    def _validate_tag_name(self, tag_name: str) -> bool:
-        """
-        Validate a tag name according to git's rules.
-        
-        Args:
-            tag_name: The tag name to validate
-            
-        Returns:
-            bool: True if valid, False otherwise
-        """
-        # Git tag cannot contain spaces, control chars, or these: ~^:?*[]\
-        invalid_chars = r'[\s~^:?*[\]\\]'
-        if re.search(invalid_chars, tag_name):
-            return False
-            
-        # Tag cannot start with a dash
-        if tag_name.startswith('-'):
-            return False
-            
-        # Tag cannot be empty
-        if not tag_name:
-            return False
-            
-        # Cannot contain double dots ".."
-        if '..' in tag_name:
-            return False
-            
-        return True
-    
-    def _pattern_to_regex(self, pattern: str) -> Pattern:
-        """
-        Convert a git-style pattern to regex.
-        
-        Args:
-            pattern: Git-style pattern (with * and ? wildcards)
-            
-        Returns:
-            Pattern: Compiled regex pattern
-        """
-        # Escape special regex chars except * and ?
-        regex = re.escape(pattern)
-        # Convert git wildcards to regex wildcards
-        regex = regex.replace('\\*', '.*').replace('\\?', '.')
-        # Ensure it matches the whole string
-        regex = f'^{regex}$'
-        return re.compile(regex)
     
     def _sort_tags_by_version(self, tags: List[str]) -> List[str]:
         """

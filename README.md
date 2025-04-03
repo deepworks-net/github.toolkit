@@ -12,6 +12,7 @@ Atomic operations that can be combined to build custom workflows:
 - **Version Updater**: Update version references in code and documentation
 - **Branch Operations**: Create, delete, checkout, list, and merge branches
 - **Tag Operations**: Create, delete, push, and list git tags
+- **Commit Operations**: Create, amend, list, cherry-pick and revert git commits
 
 ### Composite Actions
 
@@ -20,6 +21,7 @@ Workflows that combine multiple operations for common tasks:
 - **Git Operations**: Handle git operations including branch and tag management
 - **Release Notes**: Generate release notes from PRs and commits
 - **Update Changelog**: Update changelog based on merged PRs
+- **Release Operations**: Combine tag, branch, and commit operations for comprehensive release management
 
 ### Workflows
 

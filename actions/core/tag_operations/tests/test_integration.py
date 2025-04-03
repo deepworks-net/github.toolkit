@@ -145,6 +145,10 @@ class TestGitTagOperationsIntegration:
         assert tag_ops.create_tag('valid-tag') is True, "Valid tag creation should succeed"
         assert tag_ops.create_tag('invalid tag') is False, "Invalid tag with space should fail"
         assert tag_ops.create_tag('invalid^tag') is False, "Invalid tag with ^ should fail"
+        
+        # Test validator directly
+        assert tag_ops.git_validator.is_valid_tag_name('valid-tag') is True, "Valid tag name should pass validation"
+        assert tag_ops.git_validator.is_valid_tag_name('invalid tag') is False, "Invalid tag with space should fail validation"
     
     def test_force_tag_creation(self, git_repo):
         """Test force creating a tag that already exists."""
