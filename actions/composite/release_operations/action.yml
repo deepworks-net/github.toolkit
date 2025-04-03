@@ -77,15 +77,37 @@ runs:
         base_branch: ${{ inputs.target_branch }}
         remote: true
     
+    # Debug environment
+    - name: Debug environment
+      shell: bash
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Repository structure:"
+        ls -la ./actions/core/
+        echo "Tag operations content:"
+        ls -la ./actions/core/tag_operations/
+        echo "Current Git tags:"
+        git tag -l
+    
     # Create tag
     - name: Create release tag
       if: ${{ inputs.action == 'create' || inputs.action == 'publish' }}
       uses: ./actions/core/tag_operations
+      id: create_tag
       with:
         action: create
         tag_name: ${{ inputs.version }}
         message: ${{ inputs.message || format('Release {0}', inputs.version) }}
         force: ${{ inputs.action == 'update' }}
+    
+    # Show tag operation result
+    - name: Show tag operation result
+      shell: bash
+      run: |
+        echo "Tag operation result: ${{ steps.create_tag.outputs.result }}"
+        echo "Tag exists: ${{ steps.create_tag.outputs.tag_exists }}"
+        echo "Tags after operation:"
+        git tag -l
     
     # Update changelog if requested
     - name: Update changelog

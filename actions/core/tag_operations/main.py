@@ -324,15 +324,27 @@ def main():
     
     # Execute requested operation
     if action == 'create':
+        print(f"Creating tag: {tag_name}")
+        print(f"Message: {message}")
+        print(f"Ref: {ref}")
+        print(f"Force: {force}")
+        print(f"Remote: {remote}")
+        
         tag_exists = tag_ops.check_tag_exists(tag_name)
+        print(f"Tag exists check: {tag_exists}")
+        
         if tag_exists and not force:
             print(f"Tag {tag_name} already exists. Use force=true to overwrite.")
             result = False
         else:
+            print("Creating tag now...")
             result = tag_ops.create_tag(tag_name, message, ref, force)
+            print(f"Create tag result: {result}")
             
         if result and remote:
+            print("Pushing tag to remote...")
             result = tag_ops.push_tag(tag_name, force)
+            print(f"Push tag result: {result}")
     
     elif action == 'delete':
         tag_exists = tag_ops.check_tag_exists(tag_name)
@@ -362,6 +374,7 @@ def main():
     # Set outputs
     github_output = os.environ.get('GITHUB_OUTPUT')
     if github_output:
+        print(f"Writing outputs to {github_output}")
         with open(github_output, 'a') as f:
             if output is not None and isinstance(output, list):
                 f.write(f"tags={','.join(output)}\n")
@@ -373,6 +386,9 @@ def main():
                 # Escape newlines for GitHub Actions output
                 tag_message = tag_message.replace('\n', '%0A')
                 f.write(f"tag_message={tag_message}\n")
+        
+        print(f"Output result: {'success' if result else 'failure'}")
+        print(f"Output tag_exists: {'true' if tag_exists else 'false'}")
     else:
         print("GITHUB_OUTPUT environment variable not set. Skipping output.")
         if output is not None and isinstance(output, list):
