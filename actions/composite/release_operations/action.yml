@@ -1,0 +1,148 @@
+name: 'Release Operations'
+description: 'Perform Git release operations combining tag, branch, and commit actions'
+author: 'Deepworks'
+inputs:
+  action:
+    description: 'Release operation to perform (create, publish, update, delete)'
+    required: true
+  version:
+    description: 'Version for the release (e.g., v1.0.0)'
+    required: true
+  target_branch:
+    description: 'Target branch for the release'
+    required: false
+    default: 'main'
+  release_branch:
+    description: 'Name of the release branch to create'
+    required: false
+  message:
+    description: 'Release message'
+    required: false
+  body:
+    description: 'Release body content'
+    required: false
+  draft:
+    description: 'Create as draft release'
+    required: false
+    default: 'false'
+  prerelease:
+    description: 'Mark as prerelease'
+    required: false
+    default: 'false'
+  update_changelog:
+    description: 'Whether to update the changelog'
+    required: false
+    default: 'true'
+  tag_only:
+    description: 'Only create a tag, not a GitHub release'
+    required: false
+    default: 'false'
+  files:
+    description: 'Files to include in the release (comma-separated)'
+    required: false
+
+outputs:
+  release_id:
+    description: 'ID of the created or updated release'
+  tag_name:
+    description: 'Name of the created tag'
+  release_url:
+    description: 'URL of the created or updated release'
+  release_branch:
+    description: 'Name of the release branch (if created)'
+  result:
+    description: 'Operation result (success/failure)'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Git identity
+      shell: bash
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "github-actions@github.com"
+    
+    # Create release branch if specified
+    - name: Create release branch
+      if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
+      uses: ../../core/branch_operations
+      with:
+        action: create
+        branch_name: ${{ inputs.release_branch }}
+        base_branch: ${{ inputs.target_branch }}
+        remote: true
+    
+    # Create tag
+    - name: Create release tag
+      if: ${{ inputs.action == 'create' || inputs.action == 'publish' }}
+      uses: ../../core/tag_operations
+      with:
+        action: create
+        tag_name: ${{ inputs.version }}
+        message: ${{ inputs.message || format('Release {0}', inputs.version) }}
+        force: ${{ inputs.action == 'update' }}
+    
+    # Update changelog if requested
+    - name: Update changelog
+      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
+      uses: ../update_changelog
+      with:
+        version: ${{ inputs.version }}
+        target_branch: ${{ inputs.release_branch || inputs.target_branch }}
+    
+    # Commit changes if needed for changelog
+    - name: Commit changelog changes
+      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
+      uses: ../../core/commit_operations
+      with:
+        action: create
+        message: ${{ format('Update changelog for {0} release', inputs.version) }}
+        files: CHANGELOG.md
+    
+    # Push changes to remote
+    - name: Push changes
+      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
+      shell: bash
+      run: git push
+    
+    # Create GitHub release
+    - name: Create GitHub release
+      if: ${{ (inputs.action == 'create' || inputs.action == 'publish') && inputs.tag_only != 'true' }}
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        tag_name: ${{ inputs.version }}
+        release_name: ${{ inputs.message || format('Release {0}', inputs.version) }}
+        body: ${{ inputs.body || '' }}
+        draft: ${{ inputs.draft }}
+        prerelease: ${{ inputs.prerelease }}
+    
+    # Set outputs
+    - name: Set outputs
+      id: set_outputs
+      shell: bash
+      run: |
+        echo "result=success" >> $GITHUB_OUTPUT
+        echo "tag_name=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        
+        # Set release branch if created
+        if [[ "${{ inputs.release_branch }}" != "" ]]; then
+          echo "release_branch=${{ inputs.release_branch }}" >> $GITHUB_OUTPUT
+        fi
+        
+        # Set release outputs if GitHub release was created
+        if [[ "${{ steps.create_release.outputs.id }}" != "" ]]; then
+          echo "release_id=${{ steps.create_release.outputs.id }}" >> $GITHUB_OUTPUT
+          echo "release_url=${{ steps.create_release.outputs.html_url }}" >> $GITHUB_OUTPUT
+        fi
+        
+branding:
+  icon: 'tag'
+  color: 'green'
