@@ -1,0 +1,76 @@
+# .github/workflows/core.action.branch_operations.yml
+name: Core - Branch Operations
+
+on:
+  workflow_dispatch:  # allows manual triggering
+  workflow_call:
+    inputs:
+      action:
+        type: string
+        required: true
+        description: "Branch operation to perform (create, delete, list, checkout, merge, push)"
+      branch_name:
+        type: string
+        required: false
+        description: "Name of the branch to operate on"
+      base_branch:
+        type: string
+        required: false
+        default: 'main'
+        description: "Base branch for creating or merging"
+      force:
+        type: boolean
+        required: false
+        default: false
+        description: "Force operation (used with delete, checkout, or merge)"
+      message:
+        type: string
+        required: false
+        description: "Commit message for merge operations"
+      pattern:
+        type: string
+        required: false
+        description: "Pattern for listing branches (e.g. 'feature/*')"
+      remote:
+        type: boolean
+        required: false
+        default: false
+        description: "Include remote operations (push/delete remote branch)"
+    outputs:
+      branches:
+        description: "Comma-separated list of branches (when using list action)"
+        value: ${{ jobs.branch-operations.outputs.branches }}
+      result:
+        description: "Operation result (success/failure)"
+        value: ${{ jobs.branch-operations.outputs.result }}
+      current_branch:
+        description: "Current branch after operation"
+        value: ${{ jobs.branch-operations.outputs.current_branch }}
+
+jobs:
+  branch-operations:
+    runs-on: ubuntu-latest
+
+    outputs:
+      branches: ${{ steps.branch-ops.outputs.branches }}
+      result: ${{ steps.branch-ops.outputs.result }}
+      current_branch: ${{ steps.branch-ops.outputs.current_branch }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          fetch-depth: 0
+      
+      - name: Perform branch operation
+        id: branch-ops
+        uses: deepworks-net/github.toolkit/actions/core/branch_operations@v1
+        with:
+          action: ${{ inputs.action }}
+          branch_name: ${{ inputs.branch_name }}
+          base_branch: ${{ inputs.base_branch }}
+          force: ${{ inputs.force }}
+          message: ${{ inputs.message }}
+          pattern: ${{ inputs.pattern }}
+          remote: ${{ inputs.remote }}

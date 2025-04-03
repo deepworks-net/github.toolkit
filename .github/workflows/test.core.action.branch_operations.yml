@@ -1,0 +1,251 @@
+# .github/workflows/test.core.action.branch_operations.yml
+name: Test Core Action - Branch Operations
+
+on:
+  pull_request:
+    paths:
+      - 'actions/core/branch_operations/**'
+      - '.github/workflows/core.action.branch_operations.yml'
+      - '.github/workflows/test.core.action.branch_operations.yml'
+  workflow_dispatch:
+
+jobs:
+  test-create-branch:
+    name: Test Create Branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Clean Local Environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git branch | grep -v "main" | xargs -r git branch -D
+      
+      - name: Test Branch Creation
+        id: branch-ops
+        uses: ./actions/core/branch_operations
+        with:
+          action: create
+          branch_name: feature/test-branch
+          base_branch: main
+      
+      - name: Verify Output Existence
+        run: |
+          # Check if outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
+             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
+      
+      - name: Verify Output Value
+        run: |
+          if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
+            echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
+            exit 1
+          fi
+          if [[ "${{ steps.branch-ops.outputs.current_branch }}" != "feature/test-branch" ]]; then
+            echo "Expected current_branch 'feature/test-branch', got '${{ steps.branch-ops.outputs.current_branch }}'"
+            exit 1
+          fi
+          # Verify branch was actually created
+          if ! git branch | grep -q "feature/test-branch"; then
+            echo "Branch not found in git branch output"
+            exit 1
+          fi
+
+  test-list-branches:
+    name: Test List Branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Clean Local Environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git branch | grep -v "main" | xargs -r git branch -D
+      
+      - name: Create Test Branches
+        run: |
+          git checkout -b feature/test1
+          git checkout -b feature/test2
+          git checkout main
+      
+      - name: Test Branch Listing
+        id: branch-ops
+        uses: ./actions/core/branch_operations
+        with:
+          action: list
+          pattern: 'feature/*'
+      
+      - name: Verify Output Existence
+        run: |
+          # Check if outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
+             [[ -z "${{ steps.branch-ops.outputs.branches }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
+      
+      - name: Verify Output Value
+        run: |
+          if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
+            echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
+            exit 1
+          fi
+          # Check if both branches are in the output
+          if ! echo "${{ steps.branch-ops.outputs.branches }}" | grep -q "feature/test1"; then
+            echo "Branch feature/test1 not found in branches output"
+            exit 1
+          fi
+          if ! echo "${{ steps.branch-ops.outputs.branches }}" | grep -q "feature/test2"; then
+            echo "Branch feature/test2 not found in branches output"
+            exit 1
+          fi
+
+  test-delete-branch:
+    name: Test Delete Branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Clean Local Environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git branch | grep -v "main" | xargs -r git branch -D
+      
+      - name: Create Test Branch
+        run: |
+          git checkout -b feature/to-delete
+          git checkout main
+      
+      - name: Test Branch Deletion
+        id: branch-ops
+        uses: ./actions/core/branch_operations
+        with:
+          action: delete
+          branch_name: feature/to-delete
+      
+      - name: Verify Output Existence
+        run: |
+          # Check if outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
+             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
+      
+      - name: Verify Output Value
+        run: |
+          if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
+            echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
+            exit 1
+          fi
+          # Verify branch was actually deleted
+          if git branch | grep -q "feature/to-delete"; then
+            echo "Branch still exists after deletion"
+            exit 1
+          fi
+
+  test-merge-branch:
+    name: Test Merge Branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Clean Local Environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git branch | grep -v "main" | xargs -r git branch -D
+      
+      - name: Create Test Branch with Changes
+        run: |
+          git checkout -b feature/to-merge
+          echo "Test content" > test-file.txt
+          git add test-file.txt
+          git commit -m "Add test file"
+          git checkout main
+      
+      - name: Test Branch Merging
+        id: branch-ops
+        uses: ./actions/core/branch_operations
+        with:
+          action: merge
+          branch_name: feature/to-merge
+          base_branch: main
+          message: "Merge feature branch"
+      
+      - name: Verify Output Existence
+        run: |
+          # Check if outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
+             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
+      
+      - name: Verify Output Value
+        run: |
+          if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
+            echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
+            exit 1
+          fi
+          # Verify changes were merged
+          if [ ! -f "test-file.txt" ]; then
+            echo "Merged file not found"
+            exit 1
+          fi
+
+  test-force-operations:
+    name: Test Force Operations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Clean Local Environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          git branch | grep -v "main" | xargs -r git branch -D
+      
+      - name: Create Test Branch
+        run: |
+          git checkout -b feature/force-test
+          echo "Test content" > test-force.txt
+          git add test-force.txt
+          git commit -m "Add test file"
+          git checkout main
+      
+      - name: Test Force Delete Branch
+        id: branch-ops
+        uses: ./actions/core/branch_operations
+        with:
+          action: delete
+          branch_name: feature/force-test
+          force: true
+      
+      - name: Verify Output Value
+        run: |
+          if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
+            echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
+            exit 1
+          fi
+          # Verify branch was actually deleted
+          if git branch | grep -q "feature/force-test"; then
+            echo "Branch still exists after force deletion"
+            exit 1
+          }
