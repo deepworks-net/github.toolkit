@@ -1,0 +1,65 @@
+name: "Git Commit Operations"
+description: "Handles Git commit operations like creation, retrieval, and listing"
+inputs:
+  action:
+    description: "The action to perform (create/info/revert/list)"
+    required: true
+  message:
+    description: "Commit message"
+    required: false
+  files:
+    description: "Comma-separated list of files to commit"
+    required: false
+  all:
+    description: "Whether to commit all changes"
+    required: false
+    default: "false"
+  amend:
+    description: "Whether to amend previous commit"
+    required: false
+    default: "false"
+  commit_id:
+    description: "Commit ID or reference"
+    required: false
+    default: "HEAD"
+  no_edit:
+    description: "Whether to skip editing commit message when reverting"
+    required: false
+    default: "true"
+  max_count:
+    description: "Maximum number of commits to list"
+    required: false
+    default: "10"
+  format:
+    description: "Format string for listing commits"
+    required: false
+    default: "%h %s"
+outputs:
+  hash:
+    description: "Commit hash (when getting info)"
+  author:
+    description: "Commit author (when getting info)"
+  email:
+    description: "Author email (when getting info)"
+  date:
+    description: "Commit date (when getting info)"
+  message:
+    description: "Commit message (when getting info)"
+  commits:
+    description: "Comma-separated list of commits (when listing)"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    INPUT_ACTION: ${{ inputs.action }}
+    INPUT_MESSAGE: ${{ inputs.message }}
+    INPUT_FILES: ${{ inputs.files }}
+    INPUT_ALL: ${{ inputs.all }}
+    INPUT_AMEND: ${{ inputs.amend }}
+    INPUT_COMMIT_ID: ${{ inputs.commit_id }}
+    INPUT_NO_EDIT: ${{ inputs.no_edit }}
+    INPUT_MAX_COUNT: ${{ inputs.max_count }}
+    INPUT_FORMAT: ${{ inputs.format }}
+branding:
+  icon: "git-commit"
+  color: "blue"
