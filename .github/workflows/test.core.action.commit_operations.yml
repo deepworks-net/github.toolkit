@@ -58,6 +58,13 @@ jobs:
           git add test.txt
           git commit -m "Initial commit"
       
+      # Create a change to commit
+      - name: Create test file change
+        run: |
+          # Create a new test file
+          echo "# Test feature" > feature.md
+          git add feature.md
+
       # Test create commit action
       - name: Test create commit
         id: create-commit
@@ -65,7 +72,6 @@ jobs:
         with:
           action: create
           message: "Add new feature"
-          files: "README.md"
       
       # Verify outputs
       - name: Verify commit was created
@@ -78,7 +84,20 @@ jobs:
             echo "No commit hash returned"
             exit 1
           fi
+          
+          # Verify the commit exists
+          if ! git show ${{ steps.create-commit.outputs.commit_hash }} | grep -q "Add new feature"; then
+            echo "Cannot find commit with expected message"
+            exit 1
+          fi
       
+      # Create another change for amending
+      - name: Create change for amend
+        run: |
+          # Modify the feature file
+          echo "# Additional content" >> feature.md
+          git add feature.md
+
       # Test amend commit action
       - name: Test amend commit
         id: amend-commit
@@ -86,6 +105,18 @@ jobs:
         with:
           action: amend
           message: "Add new feature with improvements"
+          
+      # Verify amend commit
+      - name: Verify amended commit
+        run: |
+          if [[ "${{ steps.amend-commit.outputs.result }}" != "success" ]]; then
+            echo "Amend commit failed"
+            exit 1
+          fi
+          if [[ -z "${{ steps.amend-commit.outputs.commit_hash }}" ]]; then
+            echo "No commit hash returned from amend"
+            exit 1
+          fi
       
       # Test list commits action
       - name: Test list commits

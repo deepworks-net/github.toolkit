@@ -38,10 +38,6 @@ inputs:
     description: 'Skip pre-commit hooks'
     required: false
     default: 'false'
-  allow_empty:
-    description: 'Allow empty commits (for testing/CI environments)'
-    required: false
-    default: 'false'
 
 outputs:
   commits:

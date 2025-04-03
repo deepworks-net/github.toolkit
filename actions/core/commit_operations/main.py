@@ -41,7 +41,7 @@ class GitCommitOperations:
             sys.exit(1)
     
     def create_commit(self, message: str, files: Optional[List[str]] = None, 
-                     no_verify: bool = False, allow_empty: bool = False) -> Tuple[bool, Optional[str]]:
+                     no_verify: bool = False) -> Tuple[bool, Optional[str]]:
         """
         Create a new git commit.
         
@@ -49,15 +49,11 @@ class GitCommitOperations:
             message: The commit message
             files: Optional list of files to include in the commit
             no_verify: Skip pre-commit hooks if true
-            allow_empty: Allow empty commits for testing/CI environments
             
         Returns:
             tuple: (success, commit_hash)
         """
         try:
-            # Detect if we're running in a GitHub Actions environment
-            in_github_actions = 'GITHUB_ACTIONS' in os.environ and os.environ['GITHUB_ACTIONS'] == 'true'
-            
             # Add files to staging if specified
             if files and len(files) > 0:
                 for file_path in files:
@@ -65,54 +61,23 @@ class GitCommitOperations:
                     if file_path:  # Skip empty entries
                         subprocess.check_call(['git', 'add', file_path])
             else:
-                # Check if there are staged files already
+                # Check if there are unstaged changes
                 status_output = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
-                print(f"Git status output:\n{status_output}")
                 
-                # Parse the status output
-                staged_changes = [line for line in status_output.split('\n') 
-                                 if line and not line.startswith('??') and not line.startswith(' ')]
-                
-                unstaged_changes = [line for line in status_output.split('\n') 
-                                  if line and (line.startswith(' ') or line.startswith('??'))]
-                
-                if not staged_changes:
-                    if unstaged_changes:
-                        print("No staged changes detected, staging all changes")
-                        subprocess.check_call(['git', 'add', '.'])
-                    else:
-                        print("No changes to stage")
-                else:
-                    print(f"Found {len(staged_changes)} staged changes: {staged_changes}")
+                # If there are any unstaged changes, stage them all
+                if status_output.strip():
+                    print("Staging all changes")
+                    subprocess.check_call(['git', 'add', '.'])
             
-            # Check if there are changes to commit after staging
-            status_after_staging = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
-            if not status_after_staging.strip() and not allow_empty:
-                if in_github_actions:
-                    print("No changes to commit - creating a test file for simulating commit")
-                    # Create a test file for CI environments to demonstrate functionality
-                    test_file = ".github-action-test-file.md"
-                    with open(test_file, 'w') as f:
-                        f.write(f"# Test file for commit operation\nCreated by GitHub Action at {datetime.now().isoformat()}\n")
-                    subprocess.check_call(['git', 'add', test_file])
-                else:
-                    print("No changes to commit and allow_empty=False")
-                    return False, None
-                
             # Create the commit
             cmd = ['git', 'commit', '-m', message]
             if no_verify:
                 cmd.append('--no-verify')
                 
-            # If explicitly allowing empty commits or in GitHub Actions with no changes
-            if allow_empty or (in_github_actions and not status_after_staging.strip()):
-                cmd.append('--allow-empty')
-                
             subprocess.check_call(cmd)
             
             # Get the commit hash
             commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
-            print(f"Successfully created commit: {commit_hash}")
             return True, commit_hash
             
         except subprocess.CalledProcessError as e:
@@ -377,7 +342,6 @@ def main():
     path = os.environ.get('INPUT_PATH')
     format = os.environ.get('INPUT_FORMAT', 'medium')
     no_verify = os.environ.get('INPUT_NO_VERIFY', 'false').lower() == 'true'
-    allow_empty = os.environ.get('INPUT_ALLOW_EMPTY', 'false').lower() == 'true'
     
     # Parse file list
     files = [f.strip() for f in files_str.split(',')] if files_str else None
@@ -409,7 +373,7 @@ def main():
     
     # Execute requested operation
     if action == 'create':
-        result, new_commit_hash = commit_ops.create_commit(message, files, no_verify, allow_empty)
+        result, new_commit_hash = commit_ops.create_commit(message, files, no_verify)
     
     elif action == 'amend':
         result, new_commit_hash = commit_ops.amend_commit(message, files, no_verify)
