@@ -1,6 +1,25 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
+
+## **[(04/03/2025) - v1.0.192](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.192)**
+### What's Changed
+- 130 Create Core Branch Operations Action @mattbuske (#154)
+- 132 Establish Standard Testing Framework for Actions @mattbuske (#153)
+- 132 Establish Standard Testing Framework for Actions @mattbuske (#152)
+- Bump mkdocs-git-authors-plugin from 0.9.2 to 0.9.3 @[dependabot[bot]](https://github.com/apps/dependabot) (#146)
+- Bump mkdocs-material from 9.6.7 to 9.6.8 @[dependabot[bot]](https://github.com/apps/dependabot) (#145)
+- Bump mkdocs-git-revision-date-localized-plugin from 1.3.0 to 1.4.4 @[dependabot[bot]](https://github.com/apps/dependabot) (#144)
+- Bump mkdocs-material from 9.6.5 to 9.6.7 @[dependabot[bot]](https://github.com/apps/dependabot) (#142)
+- Bump mkdocs-material from 9.5.50 to 9.6.5 @[dependabot[bot]](https://github.com/apps/dependabot) (#141)
+- Bump docker/build-push-action from 5 to 6 @[dependabot[bot]](https://github.com/apps/dependabot) (#133)
+- Bump codecov/codecov-action from 4 to 5 @[dependabot[bot]](https://github.com/apps/dependabot) (#134)
+- Bump mkdocs-material from 9.5.49 to 9.5.50 @[dependabot[bot]](https://github.com/apps/dependabot) (#135)
+- Release v1.0.138 @[github-actions[bot]](https://github.com/apps/github-actions) (#127)
+- Version Updater @mattbuske (#126)
+- Version Calculator @mattbuske (#125)
+#### **Full Changelog**: [v1.0.122...v1.0.191](https://github.com/deepworks-net/github.toolkit/compare/v1.0.122...v1.0.191)
+
 ## **[(01/07/2025) - v1.0.138](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.138)**
 ### What's Changed
 - Version Updater @mattbuske (#126)

@@ -38,11 +38,11 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: ./actions/core/version_calculator@v1
+        uses: ./actions/core/version_calculator
         id: version
 
       - name: Get Release Content
-        uses: ./actions/composite/release_notes@v1
+        uses: ./actions/composite/release_notes
         id: notes
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
@@ -51,14 +51,14 @@ jobs:
           pr-title: ${{ inputs.pr-title || github.event.pull_request.title }}
           
       - name: Update Changelog File
-        uses: ./actions/composite/update_changelog@v1
+        uses: ./actions/composite/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'unreleased'
           version: ${{ steps.version.outputs.next_version }}
       
       - name: Commit Changes
-        uses: ./actions/composite/git_ops@v1
+        uses: ./actions/composite/git_ops
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
