@@ -18,13 +18,20 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Local Environment
+      - name: Setup Test Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Safely clean branches without trying to delete current HEAD
-          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
-            git branch -D "$branch" || true
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
           done
       
       - name: Test Branch Creation
@@ -35,27 +42,28 @@ jobs:
           branch_name: feature/test-branch
           base_branch: main
       
-      - name: Verify Output Existence
+      - name: Verify Outputs and Results
         run: |
-          # Check if outputs exist
-          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
-             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+          # Check if required outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
-      
-      - name: Verify Output Value
-        run: |
+          
+          # Verify output values
           if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
             echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
             exit 1
           fi
+          
           if [[ "${{ steps.branch-ops.outputs.current_branch }}" != "feature/test-branch" ]]; then
             echo "Expected current_branch 'feature/test-branch', got '${{ steps.branch-ops.outputs.current_branch }}'"
             exit 1
           fi
+          
           # Verify branch was actually created
-          if ! git branch | grep -q "feature/test-branch"; then
+          branch_exists=$(git branch --list feature/test-branch)
+          if [[ -z "$branch_exists" ]]; then
             echo "Branch not found in git branch output"
             exit 1
           fi
@@ -68,17 +76,23 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Local Environment
+      - name: Setup Test Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Safely clean branches without trying to delete current HEAD
-          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
-            git branch -D "$branch" || true
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
           done
-      
-      - name: Create Test Branches
-        run: |
+          
+          # Create test branches
           git checkout -b feature/test1
           git checkout -b feature/test2
           git checkout main
@@ -90,28 +104,29 @@ jobs:
           action: list
           pattern: 'feature/*'
       
-      - name: Verify Output Existence
+      - name: Verify Outputs and Results
         run: |
-          # Check if outputs exist
-          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
-             [[ -z "${{ steps.branch-ops.outputs.branches }}" ]]; then
+          # Check if required outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || [[ -z "${{ steps.branch-ops.outputs.branches }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
-      
-      - name: Verify Output Value
-        run: |
+          
+          # Verify output values
           if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
             echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
             exit 1
           fi
+          
           # Check if both branches are in the output
-          if ! echo "${{ steps.branch-ops.outputs.branches }}" | grep -q "feature/test1"; then
-            echo "Branch feature/test1 not found in branches output"
+          branches="${{ steps.branch-ops.outputs.branches }}"
+          if [[ ! "$branches" == *"feature/test1"* ]]; then
+            echo "Branch feature/test1 not found in branches output: $branches"
             exit 1
           fi
-          if ! echo "${{ steps.branch-ops.outputs.branches }}" | grep -q "feature/test2"; then
-            echo "Branch feature/test2 not found in branches output"
+          
+          if [[ ! "$branches" == *"feature/test2"* ]]; then
+            echo "Branch feature/test2 not found in branches output: $branches"
             exit 1
           fi
 
@@ -123,17 +138,23 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Local Environment
+      - name: Setup Test Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Safely clean branches without trying to delete current HEAD
-          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
-            git branch -D "$branch" || true
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
           done
-      
-      - name: Create Test Branch
-        run: |
+          
+          # Create test branch to delete
           git checkout -b feature/to-delete
           git checkout main
       
@@ -144,23 +165,23 @@ jobs:
           action: delete
           branch_name: feature/to-delete
       
-      - name: Verify Output Existence
+      - name: Verify Outputs and Results
         run: |
-          # Check if outputs exist
-          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
-             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+          # Check if required outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
-      
-      - name: Verify Output Value
-        run: |
+          
+          # Verify output values
           if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
             echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
             exit 1
           fi
+          
           # Verify branch was actually deleted
-          if git branch | grep -q "feature/to-delete"; then
+          branch_exists=$(git branch --list feature/to-delete)
+          if [[ ! -z "$branch_exists" ]]; then
             echo "Branch still exists after deletion"
             exit 1
           fi
@@ -173,17 +194,23 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Local Environment
+      - name: Setup Test Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Safely clean branches without trying to delete current HEAD
-          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
-            git branch -D "$branch" || true
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
           done
-      
-      - name: Create Test Branch with Changes
-        run: |
+          
+          # Create test branch with changes
           git checkout -b feature/to-merge
           echo "Test content" > test-file.txt
           git add test-file.txt
@@ -199,21 +226,20 @@ jobs:
           base_branch: main
           message: "Merge feature branch"
       
-      - name: Verify Output Existence
+      - name: Verify Outputs and Results
         run: |
-          # Check if outputs exist
-          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || \
-             [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
+          # Check if required outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]] || [[ -z "${{ steps.branch-ops.outputs.current_branch }}" ]]; then
             echo "Missing required outputs"
             exit 1
           fi
-      
-      - name: Verify Output Value
-        run: |
+          
+          # Verify output values
           if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
             echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
             exit 1
           fi
+          
           # Verify changes were merged
           if [ ! -f "test-file.txt" ]; then
             echo "Merged file not found"
@@ -228,17 +254,23 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Clean Local Environment
+      - name: Setup Test Environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
-          # Safely clean branches without trying to delete current HEAD
-          for branch in $(git branch --format='%(refname:short)' | grep -v "main"); do
-            git branch -D "$branch" || true
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
           done
-      
-      - name: Create Test Branch
-        run: |
+          
+          # Create test branch
           git checkout -b feature/force-test
           echo "Test content" > test-force.txt
           git add test-force.txt
@@ -253,14 +285,23 @@ jobs:
           branch_name: feature/force-test
           force: true
       
-      - name: Verify Output Value
+      - name: Verify Outputs and Results
         run: |
+          # Check if required outputs exist
+          if [[ -z "${{ steps.branch-ops.outputs.result }}" ]]; then
+            echo "Missing required outputs"
+            exit 1
+          fi
+          
+          # Verify output values
           if [[ "${{ steps.branch-ops.outputs.result }}" != "success" ]]; then
             echo "Expected result 'success', got '${{ steps.branch-ops.outputs.result }}'"
             exit 1
           fi
+          
           # Verify branch was actually deleted
-          if git branch | grep -q "feature/force-test"; then
+          branch_exists=$(git branch --list feature/force-test)
+          if [[ ! -z "$branch_exists" ]]; then
             echo "Branch still exists after force deletion"
             exit 1
           fi
