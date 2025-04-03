@@ -7,72 +7,19 @@ import re
 from typing import Optional, List, Dict, Union, Tuple, Any, Pattern
 from datetime import datetime
 
-# Add current directory to path to find git_utils
-# The Docker build will copy these utilities directly with the script
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+# Use shared git_utils - lateral relationship pattern
 try:
-    # Try importing directly
+    # Try importing from shared module first
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'shared')))
     from git_utils import GitConfig, GitValidator, GitErrors
 except ImportError:
-    # Fall back to older implementation if git_utils are not available
-    print("Warning: git_utils module not found, falling back to internal implementation")
-    class GitConfig:
-        def __init__(self, workspace_path=None):
-            self.workspace_path = workspace_path or os.environ.get('GITHUB_WORKSPACE', '/github/workspace')
-        
-        def setup_identity(self):
-            try:
-                # Try to get current user.name
-                try:
-                    subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
-                except subprocess.CalledProcessError:
-                    # If not set, configure a default identity for the action
-                    subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
-                    subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
-                    print("Configured default Git identity for commit operations")
-                return True
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                print("Failed to set up Git identity")
-                return False
-        
-        def configure_safe_directory(self):
-            try:
-                subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', self.workspace_path])
-                return True
-            except subprocess.CalledProcessError:
-                print(f"Failed to add {self.workspace_path} as safe directory")
-                return False
-    
-    class GitValidator:
-        def is_valid_commit_message(self, message: str) -> bool:
-            """Validate a commit message."""
-            if not message or not message.strip():
-                return False
-            return True
-        
-        def pattern_to_regex(self, pattern: str) -> Pattern:
-            """Convert a glob pattern to regex."""
-            regex = re.escape(pattern)
-            regex = regex.replace('\\*', '.*').replace('\\?', '.')
-            regex = f'^{regex}$'
-            return re.compile(regex)
-    
-    class GitErrors:
-        def handle_git_error(self, error, context=None):
-            """Handle general Git errors."""
-            if context:
-                print(f"Error in {context}: {error}")
-            else:
-                print(f"Git error: {error}")
-            return str(error)
-        
-        def handle_commit_error(self, error, action, message=None):
-            """Handle commit-related errors."""
-            if message:
-                print(f"Error {action} commit '{message[:50]}...': {error}")
-            else:
-                print(f"Error {action} commit: {error}")
-            return str(error)
+    # Fall back to current directory path
+    try:
+        sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+        from git_utils import GitConfig, GitValidator, GitErrors
+    except ImportError:
+        print("Error: Cannot import shared git_utils. This is a critical dependency.")
+        sys.exit(1)
 
 class GitCommitOperations:
     """Handles atomic Git commit operations."""
