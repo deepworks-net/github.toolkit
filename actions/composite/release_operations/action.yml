@@ -81,7 +81,7 @@ runs:
     # Create release branch if specified
     - name: Create release branch
       if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
-      uses: ../../core/branch_operations
+      uses: deepworks-net/github.toolkit/actions/core/branch_operations@v1
       with:
         action: create
         branch_name: ${{ inputs.release_branch }}
@@ -144,7 +144,7 @@ runs:
     # Update changelog if requested
     - name: Update changelog
       if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: ../update_changelog
+      uses: deepworks-net/github.toolkit/actions/composite/update_changelog@v1
       with:
         version: ${{ inputs.version }}
         target_branch: ${{ inputs.release_branch || inputs.target_branch }}
@@ -152,7 +152,7 @@ runs:
     # Commit changes if needed for changelog
     - name: Commit changelog changes
       if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: ../../core/commit_operations
+      uses: deepworks-net/github.toolkit/actions/core/commit_operations@v1
       with:
         action: create
         message: ${{ format('Update changelog for {0} release', inputs.version) }}
