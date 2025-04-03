@@ -33,21 +33,45 @@ jobs:
           repository: ${{ github.repository }}  # Ensures the current repository
           ref: ${{ inputs.base-branch || 'staging' }}  # Use input or default to staging
           fetch-depth: 0
+      
+      # Ensure we have a clean environment with a proper branch
+      - name: Setup Environment
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          
+          # Make sure we have a proper branch to work with
+          git fetch origin
+          
+          # Get the target branch
+          target_branch="${{ inputs.base-branch || 'staging' }}"
+          
+          # Check if we're in detached HEAD state and fix if needed
+          if git symbolic-ref -q HEAD > /dev/null; then
+            echo "Already on a branch"
+          else
+            echo "In detached HEAD state, creating a working branch"
+            # Create a working branch from our current state
+            git checkout -b working-branch
+            # Fetch and check out the target branch
+            git fetch origin ${target_branch}:${target_branch} || true
+            git checkout ${target_branch}
+          fi
           
       - name: Calculate Version
-        uses: ./actions/core/version_calculator@v1
+        uses: ./actions/core/version_calculator
         id: version
         with:
           version_prefix: ${{ inputs.version-prefix || 'v' }}
 
       - name: Update Version Numbers
-        uses: ./actions/core/version_updater@v1
+        uses: ./actions/core/version_updater
         with:
           version: ${{ steps.version.outputs.next_version }}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
-        uses: ./actions/composite/release_notes@v1
+        uses: ./actions/composite/release_notes
         id: notes
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
@@ -55,14 +79,14 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: ./actions/composite/update_changelog@v1
+        uses: ./actions/composite/update_changelog
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Create Release Branch & PR
-        uses: ./actions/composite/git_ops@v1
+        uses: ./actions/composite/git_ops
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           files: 'CHANGELOG.md'
