@@ -63,9 +63,19 @@ class GitCommitOperations:
             else:
                 # Check if there are staged files already
                 status_output = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
+                print(f"Git status output:\n{status_output}")
+                
                 # If nothing is staged and no specific files provided, stage all changes
-                if not any(line.startswith(' M') or line.startswith('M') for line in status_output.split('\n')):
+                # Check for various Git status codes: M (modified), A (added), R (renamed), 
+                # D (deleted), C (copied), ? (untracked)
+                staged_changes = [line for line in status_output.split('\n') 
+                                 if line and not line.startswith('??') and not line.startswith(' ')]
+                
+                if not staged_changes:
+                    print("No staged changes detected, staging all changes")
                     subprocess.check_call(['git', 'add', '.'])
+                else:
+                    print(f"Found {len(staged_changes)} staged changes: {staged_changes}")
             
             # Create the commit
             cmd = ['git', 'commit', '-m', message]
