@@ -2,7 +2,7 @@
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
 
-## **04/03/2025 - v1.0.191 Unreleased**
+## **[(04/03/2025) - v1.0.192](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.192)**
 ### What's Changed
 - 130 Create Core Branch Operations Action @mattbuske (#154)
 - 132 Establish Standard Testing Framework for Actions @mattbuske (#153)
