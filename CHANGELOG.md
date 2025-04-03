@@ -2,6 +2,13 @@
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
 
+
+## **04/03/2025 - v1.0.260 Unreleased**
+### What's Changed
+- Bump actions/setup-python from 4 to 5 @mattbuske (#162)
+- 128 Modularize git ops @mattbuske (#160)
+#### **Full Changelog**: [v1.0.210...v1.0.260](https://github.com/deepworks-net/github.toolkit/compare/v1.0.210...v1.0.260)
+
 ## **[(04/03/2025) - v1.0.210](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.210)**
 ### What's Changed
 - 129 Create Core Tag Operations Action @mattbuske (#156)
