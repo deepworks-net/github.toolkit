@@ -61,6 +61,17 @@ runs:
       with:
         fetch-depth: 0
     
+    - name: Debug file structure
+      shell: bash
+      run: |
+        echo "Working directory: $(pwd)"
+        echo "Repository structure:"
+        find ${{ github.workspace }} -name "action.yml" | sort
+        echo "Contents of actions/composite/release_operations directory:"
+        ls -la ${{ github.workspace }}/actions/composite/release_operations/
+        echo "Content of action.yml file:"
+        cat ${{ github.workspace }}/actions/composite/release_operations/action.yml | head -5
+    
     - name: Set up Git identity
       shell: bash
       run: |
@@ -70,7 +81,7 @@ runs:
     # Create release branch if specified
     - name: Create release branch
       if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
-      uses: ./actions/core/branch_operations
+      uses: ${{ github.workspace }}/actions/core/branch_operations
       with:
         action: create
         branch_name: ${{ inputs.release_branch }}
@@ -133,7 +144,7 @@ runs:
     # Update changelog if requested
     - name: Update changelog
       if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: ./actions/composite/update_changelog
+      uses: ${{ github.workspace }}/actions/composite/update_changelog
       with:
         version: ${{ inputs.version }}
         target_branch: ${{ inputs.release_branch || inputs.target_branch }}
@@ -141,7 +152,7 @@ runs:
     # Commit changes if needed for changelog
     - name: Commit changelog changes
       if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      uses: ./actions/core/commit_operations
+      uses: ${{ github.workspace }}/actions/core/commit_operations
       with:
         action: create
         message: ${{ format('Update changelog for {0} release', inputs.version) }}
