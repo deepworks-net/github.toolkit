@@ -30,7 +30,7 @@ Ready-to-use GitHub workflows for common development processes:
 Creates a release branch and prepares the changelog for release.
 
 **Trigger:**  
-Push a tag with prefix `prep-v` (e.g., `prep-v1.0.0`)
+Push the tag `prep`
 
 **Actions:**
 
@@ -42,8 +42,8 @@ Push a tag with prefix `prep-v` (e.g., `prep-v1.0.0`)
 **Usage:**
 
 ```bash
-git tag prep-v1.0.0
-git push origin prep-v1.0.0
+git tag prep
+git push origin prep
 ```
 
 #### 2. Update Changelog (`update-changelog.yml`)

@@ -124,7 +124,7 @@ The action will fail with clear error messages in these cases:
     pattern: 'feature/*'
 
 - name: Show Branches
-  run: echo "Found branches: ${{ steps.list-branches.outputs.branches }}"
+  run: echo "Found branches: {% raw %}${{ steps.list-branches.outputs.branches }}{% endraw %}"
 ```
 
 ### Merge and Delete Branch
