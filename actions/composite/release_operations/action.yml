@@ -83,12 +83,18 @@ runs:
       if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
       shell: bash
       run: |
-        # Create and checkout new branch
-        git checkout -b "${{ inputs.release_branch }}" "${{ inputs.target_branch }}"
-        
-        # Push to remote if requested
-        git push -u origin "${{ inputs.release_branch }}"
-        echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+        # Check if target branch exists
+        if git rev-parse --verify "${{ inputs.target_branch }}" &>/dev/null; then
+          # Create and checkout new branch
+          echo "Creating branch ${{ inputs.release_branch }} from ${{ inputs.target_branch }}"
+          git checkout -b "${{ inputs.release_branch }}" "${{ inputs.target_branch }}"
+          
+          # Push to remote if requested
+          git push -u origin "${{ inputs.release_branch }}"
+          echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+        else
+          echo "Warning: Target branch ${{ inputs.target_branch }} does not exist, skipping branch creation"
+        fi
     
     # Debug environment
     - name: Debug environment
@@ -146,11 +152,11 @@ runs:
     # Changelog operations are disabled in this version to simplify testing
     # They'll be re-enabled in a future version
     
-    # Push changes to remote
-    - name: Push changes
-      if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
-      shell: bash
-      run: git push
+    # Push changes to remote (commented out since changelog updates are disabled)
+    # - name: Push changes
+    #   if: ${{ inputs.action == 'create' && inputs.update_changelog == 'true' }}
+    #   shell: bash
+    #   run: git push
     
     # Create GitHub release
     - name: Create GitHub release
