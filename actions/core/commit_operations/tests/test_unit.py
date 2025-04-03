@@ -809,6 +809,40 @@ class TestExtraOperations:
         finally:
             # Restore original validator
             commit_ops.git_validator = original_validator
+            
+    def test_create_commit_failure_branches(self, mock_subprocess, mock_git_env):
+        """Test create_commit with various failure scenarios."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Test git add failure
+        def check_call_side_effect1(*args, **kwargs):
+            if args[0][0:2] == ['git', 'add']:
+                raise subprocess.CalledProcessError(1, ['git', 'add'])
+            return 0
+        
+        mock_subprocess['check_call'].side_effect = check_call_side_effect1
+        result1, hash1 = commit_ops.create_commit("Test message", files=["file1.txt"])
+        assert result1 is False
+        assert hash1 is None
+        
+        # Test staged and unstaged changes checks
+        mock_subprocess['check_call'].reset_mock()
+        mock_subprocess['check_call'].side_effect = None  # Reset the side effect
+        
+        # Set up for empty status to avoid staging
+        def check_output_side_effect2(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return b'git version 2.30.0'
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return ""  # No changes
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return "abc1234"
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect2
+        result2, hash2 = commit_ops.create_commit("Test empty status")
+        assert result2 is True  # Should still work even with no changes to stage
     
     def test_handle_missing_validator_method(self, mock_subprocess, mock_git_env):
         """Test handling when validator method is missing."""
@@ -1058,6 +1092,51 @@ class TestExtraOperations:
         finally:
             # Restore original errors handler
             commit_ops.git_errors = original_errors
+            
+    def test_commit_info_medium_and_full_format(self, mock_subprocess, mock_git_env):
+        """Test get_commit_info with both medium and full format."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Create responses for different formats
+        medium_format_outputs = [
+            b'git version 2.30.0',
+            b'abc1234',
+            b'abc1234',
+            b'John Doe',
+            b'1617286496',
+            b'Test commit message'
+        ]
+        
+        full_format_outputs = [
+            b'git version 2.30.0',
+            b'abc1234',
+            b'abc1234def5678ghi9012jkl3456mno7890pqr1234\nJohn Doe\njohn@example.com\n1617286496\nTest commit\nTest commit body\n'
+        ]
+        
+        # Test medium format
+        mock_subprocess['check_output'].side_effect = medium_format_outputs
+        medium_result = commit_ops.get_commit_info('abc1234', format='medium')
+        
+        # Assert medium format results
+        assert medium_result['hash'] == 'abc1234'
+        assert medium_result['author'] == 'John Doe'
+        assert '2021' in medium_result['date']
+        assert medium_result['message'] == 'Test commit message'
+        
+        # Reset mock
+        mock_subprocess['check_output'].reset_mock()
+        
+        # Test full format
+        mock_subprocess['check_output'].side_effect = full_format_outputs
+        full_result = commit_ops.get_commit_info('abc1234', format='full')
+        
+        # Assert full format results
+        assert full_result['hash'] == 'abc1234def5678ghi9012jkl3456mno7890pqr1234'
+        assert full_result['author'] == 'John Doe'
+        assert full_result['email'] == 'john@example.com'
+        assert full_result['subject'] == 'Test commit'
+        assert full_result['body'] == 'Test commit body'
 
 
 @pytest.mark.unit
@@ -1366,6 +1445,52 @@ class TestMainFunction:
         # Act & Assert
         with pytest.raises(SystemExit):
             main()
+            
+    def test_main_failure_result(self, mock_subprocess, mock_git_env):
+        """Test main function handling operation failure."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_MESSAGE'] = 'Test message'
+        
+        # Configure create_commit to return failure
+        with patch('main.GitCommitOperations.create_commit', return_value=(False, None)):
+            # Act
+            with pytest.raises(SystemExit):
+                main()
+                
+            # Check GitHub output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+                output = f.read()
+                
+            # Verify failure is written to output
+            assert 'result=failure' in output
+            
+    def test_main_with_all_input_params(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test main function with all possible input parameters."""
+        # Arrange - set all possible inputs
+        os.environ['INPUT_ACTION'] = 'list'
+        os.environ['INPUT_LIMIT'] = '5'
+        os.environ['INPUT_AUTHOR'] = 'Test Author'
+        os.environ['INPUT_SINCE'] = '2021-01-01'
+        os.environ['INPUT_UNTIL'] = '2022-01-01'
+        os.environ['INPUT_PATH'] = 'src/'
+        os.environ['INPUT_FORMAT'] = 'full'
+        os.environ['INPUT_NO_VERIFY'] = 'true'
+        
+        # Mock list_commits to return some data
+        with patch('main.GitCommitOperations.list_commits', return_value=["commit1", "commit2"]):
+            # Act
+            main()
+            
+            # Assert - Check all parameters were passed to list_commits
+            args, kwargs = mock_subprocess['check_output'].call_args_list[-1]
+            cmd = args[0]
+            # Verify all the parameters are in the command
+            assert '-n' in cmd and '5' in cmd
+            assert '--author' in cmd and 'Test Author' in cmd
+            assert '--since' in cmd and '2021-01-01' in cmd
+            assert '--until' in cmd and '2022-01-01' in cmd
+            assert 'src/' in cmd
     
     def setup_method(self):
         """Set up method to clean environment before each test."""
