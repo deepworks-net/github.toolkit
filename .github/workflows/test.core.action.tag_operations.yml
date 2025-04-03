@@ -1,0 +1,170 @@
+name: Test Core Tag Operations
+
+on:
+  push:
+    paths:
+      - 'actions/core/tag_operations/**'
+      - '.github/workflows/test.core.action.tag_operations.yml'
+  pull_request:
+    paths:
+      - 'actions/core/tag_operations/**'
+      - '.github/workflows/test.core.action.tag_operations.yml'
+  workflow_dispatch:
+
+jobs:
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install test dependencies
+        run: |
+          cd actions/core/tag_operations
+          pip install pytest pytest-cov
+      
+      - name: Run unit tests
+        run: |
+          cd actions/core/tag_operations
+          python -m pytest tests/test_unit.py -v --cov=main --cov-report=term
+      
+      - name: Check code coverage
+        run: |
+          cd actions/core/tag_operations
+          python -m pytest tests/test_unit.py --cov=main --cov-fail-under=80
+
+  test-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install test dependencies
+        run: |
+          cd actions/core/tag_operations
+          pip install pytest pytest-cov
+      
+      - name: Configure git
+        run: |
+          git config --global user.name "Test User"
+          git config --global user.email "test@example.com"
+      
+      - name: Run integration tests
+        run: |
+          cd actions/core/tag_operations
+          python -m pytest tests/test_integration.py -v
+
+  test-action:
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup test environment
+        run: |
+          git config --global user.email "test@github.com"
+          git config --global user.name "Test User"
+          
+          # Initialize a clean environment with main branch
+          git checkout -b temp-main || true
+          git checkout -b main || true
+          
+          # Clean up any other branches
+          for branch in $(git branch --format='%(refname:short)'); do
+            if [[ "$branch" != "main" ]]; then
+              git branch -D "$branch" || true
+            fi
+          done
+          
+          # Create a test file and commit it
+          echo "Test content" > test.txt
+          git add test.txt
+          git commit -m "Test commit"
+      
+      # Test create tag action
+      - name: Test create tag
+        id: create-tag
+        uses: ./actions/core/tag_operations
+        with:
+          action: create
+          tag_name: v1.0.0
+          message: "Test tag v1.0.0"
+      
+      # Test check tag action
+      - name: Test check tag
+        id: check-tag
+        uses: ./actions/core/tag_operations
+        with:
+          action: check
+          tag_name: v1.0.0
+      
+      # Verify outputs
+      - name: Verify tag exists
+        run: |
+          if [[ "${{ steps.check-tag.outputs.tag_exists }}" != "true" ]]; then
+            echo "Tag check failed"
+            exit 1
+          fi
+          if [[ "${{ steps.check-tag.outputs.result }}" != "success" ]]; then
+            echo "Tag check result is not success"
+            exit 1
+          fi
+      
+      # Test list tags action
+      - name: Test list tags
+        id: list-tags
+        uses: ./actions/core/tag_operations
+        with:
+          action: list
+      
+      # Verify list output
+      - name: Verify tag list
+        run: |
+          if [[ "${{ steps.list-tags.outputs.tags }}" != "v1.0.0" ]]; then
+            echo "Tag list failed"
+            exit 1
+          fi
+      
+      # Test create tag with force
+      - name: Test force create tag
+        id: force-create-tag
+        uses: ./actions/core/tag_operations
+        with:
+          action: create
+          tag_name: v1.0.0
+          message: "Updated tag message"
+          force: true
+      
+      # Test delete tag action
+      - name: Test delete tag
+        id: delete-tag
+        uses: ./actions/core/tag_operations
+        with:
+          action: delete
+          tag_name: v1.0.0
+      
+      # Verify tag deletion
+      - name: Test tag was deleted
+        id: check-deleted-tag
+        uses: ./actions/core/tag_operations
+        with:
+          action: check
+          tag_name: v1.0.0
+      
+      - name: Verify tag deletion
+        run: |
+          if [[ "${{ steps.check-deleted-tag.outputs.tag_exists }}" != "false" ]]; then
+            echo "Tag deletion failed"
+            exit 1
+          fi
