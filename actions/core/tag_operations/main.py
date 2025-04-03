@@ -15,7 +15,14 @@ class GitTagOperations:
     def _configure_git(self) -> None:
         """Configure git for safe directory operations."""
         try:
+            # Check if git is available
+            subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
+            
+            # Configure safe directory
             subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
+        except FileNotFoundError:
+            print("Error: Git is not installed. Please ensure git is available in the container.")
+            sys.exit(1)
         except subprocess.CalledProcessError as e:
             print(f"Error configuring git: {e}")
             sys.exit(1)
@@ -341,17 +348,27 @@ def main():
         sys.exit(1)
     
     # Set outputs
-    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a') as f:
+            if output is not None and isinstance(output, list):
+                f.write(f"tags={','.join(output)}\n")
+            
+            f.write(f"result={'success' if result else 'failure'}\n")
+            f.write(f"tag_exists={'true' if tag_exists else 'false'}\n")
+            
+            if tag_message:
+                # Escape newlines for GitHub Actions output
+                tag_message = tag_message.replace('\n', '%0A')
+                f.write(f"tag_message={tag_message}\n")
+    else:
+        print("GITHUB_OUTPUT environment variable not set. Skipping output.")
         if output is not None and isinstance(output, list):
-            f.write(f"tags={','.join(output)}\n")
-        
-        f.write(f"result={'success' if result else 'failure'}\n")
-        f.write(f"tag_exists={'true' if tag_exists else 'false'}\n")
-        
+            print(f"tags: {','.join(output)}")
+        print(f"result: {'success' if result else 'failure'}")
+        print(f"tag_exists: {'true' if tag_exists else 'false'}")
         if tag_message:
-            # Escape newlines for GitHub Actions output
-            tag_message = tag_message.replace('\n', '%0A')
-            f.write(f"tag_message={tag_message}\n")
+            print(f"tag_message: {tag_message}")
     
     if not result:
         sys.exit(1)
