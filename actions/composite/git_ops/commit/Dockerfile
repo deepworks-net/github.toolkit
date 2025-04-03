@@ -1,9 +1,11 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /action
 
-COPY src/ /app/
-COPY requirements.txt /app/
+RUN mkdir -p /action/commit/src
+
+COPY src/ /action/commit/src/
+COPY requirements.txt /action/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -12,4 +14,4 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["python", "/app/git_commit_operations.py"]
+ENTRYPOINT ["python", "/action/commit/src/git_commit_operations.py"]

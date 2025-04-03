@@ -1,9 +1,11 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /action
 
-COPY src/ /app/
-COPY requirements.txt /app/
+RUN mkdir -p /action/branch/src
+
+COPY src/ /action/branch/src/
+COPY requirements.txt /action/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -12,4 +14,4 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["python", "/app/git_branch_operations.py"]
+ENTRYPOINT ["python", "/action/branch/src/git_branch_operations.py"]
