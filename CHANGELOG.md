@@ -1,6 +1,14 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
+
+## **04/03/2025 - v1.0.209 Unreleased**
+### What's Changed
+- 129 Create Core Tag Operations Action @mattbuske (#156)
+- Bump mkdocs-git-authors-plugin from 0.9.3 to 0.9.4 @[dependabot[bot]](https://github.com/apps/dependabot) (#148)
+- Bump mkdocs-material from 9.6.8 to 9.6.11 @[dependabot[bot]](https://github.com/apps/dependabot) (#151)
+#### **Full Changelog**: [v1.0.194...v1.0.209](https://github.com/deepworks-net/github.toolkit/compare/v1.0.194...v1.0.209)
+
 ## **[(04/03/2025) - v1.0.192](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.192)**
 ### What's Changed
 - 130 Create Core Branch Operations Action @mattbuske (#154)
