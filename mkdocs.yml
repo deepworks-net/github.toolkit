@@ -6,7 +6,7 @@ repo_url: https://github.com/deepworks-net/github.toolkit
 docs_dir: docs
 site_dir: site
 extra:
-    version: 1.1.0
+    version: 1.0.194
 extra_css:
   - stylesheets/extra.css
 plugins:
@@ -76,6 +76,7 @@ theme:
       - 'Core': 
         - 'actions/core/index.md'
         - 'Branch Operations': 'actions/core/branch_operations/index.md'
+        - 'Tag Operations': 'actions/core/tag_operations/index.md'
         - 'Manage Release': 'actions/core/manage_release/index.md'
         - 'Version Calculator': 'actions/core/version_calculator/index.md'
         - 'Version Updater': 'actions/core/version_updater/index.md'
@@ -97,5 +98,6 @@ theme:
       - 'Overview': 'tests/index.md'
       - 'Core': 
         - 'Branch Operations': 'tests/core/branch_operations.md'
+        - 'Tag Operations': 'tests/core/tag_operations.md'
         - 'Version Calculator': 'tests/core/version_calculator.md'
         - 'Version Updater': 'tests/core/version_updater.md'

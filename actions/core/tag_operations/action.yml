@@ -1,0 +1,49 @@
+name: 'Tag Operations'
+description: 'Perform Git tag operations'
+author: 'Deepworks'
+inputs:
+  action:
+    description: 'Tag operation to perform (create, delete, list, push, check)'
+    required: true
+  tag_name:
+    description: 'Name of the tag to operate on'
+    required: false
+  message:
+    description: 'Message for annotated tag creation'
+    required: false
+  ref:
+    description: 'Reference (commit SHA, branch) to place the tag on'
+    required: false
+  pattern:
+    description: 'Pattern for listing tags (e.g. "v1.*")'
+    required: false
+  remote:
+    description: 'Include remote operations (push/delete remote tag)'
+    required: false
+    default: 'false'
+  force:
+    description: 'Force operation (used with create or push)'
+    required: false
+    default: 'false'
+  sort:
+    description: 'Sorting method for listing tags (alphabetic, version, date)'
+    required: false
+    default: 'alphabetic'
+
+outputs:
+  tags:
+    description: 'Comma-separated list of tags (when using list action)'
+  result:
+    description: 'Operation result (success/failure)'
+  tag_exists:
+    description: 'Whether the tag exists (true/false)'
+  tag_message:
+    description: 'Message associated with the tag (if exists and is annotated)'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  
+branding:
+  icon: 'tag'
+  color: 'blue'
