@@ -287,7 +287,7 @@ class TestGitCommitOperations:
         
         # Assert
         assert "abc1234 Add feature 1" in oneline_result[0]
-        assert "Test commit (John Doe, 2 days ago)" in short_result
+        assert "abc1234 - Test commit (John Doe, 2 days ago)" in short_result
         assert "abc1234" in full_result[0]
     
     def test_get_commit_info(self, mock_subprocess, mock_git_env, commit_outputs):
