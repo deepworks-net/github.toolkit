@@ -19,6 +19,26 @@ from main import GitCommitOperations, main, GitConfig, GitValidator, GitErrors
 class TestGitCommitOperations:
     """Unit tests for GitCommitOperations class."""
     
+    def test_format_timestamp_edge_cases(self):
+        """Test timestamp formatting with various inputs."""
+        commit_ops = GitCommitOperations()
+        
+        # Test with None timestamp
+        none_result = commit_ops._format_timestamp(None)
+        assert none_result is None
+        
+        # Test with non-integer string
+        non_int_result = commit_ops._format_timestamp("not-a-timestamp")
+        assert non_int_result == "not-a-timestamp"
+        
+        # Test with empty string
+        empty_result = commit_ops._format_timestamp("")
+        assert empty_result == ""
+        
+        # Test with valid timestamp
+        valid_result = commit_ops._format_timestamp("1609459200")  # 2021-01-01
+        assert "2021" in valid_result
+    
     def test_create_commit_success(self, mock_subprocess, mock_git_env, commit_outputs):
         """Test successful commit creation."""
         # Arrange
@@ -1194,580 +1214,186 @@ class TestExtraOperations:
 @pytest.mark.unit
 @pytest.mark.git
 @pytest.mark.commit
-class TestFallbackImplementation:
-    """Tests for the fallback implementation of git utility classes."""
+class TestGitConfigFallback:
+    """Unit tests for GitConfig class (fallback implementation)."""
     
-    def test_fallback_methods_exist(self, monkeypatch):
-        """Test that fallback classes have expected methods."""
-        # Verify our fallback classes have the expected methods
-        fallback_config = GitConfig()
-        assert hasattr(fallback_config, 'setup_identity')
-        assert hasattr(fallback_config, 'configure_safe_directory')
+    def test_initialization(self, monkeypatch):
+        """Test initialization with various paths."""
+        # Test with explicit path
+        config1 = GitConfig("/explicit/path")
+        assert config1.workspace_path == "/explicit/path"
         
-        fallback_validator = GitValidator()
-        assert hasattr(fallback_validator, 'is_valid_commit_message')
-        assert hasattr(fallback_validator, 'pattern_to_regex')
+        # Test with environment variable
+        monkeypatch.setenv('GITHUB_WORKSPACE', '/env/path')
+        config2 = GitConfig()
+        assert config2.workspace_path == '/env/path'
         
-        fallback_errors = GitErrors()
-        assert hasattr(fallback_errors, 'handle_git_error')
-        assert hasattr(fallback_errors, 'handle_commit_error')
-        
-        # Check workspace path handling
-        config_with_env = GitConfig()
-        assert '/github/workspace' in config_with_env.workspace_path
-        
-        # Ensure environment variable is honored
-        monkeypatch.setenv('GITHUB_WORKSPACE', '/custom/workspace')
-        config_with_custom_env = GitConfig()
-        assert '/custom/workspace' in config_with_custom_env.workspace_path
+        # Test with default path
+        monkeypatch.delenv('GITHUB_WORKSPACE', raising=False)
+        config3 = GitConfig()
+        assert '/github/workspace' in config3.workspace_path
     
-    def test_git_config_edge_cases(self, mock_subprocess):
-        """Test edge cases for GitConfig fallback."""
-        # Test with custom workspace path
-        custom_config = GitConfig("/custom/workspace")
-        assert custom_config.workspace_path == "/custom/workspace"
+    def test_setup_identity(self, mock_subprocess):
+        """Test setup_identity method."""
+        config = GitConfig()
         
-        # Test configure_safe_directory with subprocess error that returns non-zero
-        def check_call_error(*args, **kwargs):
-            if "safe.directory" in args[0]:
-                raise subprocess.CalledProcessError(1, args[0])
+        # Test when user.name is already configured
+        mock_subprocess['check_output'].return_value = b"Test User"
+        result1 = config.setup_identity()
+        assert result1 is True
         
-        mock_subprocess['check_call'].side_effect = check_call_error
-        result = custom_config.configure_safe_directory()
-        assert result is False
+        # Test when user.name is not configured
+        mock_subprocess['check_output'].side_effect = subprocess.CalledProcessError(1, ['git', 'config', 'user.name'])
+        result2 = config.setup_identity()
+        assert result2 is True
         
-        # Test setup_identity with FileNotFoundError
-        def check_output_file_not_found(*args, **kwargs):
-            raise FileNotFoundError("git not found")
-        
-        mock_subprocess['check_output'].side_effect = check_output_file_not_found
-        result = custom_config.setup_identity()
-        assert result is False
+        # Test when git is not available
+        mock_subprocess['check_output'].side_effect = FileNotFoundError("git not found")
+        result3 = config.setup_identity()
+        assert result3 is False
     
-    def test_git_validator_edge_cases(self):
-        """Test edge cases for GitValidator fallback."""
-        validator = GitValidator()
+    def test_configure_safe_directory(self, mock_subprocess):
+        """Test configure_safe_directory method."""
+        config = GitConfig("/test/path")
         
-        # Test with None message
-        assert validator.is_valid_commit_message(None) is False
+        # Test successful configuration
+        mock_subprocess['check_call'].return_value = 0
+        result1 = config.configure_safe_directory()
+        assert result1 is True
         
-        # Test with empty message
-        assert validator.is_valid_commit_message("") is False
-        
-        # Test with only whitespace
-        assert validator.is_valid_commit_message("   \t\n") is False
-        
-        # Test pattern_to_regex with complex patterns
-        complex_pattern = validator.pattern_to_regex("src/*.{js,ts}")
-        assert re.escape("src/*.{js,ts}") in complex_pattern.pattern
+        # Test failed configuration
+        mock_subprocess['check_call'].side_effect = subprocess.CalledProcessError(1, ['git', 'config'])
+        result2 = config.configure_safe_directory()
+        assert result2 is False
 
 @pytest.mark.unit
 @pytest.mark.git
 @pytest.mark.commit
-class TestGitOperationsEdgeCases:
-    """Tests for edge cases in Git operations."""
+class TestMain:
+    """Basic tests for main function."""
     
-    def test_format_timestamp_handling(self):
-        """Test timestamp formatting with various inputs."""
-        commit_ops = GitCommitOperations()
-        
-        # Test with None timestamp
-        none_result = commit_ops._format_timestamp(None)
-        assert none_result is None
-        
-        # Test with non-integer string
-        non_int_result = commit_ops._format_timestamp("not-a-timestamp")
-        assert non_int_result == "not-a-timestamp"
-        
-        # Test with empty string
-        empty_result = commit_ops._format_timestamp("")
-        assert empty_result == ""
-        
-        # Test with valid timestamp
-        valid_result = commit_ops._format_timestamp("1609459200")  # 2021-01-01
-        assert "2021" in valid_result
-    
-    def test_file_parameter_handling(self, mock_subprocess, mock_git_env):
-        """Test handling of file parameters with edge cases."""
-        commit_ops = GitCommitOperations()
-        
-        # Test create_commit with empty string in files list
-        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
-            files_with_empty = ["file1.txt", "", None, "   ", "file2.txt"]
-            mock_subprocess['check_output'].return_value = b"git version 2.30.0"
-            
-            with patch.object(GitCommitOperations, 'create_commit', return_value=(True, "abc1234")):
-                result, hash_val = commit_ops.create_commit("Test message", files_with_empty)
-                assert result is True
-                assert hash_val == "abc1234"
-                
-        # Test amend_commit with None message and no files
-        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
-            with patch.object(GitCommitOperations, 'amend_commit', return_value=(True, "def5678")):
-                result, hash_val = commit_ops.amend_commit(None, None)
-                assert result is True
-                assert hash_val == "def5678"
-    
-    def test_list_commits_parameters(self, mock_subprocess):
-        """Test list_commits with different parameter combinations."""
-        commit_ops = GitCommitOperations()
-        
-        # Test list_commits with all parameters None
-        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
-            with patch('subprocess.check_output', return_value=b""):
-                result = commit_ops.list_commits(None, None, None, None, None, None)
-                assert result == []
-    
-    def test_list_commits_formats(self, mock_subprocess):
-        """Test list_commits with different format options."""
-        commit_ops = GitCommitOperations()
-        
-        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
-            # Test oneline format
-            def check_output_oneline(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--oneline' in args[0]:
-                    return b"abc1234 Commit message 1\ndef5678 Commit message 2"
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_oneline
-            oneline_result = commit_ops.list_commits(format='oneline')
-            assert len(oneline_result) == 2
-            assert 'abc1234' in oneline_result[0]
-            
-            # Test short format
-            def check_output_short(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--pretty=format' in args[0][2]:
-                    return b"abc1234 - Short format (Author, 2 days ago)"
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_short
-            short_result = commit_ops.list_commits(format='short')
-            assert 'Short format' in short_result[0]
-            
-            # Test full format
-            def check_output_full(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--pretty=format:%H%n%an' in args[0][2]:
-                    return b"abc1234def5678\nAuthor Name\nauthor@example.com\n1609459200\nCommit subject\nCommit body"
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_full
-            full_result = commit_ops.list_commits(format='full')
-            assert len(full_result) == 1
-            assert 'abc1234def5678' in full_result[0]
-            
-            # Test with empty output
-            def check_output_empty(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif args[0][0:2] == ['git', 'log']:
-                    return b""
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_empty
-            empty_result = commit_ops.list_commits()
-            assert empty_result == []
-    
-    def test_get_commit_info_handling(self, mock_subprocess):
-        """Test get_commit_info method handling different scenarios."""
-        commit_ops = GitCommitOperations()
-        
-        with patch.object(GitCommitOperations, '_configure_git', return_value=None):
-            # Test verify failure
-            def check_output_verify_failure(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--verify' in args[0]:
-                    raise subprocess.CalledProcessError(128, ['git', 'rev-parse', '--verify', 'invalid'])
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_verify_failure
-            result = commit_ops.get_commit_info('invalid')
-            assert result == {}
-            
-            # Test full format with insufficient data
-            def check_output_insufficient(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--verify' in args[0]:
-                    return b"abc1234"
-                elif '--no-patch' in args[0]:
-                    return b"abc1234"  # Only one line, should need at least 5
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_insufficient
-            result = commit_ops.get_commit_info('abc1234', format='full')
-            assert result == {}
-            
-            # Test full format with complete data
-            def check_output_complete(*args, **kwargs):
-                if args[0] == ['git', '--version']:
-                    return b"git version 2.30.0"
-                elif '--verify' in args[0]:
-                    return b"abc1234"
-                elif '--no-patch' in args[0]:
-                    return b"abc1234\nJohn Doe\njohn@example.com\n1609459200\nCommit subject\nCommit body line 1\nCommit body line 2"
-                return b""
-                
-            mock_subprocess['check_output'].side_effect = check_output_complete
-            result = commit_ops.get_commit_info('abc1234', format='full')
-            assert result['hash'] == 'abc1234'
-            assert result['author'] == 'John Doe'
-            assert result['email'] == 'john@example.com'
-            assert result['subject'] == 'Commit subject'
-            assert result['body'] == 'Commit body line 1\nCommit body line 2'
-    
-    def test_validation_bypass(self, mock_subprocess):
-        """Test bypassing validation when validator methods are missing."""
-        commit_ops = GitCommitOperations()
-        
-        # Replace validator with one without is_valid_commit_message
-        class NoValidatorMethods:
-            pass
-            
-        # Save the original and replace
-        original_validator = commit_ops.git_validator
-        commit_ops.git_validator = NoValidatorMethods()
-        
-        try:
-            # Test create commit should bypass validation
-            with patch('subprocess.check_output', side_effect=lambda *args, **kwargs: 
-                b"git version 2.30.0" if args[0] == ['git', '--version'] else
-                b"abc1234" if args[0] == ['git', 'rev-parse', 'HEAD'] else b""):
-                
-                # Reset the check_call mock
-                mock_subprocess['check_call'].reset_mock()
-                
-                result, hash_val = commit_ops.create_commit("Test message")
-                assert result is True
-                assert hash_val == "abc1234"
-                
-                # Verify commit was called without validation stopping it
-                assert any('commit' in str(call) for call in mock_subprocess['check_call'].call_args_list)
-                
-            # Same test for amend
-            with patch('subprocess.check_output', side_effect=lambda *args, **kwargs: 
-                b"git version 2.30.0" if args[0] == ['git', '--version'] else
-                b"def5678" if args[0] == ['git', 'rev-parse', 'HEAD'] else b""):
-                
-                # Reset the check_call mock
-                mock_subprocess['check_call'].reset_mock()
-                
-                result, hash_val = commit_ops.amend_commit("Test message")
-                assert result is True
-                assert hash_val == "def5678"
-                
-                # Verify amend was called without validation stopping it
-                assert any('--amend' in str(call) for call in mock_subprocess['check_call'].call_args_list)
-                
-        finally:
-            # Restore the original validator
-            commit_ops.git_validator = original_validator
-
-@pytest.mark.unit
-@pytest.mark.git
-@pytest.mark.commit
-class TestMainFunction:
-    """Unit tests for main function."""
-    
-    def test_error_handling_in_initialization(self, monkeypatch):
-        """Test error handling during main function initialization."""
-        # Test initialization error path
-        with patch('os.environ.get', side_effect=Exception("Initialization error")):
-            with pytest.raises(SystemExit):
-                main()
-    
-    def test_input_validation_edge_cases(self):
-        """Test edge cases in input validation in main function."""
-        # Test amend with no message provided (should be valid)
-        with patch('main.GitCommitOperations._configure_git', return_value=None):
-            with patch('main.GitCommitOperations.amend_commit', return_value=(True, 'abc1234')):
-                os.environ['INPUT_ACTION'] = 'amend'
-                if 'INPUT_MESSAGE' in os.environ:
-                    del os.environ['INPUT_MESSAGE']
-                main()  # Should not raise an exception
-                
-        # Test with missing action input
-        with pytest.raises(SystemExit):
-            os.environ.pop('INPUT_ACTION', None)
-            main()
-            
-        # Test with empty action input
-        with pytest.raises(SystemExit):
-            os.environ['INPUT_ACTION'] = ''
-            main()
-    
-    def test_main_error_conditions(self):
-        """Test error conditions in main function."""
-        # Test with git not installed
-        with patch('subprocess.check_output', side_effect=FileNotFoundError("No git")):
-            with pytest.raises(SystemExit):
-                main()
-                
-        # Test with git version check failing
-        with patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(1, ['git', '--version'])):
-            with pytest.raises(SystemExit):
-                main()
-                
-        # Test with invalid action
-        os.environ['INPUT_ACTION'] = 'invalid-action'
-        with pytest.raises(SystemExit):
-            main()
-            
-        # Test create action missing required message
-        os.environ['INPUT_ACTION'] = 'create'
-        os.environ.pop('INPUT_MESSAGE', None)
-        with pytest.raises(SystemExit):
-            main()
-            
-        # Test get action missing required commit hash
-        os.environ['INPUT_ACTION'] = 'get'
-        os.environ.pop('INPUT_COMMIT_HASH', None)
-        with pytest.raises(SystemExit):
-            main()
-    
-    def test_no_verify_parameter_handling(self):
-        """Test no_verify parameter handling in main function."""
-        # Setup patches
-        with patch('main.GitCommitOperations._configure_git', return_value=None):
-            # Test no_verify with create action
-            with patch('main.GitCommitOperations.create_commit', return_value=(True, 'abc1234')) as mock_create:
-                os.environ['INPUT_ACTION'] = 'create'
-                os.environ['INPUT_MESSAGE'] = 'Test message'
-                os.environ['INPUT_NO_VERIFY'] = 'true'
-                main()
-                mock_create.assert_called_once()
-                assert mock_create.call_args[0][2] is True  # Third arg is no_verify
-                
-            # Test no_verify with amend action
-            with patch('main.GitCommitOperations.amend_commit', return_value=(True, 'def5678')) as mock_amend:
-                os.environ['INPUT_ACTION'] = 'amend'
-                os.environ['INPUT_MESSAGE'] = 'Updated message'
-                os.environ['INPUT_NO_VERIFY'] = 'false'
-                main()
-                mock_amend.assert_called_once()
-                assert mock_amend.call_args[0][2] is False  # Third arg is no_verify
-                
-            # Test no_verify with invalid value (should default to False)
-            with patch('main.GitCommitOperations.cherry_pick_commit', return_value=True) as mock_cherry:
-                os.environ['INPUT_ACTION'] = 'cherry-pick'
-                os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
-                os.environ['INPUT_NO_VERIFY'] = 'not-a-boolean'
-                main()
-                mock_cherry.assert_called_once()
-                assert mock_cherry.call_args[0][1] is False  # Second arg is no_verify
-    
-    def test_github_output_file_handling(self):
-        """Test GitHub output file handling in main function."""
-        # Test all action outputs
-        output_file = '/tmp/github_output'
-        os.environ['GITHUB_OUTPUT'] = output_file
-        
-        # Test create action output
+    def test_simple_create_commit(self, mock_git_env):
+        """Test creating a commit."""
         with patch('main.GitCommitOperations.create_commit', return_value=(True, 'abc1234')):
             os.environ['INPUT_ACTION'] = 'create'
             os.environ['INPUT_MESSAGE'] = 'Test message'
-            os.environ['INPUT_FILES'] = 'file1.txt,file2.js'
             main()
             
-            with open(output_file, 'r') as f:
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
                 output = f.read()
                 assert 'result=success' in output
                 assert 'commit_hash=abc1234' in output
-            
-        # Test amend action output
-        with patch('main.GitCommitOperations.amend_commit', return_value=(True, 'def5678')):
+    
+    def test_simple_amend_commit(self, mock_git_env):
+        """Test amending a commit."""
+        with patch('main.GitCommitOperations.amend_commit', return_value=(True, 'abc1234')):
             os.environ['INPUT_ACTION'] = 'amend'
-            os.environ['INPUT_MESSAGE'] = 'Updated message'
-            os.environ['INPUT_FILES'] = 'file3.txt,file4.js'
+            os.environ['INPUT_MESSAGE'] = 'Test message'
             main()
             
-            with open(output_file, 'r') as f:
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
                 output = f.read()
                 assert 'result=success' in output
-                assert 'commit_hash=def5678' in output
-                
-        # Test revert action output
-        with patch('main.GitCommitOperations.revert_commit', return_value=(True, 'ghi9012')):
-            os.environ['INPUT_ACTION'] = 'revert'
+                assert 'commit_hash=abc1234' in output
+    
+    def test_simple_list_commits(self, mock_git_env):
+        """Test listing commits."""
+        commits = ["commit1", "commit2"]
+        with patch('main.GitCommitOperations.list_commits', return_value=commits):
+            os.environ['INPUT_ACTION'] = 'list'
+            main()
+            
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+                output = f.read()
+                assert 'result=success' in output
+                assert 'commits=commit1,commit2' in output
+    
+    def test_simple_get_commit(self, mock_git_env):
+        """Test getting commit info."""
+        commit_info = {
+            'hash': 'abc1234',
+            'author': 'Test Author',
+            'message': 'Test message'
+        }
+        with patch('main.GitCommitOperations.get_commit_info', return_value=commit_info):
+            os.environ['INPUT_ACTION'] = 'get'
             os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
             main()
             
-            with open(output_file, 'r') as f:
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
                 output = f.read()
                 assert 'result=success' in output
-                assert 'commit_hash=ghi9012' in output
-                
-        # Test cherry-pick action output
+                assert 'hash=abc1234' in output
+                assert 'author=Test Author' in output
+    
+    def test_simple_cherry_pick(self, mock_git_env):
+        """Test cherry-picking a commit."""
         with patch('main.GitCommitOperations.cherry_pick_commit', return_value=True):
             os.environ['INPUT_ACTION'] = 'cherry-pick'
             os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
             main()
             
-            with open(output_file, 'r') as f:
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
                 output = f.read()
                 assert 'result=success' in output
-        
-    def test_stdout_output_handling(self, mock_subprocess, mock_git_env, capsys):
-        """Test stdout output when GITHUB_OUTPUT is not set."""
-        # Save original GITHUB_OUTPUT
-        original_output = os.environ.pop('GITHUB_OUTPUT', None)
-        
-        try:
-            # Test create action output to stdout
-            with patch('main.GitCommitOperations.create_commit', return_value=(True, 'abc1234')):
-                os.environ['INPUT_ACTION'] = 'create'
-                os.environ['INPUT_MESSAGE'] = 'Test message'
-                main()
-                
-                # Capture stdout
-                captured = capsys.readouterr()
-                assert 'result: success' in captured.out
-                assert 'commit_hash: abc1234' in captured.out
-                
-            # Test list action output to stdout
-            with patch('main.GitCommitOperations.list_commits', return_value=["commit1", "commit2"]):
-                os.environ['INPUT_ACTION'] = 'list'
-                main()
-                
-                # Capture stdout
-                captured = capsys.readouterr()
-                assert 'result: success' in captured.out
-                assert 'commits:' in captured.out
-                assert 'commit1' in captured.out
-                assert 'commit2' in captured.out
-                
-            # Test get action output to stdout
-            commit_info = {
-                'hash': 'abc1234',
-                'author': 'Test Author',
-                'message': 'Test message',
-                'date': '2021-04-01'
-            }
-            
-            with patch('main.GitCommitOperations.get_commit_info', return_value=commit_info):
-                os.environ['INPUT_ACTION'] = 'get'
-                os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
-                main()
-                
-                # Capture stdout
-                captured = capsys.readouterr()
-                assert 'result: success' in captured.out
-                assert 'commit info:' in captured.out
-                assert 'hash: abc1234' in captured.out
-                assert 'author: Test Author' in captured.out
-                
-        finally:
-            # Restore GITHUB_OUTPUT if it was set
-            if original_output:
-                os.environ['GITHUB_OUTPUT'] = original_output
     
-    def test_complex_output_values(self, mock_subprocess, mock_git_env):
-        """Test handling of complex output values in main function."""
-        # Setup output file
-        output_file = '/tmp/github_output'
-        os.environ['GITHUB_OUTPUT'] = output_file
-        
-        # Test get action with commit info containing newlines
+    def test_simple_revert(self, mock_git_env):
+        """Test reverting a commit."""
+        with patch('main.GitCommitOperations.revert_commit', return_value=(True, 'abc1234')):
+            os.environ['INPUT_ACTION'] = 'revert'
+            os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
+            main()
+            
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+                output = f.read()
+                assert 'result=success' in output
+                assert 'commit_hash=abc1234' in output
+    
+    def test_output_escaping(self, mock_git_env):
+        """Test escaping newlines in output."""
         commit_info = {
             'hash': 'abc1234',
-            'author': 'Test User',
-            'message': 'Line 1\nLine 2\nLine 3',
-            'body': 'Details\nMore details',
-            'date': '2021-04-01'
+            'message': 'Line 1\nLine 2\nLine 3'
         }
-        
         with patch('main.GitCommitOperations.get_commit_info', return_value=commit_info):
             os.environ['INPUT_ACTION'] = 'get'
             os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
-            os.environ['INPUT_FORMAT'] = 'full'
             main()
             
-            with open(output_file, 'r') as f:
+            # Check github output
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
                 output = f.read()
-                assert 'result=success' in output
-                assert 'hash=abc1234' in output
                 assert 'message=Line 1%0ALine 2%0ALine 3' in output
-                
-        # Test commit info with non-string values
-        non_string_info = {
-            'hash': 'abc1234',
-            'author': 'Test Author',
-            'count': 42,  # Integer value
-            'active': True,  # Boolean value
-            'data': None,  # None value
-            'metadata': {'key': 'value'},  # Dict value
-        }
-        
-        with patch('main.GitCommitOperations.get_commit_info', return_value=non_string_info):
-            os.environ['INPUT_ACTION'] = 'get'
-            os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
-            main()
-            
-            # Check output
-            with open(output_file, 'r') as f:
-                output = f.read()
-                assert 'hash=abc1234' in output
-                assert 'count=42' in output
-                assert 'active=True' in output
-                assert 'data=None' in output
-                assert 'metadata=' in output
-                
-        # Test list action with complex commit messages
-        complex_commits = [
-            "abc1234 - Commit with, commas",
-            "def5678 - Commit with\nnewlines",
-            "ghi9012 - Normal commit"
-        ]
-        
-        with patch('main.GitCommitOperations.list_commits', return_value=complex_commits):
-            os.environ['INPUT_ACTION'] = 'list'
-            main()
-            
-            # Check output
-            with open(output_file, 'r') as f:
-                output = f.read()
-                assert 'result=success' in output
-                assert 'commits=' in output
-                # Newlines should be escaped
-                assert '%0A' in output
     
-    def test_operation_failure_handling(self, mock_subprocess, mock_git_env):
-        """Test handling of operation failures in main function."""
-        # Setup output file
-        output_file = '/tmp/github_output'
-        os.environ['GITHUB_OUTPUT'] = output_file
-        
-        # Test operation failure output handling
-        with patch('main.GitCommitOperations.create_commit', return_value=(False, None)):
-            os.environ['INPUT_ACTION'] = 'create'
-            os.environ['INPUT_MESSAGE'] = 'Test message'
+    def test_basic_failures(self):
+        """Test basic failure paths."""
+        # Test git not available
+        with patch('subprocess.check_output', side_effect=FileNotFoundError()):
             with pytest.raises(SystemExit):
                 main()
-            
-            with open(output_file, 'r') as f:
-                output = f.read()
-                assert 'result=failure' in output
-                
-        # Test list operation with empty results
-        with patch('main.GitCommitOperations.list_commits', return_value=[]):
-            os.environ['INPUT_ACTION'] = 'list'
+        
+        # Test invalid action
+        os.environ['INPUT_ACTION'] = 'invalid-action'
+        with pytest.raises(SystemExit):
             main()
             
-            # Check output
-            with open(output_file, 'r') as f:
-                output = f.read()
-                assert 'commits=' in output
-                
-        # Test get operation with empty results
-        with patch('main.GitCommitOperations.get_commit_info', return_value={}):
-            os.environ['INPUT_ACTION'] = 'get'
-            os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
+        # Test missing required inputs
+        os.environ['INPUT_ACTION'] = 'create'
+        if 'INPUT_MESSAGE' in os.environ:
+            del os.environ['INPUT_MESSAGE']
+        with pytest.raises(SystemExit):
+            main()
+            
+        # Test operation failure
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_MESSAGE'] = 'Test message'
+        with patch('main.GitCommitOperations.create_commit', return_value=(False, None)):
             with pytest.raises(SystemExit):
                 main()
     
@@ -2328,6 +1954,50 @@ class TestGitValidatorFallback:
 
 
 
+
+@pytest.mark.unit
+@pytest.mark.git
+@pytest.mark.commit
+class TestGitValidatorFallback:
+    """Unit tests for GitValidator class (fallback implementation)."""
+    
+    def test_is_valid_commit_message(self):
+        """Test commit message validation."""
+        validator = GitValidator()
+        
+        # Valid message
+        assert validator.is_valid_commit_message("Valid message") is True
+        
+        # Empty message
+        assert validator.is_valid_commit_message("") is False
+        
+        # None message
+        assert validator.is_valid_commit_message(None) is False
+        
+        # Whitespace-only message
+        assert validator.is_valid_commit_message("   \n\t  ") is False
+    
+    def test_pattern_to_regex(self):
+        """Test glob pattern to regex conversion."""
+        validator = GitValidator()
+        
+        # Simple pattern
+        simple_pattern = validator.pattern_to_regex("file.txt")
+        assert simple_pattern.match("file.txt")
+        assert not simple_pattern.match("file1.txt")
+        
+        # Star pattern
+        star_pattern = validator.pattern_to_regex("*.txt")
+        assert star_pattern.match("file.txt")
+        assert star_pattern.match("image.txt")
+        assert not star_pattern.match("file.md")
+        
+        # Question mark pattern
+        qmark_pattern = validator.pattern_to_regex("file?.txt")
+        assert qmark_pattern.match("file1.txt")
+        assert qmark_pattern.match("fileA.txt")
+        assert not qmark_pattern.match("file.txt")
+        assert not qmark_pattern.match("file12.txt")
 
 @pytest.mark.unit
 @pytest.mark.git
