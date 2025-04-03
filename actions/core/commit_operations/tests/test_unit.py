@@ -593,6 +593,340 @@ class TestGitCommitOperations:
 @pytest.mark.unit
 @pytest.mark.git
 @pytest.mark.commit
+class TestExtraOperations:
+    """Additional tests for GitCommitOperations to increase coverage."""
+    
+    def test_create_commit_with_empty_files_list(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test creating commit with empty files list."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt"
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        result, commit_hash = commit_ops.create_commit("Add new feature", files=[])
+        
+        # Assert
+        assert result is True
+        assert commit_hash == commit_outputs['commit_create']
+        # Verify git add . was called since no specific files were provided
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', '.'])
+        # Verify git commit command was called
+        mock_subprocess['check_call'].assert_any_call(['git', 'commit', '-m', 'Add new feature'])
+        
+    def test_create_commit_with_empty_status(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test creating commit with no changes to stage."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return ""  # No changes
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        result, commit_hash = commit_ops.create_commit("Add new feature")
+        
+        # Assert
+        assert result is True
+        assert commit_hash == commit_outputs['commit_create']
+        # Verify git commit command was called
+        mock_subprocess['check_call'].assert_any_call(['git', 'commit', '-m', 'Add new feature'])
+        
+    def test_cherry_pick_no_verify(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test cherry-pick with no_verify flag."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        mock_subprocess['check_output'].side_effect = [
+            commit_outputs['git_version'],  # git --version
+            commit_outputs['get_commit_hash']  # git rev-parse --verify
+        ]
+        
+        # Act
+        result = commit_ops.cherry_pick_commit('abc1234', no_verify=True)
+        
+        # Assert
+        assert result is True
+        # Verify git cherry-pick command was called with --no-verify
+        mock_subprocess['check_call'].assert_any_call(['git', 'cherry-pick', 'abc1234', '--no-verify'])
+        
+    def test_revert_no_verify(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test revert with no_verify flag."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['revert_success']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        result, revert_hash = commit_ops.revert_commit('abc1234', no_verify=True)
+        
+        # Assert
+        assert result is True
+        assert revert_hash == commit_outputs['revert_success']
+        # Verify git revert command was called with --no-verify
+        mock_subprocess['check_call'].assert_any_call(['git', 'revert', '--no-edit', 'abc1234', '--no-verify'])
+        
+    def test_files_with_empty_strings(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test handling files list with empty strings."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act - include an empty string in the files list
+        result, commit_hash = commit_ops.create_commit("Add new feature", files=["file1.txt", "", "file2.js"])
+        
+        # Assert
+        assert result is True
+        # Should only add the non-empty files
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', 'file1.txt'])
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', 'file2.js'])
+        # Verify git commit command was called
+        mock_subprocess['check_call'].assert_any_call(['git', 'commit', '-m', 'Add new feature'])
+        
+    def test_list_commits_exception(self, mock_subprocess, mock_git_env):
+        """Test list_commits error handling."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Make git log command fail
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return b'git version 2.30.0'
+            elif args[0][0:2] == ['git', 'log']:
+                raise subprocess.CalledProcessError(128, ['git', 'log'])
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        result = commit_ops.list_commits()
+        
+        # Assert
+        assert result == []
+        
+    def test_invalid_commit_message(self, mock_subprocess, mock_git_env):
+        """Test handling invalid commit message."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Override validator method to actually reject empty messages
+        with patch.object(commit_ops.git_validator, 'is_valid_commit_message', return_value=False):
+            # Act
+            result, commit_hash = commit_ops.create_commit("")
+            
+            # Assert
+            assert result is False
+            assert commit_hash is None
+        
+    def test_amend_commit_invalid_message(self, mock_subprocess, mock_git_env):
+        """Test amend commit with invalid message."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Override validator method
+        with patch.object(commit_ops.git_validator, 'is_valid_commit_message', return_value=False):
+            # Act
+            result, commit_hash = commit_ops.amend_commit(message="")
+            
+            # Assert
+            assert result is False
+            assert commit_hash is None
+    
+    def test_handle_missing_validator_method(self, mock_subprocess, mock_git_env):
+        """Test handling when validator method is missing."""
+        # Arrange
+        commit_ops = GitCommitOperations()
+        
+        # Save original validator
+        original_validator = commit_ops.git_validator
+        
+        try:
+            # Replace with a simple object without is_valid_commit_message
+            commit_ops.git_validator = object()
+            
+            # Configure subprocess return values
+            def check_output_side_effect(*args, **kwargs):
+                if args[0] == ['git', '--version']:
+                    return b'git version 2.30.0'
+                elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                    return "M  file1.txt"
+                elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                    return "0123456789abcdef0123456789abcdef01234567"
+                return ""
+            
+            mock_subprocess['check_output'].side_effect = check_output_side_effect
+            
+            # Act
+            result, commit_hash = commit_ops.create_commit("Test message without validator check")
+            
+            # Assert - should proceed without check and succeed
+            assert result is True
+            assert commit_hash == "0123456789abcdef0123456789abcdef01234567"
+        finally:
+            # Restore the original validator
+            commit_ops.git_validator = original_validator
+            
+    def test_main_with_no_verify_flag(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test main function with no_verify flag."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_MESSAGE'] = 'Test commit'
+        os.environ['INPUT_NO_VERIFY'] = 'true'  # Set no_verify to true
+        
+        # Configure mock to return a valid response
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt\n"
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        main()
+        
+        # Assert
+        # Verify git commit command was called with --no-verify
+        mock_subprocess['check_call'].assert_any_call(['git', 'commit', '-m', 'Test commit', '--no-verify'])
+    
+    def test_main_with_invalid_no_verify_value(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test main function with invalid no_verify input."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_MESSAGE'] = 'Test commit'
+        os.environ['INPUT_NO_VERIFY'] = 'not-a-boolean'  # Invalid boolean value
+        
+        # Configure mock to return a valid response
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt\n"
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        main()
+        
+        # Assert
+        # Should default to false for no_verify and not include --no-verify flag
+        mock_subprocess['check_call'].assert_any_call(['git', 'commit', '-m', 'Test commit'])
+        # No call should include the --no-verify flag
+        assert not any('--no-verify' in str(call_args) for call_args in mock_subprocess['check_call'].call_args_list)
+        
+    def test_main_with_files(self, mock_subprocess, mock_git_env, commit_outputs):
+        """Test main function with comma-separated file list."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'create'
+        os.environ['INPUT_MESSAGE'] = 'Test commit'
+        os.environ['INPUT_FILES'] = 'file1.txt,file2.js,file3.py'
+        
+        # Set up responses
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act
+        main()
+        
+        # Assert - verify each file was added
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', 'file1.txt'])
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', 'file2.js'])
+        mock_subprocess['check_call'].assert_any_call(['git', 'add', 'file3.py'])
+    
+    def test_main_outputs_empty_commits(self, mock_subprocess, mock_git_env):
+        """Test main function with empty commit list."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'list'
+        
+        # Configure mock to return empty commit list
+        with patch('main.GitCommitOperations.list_commits', return_value=[]):
+            # Act
+            main()
+            
+            # Assert
+            with open(mock_git_env['GITHUB_OUTPUT'], 'r') as f:
+                output = f.read()
+            
+            assert 'result=success' in output
+            assert 'commits=' in output  # Should still output the commits key, just with empty value
+    
+    def test_main_outputs_no_result(self, mock_subprocess, mock_git_env):
+        """Test main function when operation returns no result."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'get'
+        os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
+        
+        # Configure mock to return empty commit info
+        with patch('main.GitCommitOperations.get_commit_info', return_value={}):
+            # Act
+            with pytest.raises(SystemExit):
+                main()
+                
+    def test_main_general_exception(self, mock_subprocess, mock_git_env):
+        """Test main function when an exception occurs."""
+        # Arrange
+        os.environ['INPUT_ACTION'] = 'list'
+        
+        # Make git check fail with a general exception
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                raise Exception("General test exception")
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Act & Assert
+        with pytest.raises(SystemExit):
+            main()
+
+
+@pytest.mark.unit
+@pytest.mark.git
+@pytest.mark.commit
 class TestMainFunction:
     """Unit tests for main function."""
     

@@ -92,14 +92,19 @@ class GitCommitOperations:
             # Check if git is available
             subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
             
-            # Configure git environment using GitConfig utilities
-            safe_dir_result = self.git_config.configure_safe_directory()
-            identity_result = self.git_config.setup_identity()
+            # Configure safe directory
+            subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
             
-            # Exit if configuration failed
-            if not safe_dir_result or not identity_result:
-                print("Error: Git configuration failed.")
-                sys.exit(1)
+            # Set default Git identity if not configured
+            try:
+                # Try to get current user.name
+                subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError:
+                # If not set, configure a default identity for the action
+                # This is essential for creating commits, as Git requires an identity
+                subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
+                subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
+                print("Configured default Git identity for commit operations")
                 
         except FileNotFoundError:
             print("Error: Git is not installed. Please ensure git is available in the container.")
