@@ -77,22 +77,22 @@ def commit_outputs():
         'git_version': b"git version 2.30.0",
         'commit_create': "0123456789abcdef0123456789abcdef01234567",
         'commit_amend': "fedcba9876543210fedcba9876543210fedcba98",
-        'list_commits': "abc1234 - Add feature 1 (John Doe, 2023-04-01)\n"
-                        "def5678 - Fix bug in code (Jane Smith, 2023-03-30)\n"
-                        "ghi9012 - Update documentation (John Doe, 2023-03-29)",
-        'list_commits_author': "abc1234 - Add feature 1 (John Doe, 2023-04-01)\n"
-                                "ghi9012 - Update documentation (John Doe, 2023-03-29)",
+        'list_commits': "abc1234 - Add feature 1 (John Doe, 2021-04-01)\n"
+                        "def5678 - Fix bug in code (Jane Smith, 2021-03-30)\n"
+                        "ghi9012 - Update documentation (John Doe, 2021-03-29)",
+        'list_commits_author': "abc1234 - Add feature 1 (John Doe, 2021-04-01)\n"
+                                "ghi9012 - Update documentation (John Doe, 2021-03-29)",
         'list_commits_oneline': "abc1234 Add feature 1\n"
                                 "def5678 Fix bug in code\n"
                                 "ghi9012 Update documentation",
         'get_commit_info': "commit abc1234def5678ghi9012jkl3456mno7890pqr1234\n"
                             "Author: John Doe <john@example.com>\n"
-                            "Date:   Sat Apr 1 12:34:56 2023 +0000\n\n"
+                            "Date:   Sat Apr 1 12:34:56 2021 +0000\n\n"
                             "    Add feature 1\n\n"
                             "    This is a detailed description of the feature.",
         'get_commit_hash': "abc1234def5678ghi9012jkl3456mno7890pqr1234",
         'get_commit_author': "John Doe",
-        'get_commit_date': "1617286496",  # Unix timestamp for 2023-04-01 12:34:56
+        'get_commit_date': "1617286496",  # Unix timestamp for 2021-04-01 12:34:56
         'get_commit_message': "Add feature 1",
         'cherry_pick_success': "",
         'cherry_pick_conflict': "error: could not apply abc1234... Add feature 1",

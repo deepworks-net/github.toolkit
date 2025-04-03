@@ -23,10 +23,17 @@ class TestGitCommitOperations:
         """Test successful commit creation."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['commit_create']  # git rev-parse HEAD
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt"
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result, commit_hash = commit_ops.create_commit("Add new feature")
@@ -41,10 +48,15 @@ class TestGitCommitOperations:
         """Test creating commit with specific files."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['commit_create']  # git rev-parse HEAD
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result, commit_hash = commit_ops.create_commit("Add new feature", ["file1.txt", "file2.js"])
@@ -79,10 +91,15 @@ class TestGitCommitOperations:
         """Test successful commit amend."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['commit_amend']  # git rev-parse HEAD
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_amend']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result, commit_hash = commit_ops.amend_commit("Updated feature")
@@ -97,10 +114,15 @@ class TestGitCommitOperations:
         """Test amending commit without changing message."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['commit_amend']  # git rev-parse HEAD
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_amend']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result, commit_hash = commit_ops.amend_commit()
@@ -115,10 +137,15 @@ class TestGitCommitOperations:
         """Test listing commits."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['list_commits']  # git log
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0][0:2] == ['git', 'log'] and kwargs.get('text', True):
+                return commit_outputs['list_commits']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result = commit_ops.list_commits()
@@ -138,10 +165,15 @@ class TestGitCommitOperations:
         """Test listing commits filtered by author."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['list_commits_author']  # git log --author
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0][0:2] == ['git', 'log'] and '--author' in args[0] and kwargs.get('text', True):
+                return commit_outputs['list_commits_author']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result = commit_ops.list_commits(author="John Doe")
@@ -206,14 +238,27 @@ class TestGitCommitOperations:
         """Test cherry-pick with conflict."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['get_commit_hash']  # git rev-parse --verify
-        ]
-        mock_subprocess['check_call'].side_effect = [
-            0,  # git config successful
-            subprocess.CalledProcessError(1, ['git', 'cherry-pick', 'abc1234'])  # cherry-pick fails
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Set up check_call to fail on cherry-pick
+        check_call_count = 0
+        def check_call_side_effect(*args, **kwargs):
+            nonlocal check_call_count
+            check_call_count += 1
+            # First call is for safe.directory configuration
+            if check_call_count > 1 and args[0][0:3] == ['git', 'cherry-pick', 'abc1234']:
+                raise subprocess.CalledProcessError(1, ['git', 'cherry-pick', 'abc1234'])
+            return 0
+            
+        mock_subprocess['check_call'].side_effect = check_call_side_effect
         
         # Act
         result = commit_ops.cherry_pick_commit('abc1234')
@@ -225,11 +270,17 @@ class TestGitCommitOperations:
         """Test successful revert."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['get_commit_hash'],  # git rev-parse --verify
-            commit_outputs['revert_success']  # git rev-parse HEAD
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['revert_success']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         result, revert_hash = commit_ops.revert_commit('abc1234')
@@ -244,14 +295,27 @@ class TestGitCommitOperations:
         """Test revert with conflict."""
         # Arrange
         commit_ops = GitCommitOperations()
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['get_commit_hash']  # git rev-parse --verify
-        ]
-        mock_subprocess['check_call'].side_effect = [
-            0,  # git config successful
-            subprocess.CalledProcessError(1, ['git', 'revert', '--no-edit', 'abc1234'])  # revert fails
-        ]
+        # Set up responses for different commands
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            return ""
+        
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Set up check_call to fail on revert
+        check_call_count = 0
+        def check_call_side_effect(*args, **kwargs):
+            nonlocal check_call_count
+            check_call_count += 1
+            # First call is for safe.directory configuration
+            if check_call_count > 1 and args[0][0:3] == ['git', 'revert', '--no-edit', 'abc1234']:
+                raise subprocess.CalledProcessError(1, ['git', 'revert', '--no-edit', 'abc1234'])
+            return 0
+            
+        mock_subprocess['check_call'].side_effect = check_call_side_effect
         
         # Act
         result, revert_hash = commit_ops.revert_commit('abc1234')
@@ -264,13 +328,13 @@ class TestGitCommitOperations:
         """Test timestamp formatting."""
         # Arrange
         commit_ops = GitCommitOperations()
-        timestamp = "1617286496"  # 2023-04-01 12:34:56
+        timestamp = "1617286496"  # 2021-04-01 12:34:56
         
         # Act
         result = commit_ops._format_timestamp(timestamp)
         
         # Assert
-        assert "2023" in result
+        assert "2021" in result  # The timestamp is for 2021, not 2023
         assert ":" in result  # Should contain time with colons
 
 
@@ -286,11 +350,19 @@ class TestMainFunction:
         os.environ['INPUT_ACTION'] = 'create'
         os.environ['INPUT_MESSAGE'] = 'Test commit'
         
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            "M  file1.txt\n",  # git status --porcelain
-            commit_outputs['commit_create']  # git rev-parse HEAD
-        ]
+        # Set up detailed response patterns for main function
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'status', '--porcelain'] and kwargs.get('text', False):
+                return "M  file1.txt\n"
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_create']
+            elif args[0] == ['git', 'config', 'user.name']:
+                raise subprocess.CalledProcessError(128, ['git', 'config', 'user.name'])
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         main()
@@ -308,10 +380,17 @@ class TestMainFunction:
         os.environ['INPUT_ACTION'] = 'amend'
         os.environ['INPUT_MESSAGE'] = 'Updated commit'
         
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['commit_amend']  # git rev-parse HEAD
-        ]
+        # Set up detailed response patterns for main function
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['commit_amend']
+            elif args[0] == ['git', 'config', 'user.name']:
+                raise subprocess.CalledProcessError(128, ['git', 'config', 'user.name'])
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         main()
@@ -329,10 +408,17 @@ class TestMainFunction:
         os.environ['INPUT_ACTION'] = 'list'
         os.environ['INPUT_LIMIT'] = '2'
         
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['list_commits']  # git log
-        ]
+        # Set up detailed response patterns for main function
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0][0:2] == ['git', 'log'] and kwargs.get('text', True):
+                return commit_outputs['list_commits']
+            elif args[0] == ['git', 'config', 'user.name']:
+                raise subprocess.CalledProcessError(128, ['git', 'config', 'user.name'])
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
         
         # Act
         main()
@@ -382,10 +468,21 @@ class TestMainFunction:
         os.environ['INPUT_ACTION'] = 'cherry-pick'
         os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
         
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['get_commit_hash']  # git rev-parse --verify
-        ]
+        # Set up detailed response patterns for main function
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            elif args[0] == ['git', 'config', 'user.name']:
+                raise subprocess.CalledProcessError(128, ['git', 'config', 'user.name'])
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Reset mock_check_call to just return success
+        mock_subprocess['check_call'].side_effect = None
+        mock_subprocess['check_call'].return_value = 0
         
         # Act
         main()
@@ -402,11 +499,23 @@ class TestMainFunction:
         os.environ['INPUT_ACTION'] = 'revert'
         os.environ['INPUT_COMMIT_HASH'] = 'abc1234'
         
-        mock_subprocess['check_output'].side_effect = [
-            commit_outputs['git_version'],  # git --version
-            commit_outputs['get_commit_hash'],  # git rev-parse --verify
-            commit_outputs['revert_success']  # git rev-parse HEAD
-        ]
+        # Set up detailed response patterns for main function
+        def check_output_side_effect(*args, **kwargs):
+            if args[0] == ['git', '--version']:
+                return commit_outputs['git_version']
+            elif args[0] == ['git', 'rev-parse', '--verify', 'abc1234']:
+                return commit_outputs['get_commit_hash']
+            elif args[0] == ['git', 'rev-parse', 'HEAD'] and kwargs.get('text', False):
+                return commit_outputs['revert_success']
+            elif args[0] == ['git', 'config', 'user.name']:
+                raise subprocess.CalledProcessError(128, ['git', 'config', 'user.name'])
+            return ""
+            
+        mock_subprocess['check_output'].side_effect = check_output_side_effect
+        
+        # Reset mock_check_call to just return success
+        mock_subprocess['check_call'].side_effect = None
+        mock_subprocess['check_call'].return_value = 0
         
         # Act
         main()
