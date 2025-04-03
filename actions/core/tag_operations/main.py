@@ -27,6 +27,7 @@ class GitTagOperations:
                 subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError:
                 # If not set, configure a default identity for the action
+                # This is essential for creating annotated tags, as Git requires an identity
                 subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
                 subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
                 print("Configured default Git identity for tag operations")
