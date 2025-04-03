@@ -5,32 +5,19 @@ import sys
 import subprocess
 from typing import Optional, List, Dict, Union, Tuple
 
-# Use shared git_utils - establishing lateral relationship pattern
-try:
-    # Try importing from shared module first
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'shared')))
-    from git_utils import GitConfig, GitValidator, GitErrors
-except ImportError:
-    # Fall back to current directory path
-    try:
-        sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-        from git_utils import GitConfig, GitValidator, GitErrors
-    except ImportError:
-        print("Error: Cannot import shared git_utils. This is a critical dependency.")
-        sys.exit(1)
-
 class GitBranchOperations:
     """Handles atomic Git branch operations."""
     
     def __init__(self):
-        """Initialize with git configuration."""
-        self.git_config = GitConfig()
-        self.git_validator = GitValidator()
-        self.git_errors = GitErrors()
-        
-        # Configure git environment
-        self.git_config.setup_identity()
-        self.git_config.configure_safe_directory()
+        self._configure_git()
+    
+    def _configure_git(self) -> None:
+        """Configure git for safe directory operations."""
+        try:
+            subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
+        except subprocess.CalledProcessError as e:
+            print(f"Error configuring git: {e}")
+            sys.exit(1)
     
     def create_branch(self, branch_name: str, base_branch: Optional[str] = 'main') -> bool:
         """

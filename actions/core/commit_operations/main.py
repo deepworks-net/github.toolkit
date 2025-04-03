@@ -7,19 +7,10 @@ import re
 from typing import Optional, List, Dict, Union, Tuple, Any, Pattern
 from datetime import datetime
 
-# Use shared git_utils - lateral relationship pattern
-try:
-    # Try importing from shared module first
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'shared')))
-    from git_utils import GitConfig, GitValidator, GitErrors
-except ImportError:
-    # Fall back to current directory path
-    try:
-        sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-        from git_utils import GitConfig, GitValidator, GitErrors
-    except ImportError:
-        print("Error: Cannot import shared git_utils. This is a critical dependency.")
-        sys.exit(1)
+# Import local git_utils - keeping original behavior for now
+# while working towards the lateral relationship pattern
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+from git_utils import GitConfig, GitValidator, GitErrors
 
 class GitCommitOperations:
     """Handles atomic Git commit operations."""
