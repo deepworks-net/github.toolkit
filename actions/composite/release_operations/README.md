@@ -109,11 +109,17 @@ This action wraps multiple atomic Git operations to provide a comprehensive rele
 
 ## Implementation
 
-This action is a composite action that combines the following core actions:
-- `actions/core/branch_operations`
-- `actions/core/tag_operations`
-- `actions/core/commit_operations`
-- `actions/composite/update_changelog`
+This action is a composite action that implements a resonance-based modular architecture, combining the following actions through lateral relationships:
+
+- **Core Actions** (Atomic operations):
+  - `actions/core/branch_operations` - Manages Git branch creation and manipulation
+  - `actions/core/tag_operations` - Handles Git tag creation and management
+  - `actions/core/commit_operations` - Manages Git commit operations
+
+- **Composite Actions** (Combined operations):
+  - `actions/composite/update_changelog` - Updates the CHANGELOG.md file
+
+All components maintain peer-to-peer relationships rather than hierarchical dependencies, promoting a more flexible and maintainable codebase.
 
 ## Examples
 
