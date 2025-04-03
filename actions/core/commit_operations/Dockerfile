@@ -11,6 +11,7 @@ RUN apt-get update && \
     pip cache purge
 
 COPY main.py /main.py
+COPY git_utils.py /git_utils.py
 
 RUN chmod +x /main.py
 

@@ -4,41 +4,88 @@ import os
 import sys
 import subprocess
 import re
-from typing import Optional, List, Dict, Union, Tuple, Any
+from typing import Optional, List, Dict, Union, Tuple, Any, Pattern
 from datetime import datetime
+
+# Add current directory to path to find git_utils
+# The Docker build will copy these utilities directly with the script
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+try:
+    # Try importing directly
+    from git_utils import GitConfig, GitValidator, GitErrors
+except ImportError:
+    # Fall back to older implementation if git_utils are not available
+    print("Warning: git_utils module not found, falling back to internal implementation")
+    class GitConfig:
+        def __init__(self, workspace_path=None):
+            self.workspace_path = workspace_path or os.environ.get('GITHUB_WORKSPACE', '/github/workspace')
+        
+        def setup_identity(self):
+            try:
+                # Try to get current user.name
+                try:
+                    subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
+                except subprocess.CalledProcessError:
+                    # If not set, configure a default identity for the action
+                    subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
+                    subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
+                    print("Configured default Git identity for commit operations")
+                return True
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                print("Failed to set up Git identity")
+                return False
+        
+        def configure_safe_directory(self):
+            try:
+                subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', self.workspace_path])
+                return True
+            except subprocess.CalledProcessError:
+                print(f"Failed to add {self.workspace_path} as safe directory")
+                return False
+    
+    class GitValidator:
+        def is_valid_commit_message(self, message: str) -> bool:
+            """Validate a commit message."""
+            if not message or not message.strip():
+                return False
+            return True
+        
+        def pattern_to_regex(self, pattern: str) -> Pattern:
+            """Convert a glob pattern to regex."""
+            regex = re.escape(pattern)
+            regex = regex.replace('\\*', '.*').replace('\\?', '.')
+            regex = f'^{regex}$'
+            return re.compile(regex)
+    
+    class GitErrors:
+        def handle_git_error(self, error, context=None):
+            """Handle general Git errors."""
+            if context:
+                print(f"Error in {context}: {error}")
+            else:
+                print(f"Git error: {error}")
+            return str(error)
+        
+        def handle_commit_error(self, error, action, message=None):
+            """Handle commit-related errors."""
+            if message:
+                print(f"Error {action} commit '{message[:50]}...': {error}")
+            else:
+                print(f"Error {action} commit: {error}")
+            return str(error)
 
 class GitCommitOperations:
     """Handles atomic Git commit operations."""
     
     def __init__(self):
-        self._configure_git()
-    
-    def _configure_git(self) -> None:
-        """Configure git for safe directory operations."""
-        try:
-            # Check if git is available
-            subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
-            
-            # Configure safe directory
-            subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
-            
-            # Set default Git identity if not configured
-            try:
-                # Try to get current user.name
-                subprocess.check_output(['git', 'config', 'user.name'], stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError:
-                # If not set, configure a default identity for the action
-                # This is essential for creating commits, as Git requires an identity
-                subprocess.check_call(['git', 'config', '--global', 'user.name', 'GitHub Actions'])
-                subprocess.check_call(['git', 'config', '--global', 'user.email', 'github-actions@github.com'])
-                print("Configured default Git identity for commit operations")
-                
-        except FileNotFoundError:
-            print("Error: Git is not installed. Please ensure git is available in the container.")
-            sys.exit(1)
-        except subprocess.CalledProcessError as e:
-            print(f"Error configuring git: {e}")
-            sys.exit(1)
+        """Initialize with git configuration."""
+        self.git_config = GitConfig()
+        self.git_validator = GitValidator()
+        self.git_errors = GitErrors()
+        
+        # Configure git environment
+        self.git_config.setup_identity()
+        self.git_config.configure_safe_directory()
     
     def create_commit(self, message: str, files: Optional[List[str]] = None, 
                      no_verify: bool = False) -> Tuple[bool, Optional[str]]:
@@ -53,6 +100,12 @@ class GitCommitOperations:
         Returns:
             tuple: (success, commit_hash)
         """
+        # Validate commit message
+        if hasattr(self.git_validator, 'is_valid_commit_message'):
+            if not self.git_validator.is_valid_commit_message(message):
+                print(f"Invalid commit message: {message}")
+                return False, None
+        
         try:
             # Add files to staging if specified
             if files and len(files) > 0:
@@ -81,7 +134,10 @@ class GitCommitOperations:
             return True, commit_hash
             
         except subprocess.CalledProcessError as e:
-            print(f"Error creating commit: {e}")
+            if hasattr(self.git_errors, 'handle_commit_error'):
+                self.git_errors.handle_commit_error(e, 'creating', message)
+            else:
+                print(f"Error creating commit: {e}")
             return False, None
     
     def amend_commit(self, message: Optional[str] = None, files: Optional[List[str]] = None,
@@ -97,6 +153,12 @@ class GitCommitOperations:
         Returns:
             tuple: (success, commit_hash)
         """
+        # Validate commit message if provided
+        if message and hasattr(self.git_validator, 'is_valid_commit_message'):
+            if not self.git_validator.is_valid_commit_message(message):
+                print(f"Invalid commit message: {message}")
+                return False, None
+                
         try:
             # Add files to staging if specified
             if files and len(files) > 0:
@@ -123,7 +185,10 @@ class GitCommitOperations:
             return True, commit_hash
             
         except subprocess.CalledProcessError as e:
-            print(f"Error amending commit: {e}")
+            if hasattr(self.git_errors, 'handle_commit_error'):
+                self.git_errors.handle_commit_error(e, 'amending', message)
+            else:
+                print(f"Error amending commit: {e}")
             return False, None
     
     def list_commits(self, limit: int = 10, author: Optional[str] = None, 
@@ -178,7 +243,10 @@ class GitCommitOperations:
             return output.strip().split('\n') if output.strip() else []
             
         except subprocess.CalledProcessError as e:
-            print(f"Error listing commits: {e}")
+            if hasattr(self.git_errors, 'handle_git_error'):
+                self.git_errors.handle_git_error(e, "listing commits")
+            else:
+                print(f"Error listing commits: {e}")
             return []
     
     def get_commit_info(self, commit_hash: str, format: str = 'medium') -> Dict[str, str]:
@@ -197,7 +265,10 @@ class GitCommitOperations:
             try:
                 subprocess.check_output(['git', 'rev-parse', '--verify', commit_hash], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError:
-                print(f"Error: Commit {commit_hash} does not exist")
+                if hasattr(self.git_errors, 'handle_git_error'):
+                    self.git_errors.handle_git_error(f"Commit {commit_hash} does not exist", "get commit info")
+                else:
+                    print(f"Error: Commit {commit_hash} does not exist")
                 return {}
             
             # Get commit details
@@ -239,7 +310,10 @@ class GitCommitOperations:
             return {}
             
         except subprocess.CalledProcessError as e:
-            print(f"Error getting commit info: {e}")
+            if hasattr(self.git_errors, 'handle_git_error'):
+                self.git_errors.handle_git_error(e, f"getting info for commit {commit_hash}")
+            else:
+                print(f"Error getting commit info: {e}")
             return {}
     
     def cherry_pick_commit(self, commit_hash: str, no_verify: bool = False) -> bool:
@@ -258,7 +332,10 @@ class GitCommitOperations:
             try:
                 subprocess.check_output(['git', 'rev-parse', '--verify', commit_hash], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError:
-                print(f"Error: Commit {commit_hash} does not exist")
+                if hasattr(self.git_errors, 'handle_git_error'):
+                    self.git_errors.handle_git_error(f"Commit {commit_hash} does not exist", "cherry-pick")
+                else:
+                    print(f"Error: Commit {commit_hash} does not exist")
                 return False
             
             # Cherry-pick the commit
@@ -270,8 +347,11 @@ class GitCommitOperations:
             return True
             
         except subprocess.CalledProcessError as e:
-            print(f"Error cherry-picking commit {commit_hash}: {e}")
-            print("You may need to resolve conflicts manually")
+            if hasattr(self.git_errors, 'handle_commit_error'):
+                self.git_errors.handle_commit_error(e, 'cherry-picking')
+            else:
+                print(f"Error cherry-picking commit {commit_hash}: {e}")
+                print("You may need to resolve conflicts manually")
             return False
     
     def revert_commit(self, commit_hash: str, no_verify: bool = False) -> Tuple[bool, Optional[str]]:
@@ -290,7 +370,10 @@ class GitCommitOperations:
             try:
                 subprocess.check_output(['git', 'rev-parse', '--verify', commit_hash], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError:
-                print(f"Error: Commit {commit_hash} does not exist")
+                if hasattr(self.git_errors, 'handle_git_error'):
+                    self.git_errors.handle_git_error(f"Commit {commit_hash} does not exist", "revert")
+                else:
+                    print(f"Error: Commit {commit_hash} does not exist")
                 return False, None
             
             # Revert the commit
@@ -305,8 +388,11 @@ class GitCommitOperations:
             return True, revert_hash
             
         except subprocess.CalledProcessError as e:
-            print(f"Error reverting commit {commit_hash}: {e}")
-            print("You may need to resolve conflicts manually")
+            if hasattr(self.git_errors, 'handle_commit_error'):
+                self.git_errors.handle_commit_error(e, 'reverting')
+            else:
+                print(f"Error reverting commit {commit_hash}: {e}")
+                print("You may need to resolve conflicts manually")
             return False, None
     
     def _format_timestamp(self, timestamp: str) -> str:
