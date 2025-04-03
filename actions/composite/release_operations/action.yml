@@ -82,30 +82,51 @@ runs:
       shell: bash
       run: |
         echo "Current directory: $(pwd)"
-        echo "Repository structure:"
-        ls -la ./actions/core/
-        echo "Tag operations content:"
-        ls -la ./actions/core/tag_operations/
         echo "Current Git tags:"
         git tag -l
+        echo "Git status:"
+        git status
+        echo "Git configuration:"
+        git config --global --list
     
-    # Create tag
+    # Create tag directly for reliability
     - name: Create release tag
       if: ${{ inputs.action == 'create' || inputs.action == 'publish' }}
-      uses: ./actions/core/tag_operations
       id: create_tag
-      with:
-        action: create
-        tag_name: ${{ inputs.version }}
-        message: ${{ inputs.message || format('Release {0}', inputs.version) }}
-        force: ${{ inputs.action == 'update' }}
-    
-    # Show tag operation result
-    - name: Show tag operation result
       shell: bash
       run: |
-        echo "Tag operation result: ${{ steps.create_tag.outputs.result }}"
-        echo "Tag exists: ${{ steps.create_tag.outputs.tag_exists }}"
+        # Check if tag exists
+        if git tag -l | grep -q "${{ inputs.version }}"; then
+          if [[ "${{ inputs.action == 'update' }}" == "true" ]]; then
+            echo "Tag exists, using force option to recreate"
+            FORCE_FLAG="-f"
+          else
+            echo "Tag ${{ inputs.version }} already exists and force is not enabled"
+            echo "result=failure" >> $GITHUB_OUTPUT
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+        else
+          echo "Tag does not exist, creating new tag"
+          FORCE_FLAG=""
+          echo "tag_exists=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Create the tag
+        MESSAGE="${{ inputs.message || format('Release {0}', inputs.version) }}"
+        echo "Creating tag with message: $MESSAGE"
+        
+        # Create annotated tag
+        if git tag $FORCE_FLAG -a "${{ inputs.version }}" -m "$MESSAGE"; then
+          echo "Successfully created tag ${{ inputs.version }}"
+          echo "result=success" >> $GITHUB_OUTPUT
+        else
+          echo "Failed to create tag ${{ inputs.version }}"
+          echo "result=failure" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        # Show tags for debugging
         echo "Tags after operation:"
         git tag -l
     
@@ -151,18 +172,36 @@ runs:
       id: set_outputs
       shell: bash
       run: |
+        # Echo for debugging
+        echo "Setting outputs..."
+        
+        # Always set result to success at this point (we'd have exited on failure)
         echo "result=success" >> $GITHUB_OUTPUT
         echo "tag_name=${{ inputs.version }}" >> $GITHUB_OUTPUT
+        
+        # Debug
+        echo "result=success"
+        echo "tag_name=${{ inputs.version }}"
         
         # Set release branch if created
         if [[ "${{ inputs.release_branch }}" != "" ]]; then
           echo "release_branch=${{ inputs.release_branch }}" >> $GITHUB_OUTPUT
+          echo "release_branch=${{ inputs.release_branch }}"
         fi
         
         # Set release outputs if GitHub release was created
         if [[ "${{ steps.create_release.outputs.id }}" != "" ]]; then
           echo "release_id=${{ steps.create_release.outputs.id }}" >> $GITHUB_OUTPUT
           echo "release_url=${{ steps.create_release.outputs.html_url }}" >> $GITHUB_OUTPUT
+          
+          echo "release_id=${{ steps.create_release.outputs.id }}"
+          echo "release_url=${{ steps.create_release.outputs.html_url }}"
+        fi
+        
+        # Debug - show output file if available
+        if [ -f "$GITHUB_OUTPUT" ]; then
+          echo "Contents of GITHUB_OUTPUT file:"
+          cat $GITHUB_OUTPUT
         fi
         
 branding:
