@@ -66,7 +66,8 @@ class BridgeTestHarness:
         self.test_results['summary'][status] += 1
         
         # Print immediate feedback
-        status_icon = {'passed': '✓', 'failed': '✗', 'skipped': '○'}[status]
+        status_icons = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
+        status_icon = status_icons.get(status, '?')
         print(f"  {status_icon} {name}: {message}")
     
     def run_unit_tests(self):
@@ -302,23 +303,31 @@ class BridgeTestHarness:
                         content = f.read()
                     
                     # Skip header comments for parsing
-                    yaml_content = '\n'.join(line for line in content.split('\n') 
-                                           if not line.strip().startswith('#'))
+                    yaml_content = '\n'.join(
+                        line for line in content.split('\n') 
+                        if not line.strip().startswith('#')
+                    )
                     
                     config = yaml.safe_load(yaml_content)
                     
                     # Check required fields
                     required_fields = ['name', 'runs']
-                    missing_fields = [field for field in required_fields 
-                                    if field not in config]
+                    missing_fields = [
+                        field for field in required_fields 
+                        if field not in config
+                    ]
                     
                     if missing_fields:
-                        invalid_actions.append(f"{action_dir.name}: missing {missing_fields}")
+                        invalid_actions.append(
+                            f"{action_dir.name}: missing {missing_fields}"
+                        )
                     else:
                         valid_actions += 1
                         
                 except Exception as e:
-                    invalid_actions.append(f"{action_dir.name}: parse error - {str(e)}")
+                    invalid_actions.append(
+                        f"{action_dir.name}: parse error - {str(e)}"
+                    )
             
             if invalid_actions:
                 self.log_test("Action Structure", "failed", 

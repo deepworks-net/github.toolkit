@@ -2,30 +2,33 @@ name: Bridge Tests
 
 on:
   push:
+    branches: [main, develop]
     paths:
       - 'axioms/**/*.fcm'
       - '.bridge/**'
       - 'actions/**'
   pull_request:
+    branches: [main, develop]
     paths:
       - 'axioms/**/*.fcm'
       - '.bridge/**'
       - 'actions/**'
-  workflow_dispatch:
 
 jobs:
   bridge-validation:
-    runs-on: ubuntu-latest
     name: Bridge Architecture Validation
-    
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
+          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -36,7 +39,6 @@ jobs:
         run: |
           echo "=== Running Complete Bridge Test Suite ==="
           python .bridge/test-harness.py --all
-        continue-on-error: false
       
       - name: Validate Architecture Purity
         run: |
@@ -161,7 +163,7 @@ except Exception as e:
       
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bridge-test-results
           path: |
@@ -171,7 +173,7 @@ except Exception as e:
       
       - name: Comment Test Results
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
@@ -223,13 +225,12 @@ except Exception as e:
             });
 
   action-tests:
-    runs-on: ubuntu-latest
     name: Test Generated Actions
+    runs-on: ubuntu-latest
     needs: bridge-validation
     if: success()
-    
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
       
       - name: Test Tag Operations Action
