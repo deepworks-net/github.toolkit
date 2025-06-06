@@ -4,11 +4,12 @@
 
 
 
-## **06/06/2025 - v1.0.271 Unreleased**
+## **06/06/2025 - v1.0.275 Unreleased**
 ### What's Changed
+- Refines GitHub Action validation and test result reporting @mattbuske (#176)
 - Improves test infrastructure and updates workflow @mattbuske (#174)
 - FCM Updates @mattbuske (#172)
-#### **Full Changelog**: [v1.0.261...v1.0.271](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.271)
+#### **Full Changelog**: [v1.0.261...v1.0.275](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.275)
 
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
