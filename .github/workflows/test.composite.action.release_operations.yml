@@ -144,7 +144,6 @@ jobs:
           version: v0.2.0-test
           message: "Test release with branch"
           release_branch: release/0.2.0-test
-          target_branch: develop/bridge-tests
           tag_only: true
           update_changelog: false
       
