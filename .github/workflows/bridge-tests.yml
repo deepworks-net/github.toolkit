@@ -1,0 +1,313 @@
+name: Bridge Tests
+
+on:
+  push:
+    paths:
+      - 'axioms/**/*.fcm'
+      - '.bridge/**'
+      - 'actions/**'
+  pull_request:
+    paths:
+      - 'axioms/**/*.fcm'
+      - '.bridge/**'
+      - 'actions/**'
+  workflow_dispatch:
+
+jobs:
+  bridge-validation:
+    runs-on: ubuntu-latest
+    name: Bridge Architecture Validation
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+      
+      - name: Run Bridge Test Harness
+        run: |
+          echo "=== Running Complete Bridge Test Suite ==="
+          python .bridge/test-harness.py --all
+        continue-on-error: false
+      
+      - name: Validate Architecture Purity
+        run: |
+          echo "=== Validating FCM Architecture Purity ==="
+          if [ -f .bridge/validator.py ]; then
+            python .bridge/validator.py
+          else
+            echo "Running shell-based validation..."
+            bash .bridge/validate.sh
+          fi
+      
+      - name: Test Generated Actions Structure
+        run: |
+          echo "=== Testing Generated Action Structure ==="
+          
+          # Check that all generated actions have required files
+          for action_dir in actions/core/*/; do
+            if [ -d "$action_dir" ]; then
+              action_name=$(basename "$action_dir")
+              echo "Checking action: $action_name"
+              
+              # Check for required files
+              if [ ! -f "$action_dir/action.yml" ]; then
+                echo "❌ Missing action.yml in $action_name"
+                exit 1
+              fi
+              
+              if [ ! -f "$action_dir/Dockerfile" ]; then
+                echo "❌ Missing Dockerfile in $action_name"
+                exit 1
+              fi
+              
+              # Check for generation markers in generated actions
+              if [ -f "$action_dir/.bridge-sync" ]; then
+                echo "✅ $action_name has bridge sync file"
+                
+                # Verify action.yml has generation header
+                if grep -q "# Generated from" "$action_dir/action.yml"; then
+                  echo "✅ $action_name action.yml has generation header"
+                else
+                  echo "❌ $action_name action.yml missing generation header"
+                  exit 1
+                fi
+              else
+                echo "⚠️  $action_name appears to be manually created (no .bridge-sync)"
+              fi
+              
+              echo ""
+            fi
+          done
+      
+      - name: Test FCM-to-Action Generation
+        run: |
+          echo "=== Testing FCM-to-Action Generation ==="
+          
+          # Test generation with minimal FCM
+          if [ -f .bridge/tests/fixtures/minimal.fcm ]; then
+            echo "Testing generation with minimal.fcm..."
+            
+            if [ -f .bridge/generator.py ]; then
+              # Python-based generation
+              python .bridge/generator.py .bridge/tests/fixtures/minimal.fcm
+            else
+              # Shell-based generation
+              bash .bridge/generate.sh .bridge/tests/fixtures/minimal.fcm
+            fi
+            
+            # Verify output
+            if [ -f actions/core/minimal/action.yml ]; then
+              echo "✅ Successfully generated action from minimal FCM"
+            else
+              echo "❌ Failed to generate action from minimal FCM"
+              exit 1
+            fi
+          else
+            echo "⚠️  Minimal test FCM not found, skipping generation test"
+          fi
+      
+      - name: Verify GitHub Actions Compatibility
+        run: |
+          echo "=== Verifying GitHub Actions Compatibility ==="
+          
+          # Check that all action.yml files are valid YAML
+          for action_yml in actions/core/*/action.yml; do
+            if [ -f "$action_yml" ]; then
+              action_name=$(basename "$(dirname "$action_yml")")
+              echo "Validating $action_name..."
+              
+              # Basic YAML validation using Python
+              python -c "
+import yaml
+import sys
+try:
+    with open('$action_yml', 'r') as f:
+        content = f.read()
+    
+    # Skip header comments for YAML parsing
+    yaml_content = '\n'.join(line for line in content.split('\n') if not line.strip().startswith('#'))
+    config = yaml.safe_load(yaml_content)
+    
+    # Check required GitHub Action fields
+    required_fields = ['name', 'runs']
+    missing = [field for field in required_fields if field not in config]
+    
+    if missing:
+        print(f'❌ Missing required fields in $action_name: {missing}')
+        sys.exit(1)
+    
+    # Check runs configuration
+    if 'using' not in config['runs']:
+        print(f'❌ Missing runs.using in $action_name')
+        sys.exit(1)
+    
+    print(f'✅ $action_name is valid GitHub Action')
+    
+except Exception as e:
+    print(f'❌ Error validating $action_name: {e}')
+    sys.exit(1)
+"
+            fi
+          done
+      
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: bridge-test-results
+          path: |
+            .bridge/test-results.json
+            .bridge/validation-report.txt
+          retention-days: 30
+      
+      - name: Comment Test Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '## 🔗 Bridge Test Results\n\n';
+            
+            try {
+              // Read test results if available
+              if (fs.existsSync('.bridge/test-results.json')) {
+                const results = JSON.parse(fs.readFileSync('.bridge/test-results.json', 'utf8'));
+                const summary = results.summary;
+                
+                comment += `### Test Summary\n`;
+                comment += `- **Total Tests**: ${summary.total}\n`;
+                comment += `- **Passed**: ${summary.passed} ✅\n`;
+                comment += `- **Failed**: ${summary.failed} ${summary.failed > 0 ? '❌' : ''}\n`;
+                comment += `- **Skipped**: ${summary.skipped} ⏭️\n`;
+                
+                const successRate = summary.total > 0 ? (summary.passed / summary.total * 100).toFixed(1) : 0;
+                comment += `- **Success Rate**: ${successRate}%\n\n`;
+                
+                if (summary.failed > 0) {
+                  comment += `### Failed Tests\n`;
+                  const failedTests = results.tests.filter(t => t.status === 'failed');
+                  failedTests.forEach(test => {
+                    comment += `- ❌ **${test.name}**: ${test.message}\n`;
+                  });
+                  comment += '\n';
+                }
+              } else {
+                comment += 'Test results file not found.\n\n';
+              }
+            } catch (error) {
+              comment += `Error reading test results: ${error.message}\n\n`;
+            }
+            
+            comment += `### Architecture Status\n`;
+            comment += `- FCM Definitions: \`axioms/\`\n`;
+            comment += `- Generated Actions: \`actions/core/\`\n`;
+            comment += `- Bridge Infrastructure: \`.bridge/\`\n\n`;
+            comment += `For detailed results, check the workflow artifacts.`;
+            
+            // Post comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  action-tests:
+    runs-on: ubuntu-latest
+    name: Test Generated Actions
+    needs: bridge-validation
+    if: success()
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Test Tag Operations Action
+        run: |
+          echo "=== Testing Tag Operations Action ==="
+          
+          # Set up git for testing
+          git config user.name "Test User"
+          git config user.email "test@example.com"
+          
+          # Test the generated tag-operations action if it exists
+          if [ -d "actions/core/tag-operations" ]; then
+            echo "Found generated tag-operations action"
+            
+            # For now, just verify the structure since we can't run Docker in this context
+            echo "Verifying action structure..."
+            
+            if [ -f "actions/core/tag-operations/action.yml" ] && \
+               [ -f "actions/core/tag-operations/Dockerfile" ] && \
+               [ -f "actions/core/tag-operations/entrypoint.sh" ]; then
+              echo "✅ Tag operations action has complete structure"
+            else
+              echo "❌ Tag operations action missing required files"
+              exit 1
+            fi
+          else
+            echo "⚠️  Generated tag-operations action not found"
+          fi
+      
+      - name: Validate Action Inputs/Outputs
+        run: |
+          echo "=== Validating Action Interfaces ==="
+          
+          # Check that generated actions have sensible inputs/outputs
+          for action_dir in actions/core/*/; do
+            if [ -f "$action_dir/action.yml" ] && [ -f "$action_dir/.bridge-sync" ]; then
+              action_name=$(basename "$action_dir")
+              echo "Checking interface for $action_name..."
+              
+              # Use Python to parse and validate the action interface
+              python -c "
+import yaml
+import sys
+
+try:
+    with open('$action_dir/action.yml', 'r') as f:
+        content = f.read()
+    
+    # Skip header comments
+    yaml_content = '\n'.join(line for line in content.split('\n') if not line.strip().startswith('#'))
+    config = yaml.safe_load(yaml_content)
+    
+    # Validate inputs
+    inputs = config.get('inputs', {})
+    if not inputs:
+        print(f'⚠️  $action_name has no inputs')
+    else:
+        for input_name, input_config in inputs.items():
+            if 'description' not in input_config:
+                print(f'❌ $action_name input {input_name} missing description')
+                sys.exit(1)
+            if 'required' not in input_config:
+                print(f'❌ $action_name input {input_name} missing required field')
+                sys.exit(1)
+        print(f'✅ $action_name has {len(inputs)} valid inputs')
+    
+    # Validate outputs
+    outputs = config.get('outputs', {})
+    if outputs:
+        for output_name, output_config in outputs.items():
+            if 'description' not in output_config:
+                print(f'❌ $action_name output {output_name} missing description')
+                sys.exit(1)
+        print(f'✅ $action_name has {len(outputs)} valid outputs')
+    
+except Exception as e:
+    print(f'❌ Error validating $action_name interface: {e}')
+    sys.exit(1)
+"
+            fi
+          done

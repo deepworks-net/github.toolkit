@@ -1,0 +1,27 @@
+# Minimal Test FCM
+Model: test.minimal
+Version: 1.0.0
+Layer: Axiom
+Domain: test
+
+Capability: Minimal test action for bridge validation
+
+Parameters:
+  - message: string
+  - optional_param: string (optional)
+
+Outputs:
+  - result
+  - status
+
+Interface:
+  type: docker
+  image: python:3.9-slim
+  requirements: []
+
+Dependencies:
+  - echo
+
+Patterns:
+  - test-action
+  - minimal-operation
