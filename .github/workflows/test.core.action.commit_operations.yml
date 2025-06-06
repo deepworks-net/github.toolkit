@@ -49,6 +49,7 @@ jobs:
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           
           # Initialize a clean environment
           git checkout -b test-commits || true
