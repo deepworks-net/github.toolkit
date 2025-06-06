@@ -1,0 +1,19 @@
+# Expected output for minimal.fcm
+name: Minimal
+description: Minimal test action for bridge validation
+inputs:
+  message:
+    description: Message
+    required: true
+  optional_param:
+    description: Optional Param
+    required: false
+    default: ''
+outputs:
+  result:
+    description: Result
+  status:
+    description: Status
+runs:
+  using: docker
+  image: Dockerfile
