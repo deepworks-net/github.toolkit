@@ -92,6 +92,13 @@ jobs:
             exit 1
           fi
       
+      # Fix permissions after Docker action
+      - name: Fix file permissions
+        run: |
+          # Docker actions may create files with different ownership
+          # Fix permissions to allow subsequent operations
+          sudo chown -R $USER:$USER .
+          
       # Create another change for amending
       - name: Create change for amend
         run: |
