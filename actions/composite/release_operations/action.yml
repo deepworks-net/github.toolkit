@@ -124,11 +124,29 @@ runs:
         # Final check and branch creation
         if git rev-parse --verify "$TARGET_BRANCH" &>/dev/null; then
           echo "Creating branch ${{ inputs.release_branch }} from $TARGET_BRANCH"
-          git checkout -b "${{ inputs.release_branch }}" "$TARGET_BRANCH"
           
-          # Push to remote if requested
-          git push -u origin "${{ inputs.release_branch }}"
-          echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+          # Check if release branch already exists locally or remotely
+          if git show-ref --verify --quiet "refs/heads/${{ inputs.release_branch }}" || \
+             git show-ref --verify --quiet "refs/remotes/origin/${{ inputs.release_branch }}"; then
+            echo "Branch ${{ inputs.release_branch }} already exists, deleting and recreating for test"
+            
+            # Delete local branch if it exists
+            git branch -D "${{ inputs.release_branch }}" 2>/dev/null || true
+            
+            # Create new branch
+            git checkout -b "${{ inputs.release_branch }}" "$TARGET_BRANCH"
+            
+            # Force push to overwrite remote branch for testing
+            git push -f -u origin "${{ inputs.release_branch }}"
+            echo "Successfully recreated and force pushed branch ${{ inputs.release_branch }}"
+          else
+            # Create new branch normally
+            git checkout -b "${{ inputs.release_branch }}" "$TARGET_BRANCH"
+            
+            # Push to remote
+            git push -u origin "${{ inputs.release_branch }}"
+            echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+          fi
         else
           echo "Error: Could not find any suitable target branch for release branch creation"
           echo "Available branches:"
