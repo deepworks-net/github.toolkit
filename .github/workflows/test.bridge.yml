@@ -24,6 +24,12 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory /github/workspace
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -233,13 +239,15 @@ except Exception as e:
       - name: Checkout Repository
         uses: actions/checkout@v4
       
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory /github/workspace
+      
       - name: Test Tag Operations Action
         run: |
           echo "=== Testing Tag Operations Action ==="
-          
-          # Set up git for testing
-          git config user.name "Test User"
-          git config user.email "test@example.com"
           
           # Test the generated tag-operations action if it exists
           if [ -d "actions/core/tag-operations" ]; then
