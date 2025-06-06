@@ -2,6 +2,29 @@
 
 A collection of reusable GitHub Actions workflows and core actions for standardizing development processes across repositories.
 
+## Architecture
+
+This repository follows a **six-layer architecture** based on Formal Conceptual Models (FCM) that maintains GitHub compatibility while achieving architectural purity:
+
+### Six-Layer Structure
+
+1. **Axioms** (`axioms/`) - Foundational capabilities defined as FCM models
+2. **Logic** (`logic/`) - Compositions and relationships between axioms  
+3. **Patterns** (`patterns/`) - Reusable workflow patterns
+4. **Mechanics** (`mechanics/`) - Implementation templates and operational structures
+5. **Reflection** (`reflection/`) - Self-awareness and analysis capabilities
+6. **Emergence** (`emergence/`) - Discovered patterns and emergent capabilities
+
+### Bridge System
+
+The repository uses a **bridge architecture** to maintain GitHub Actions compatibility:
+
+- **Source Layer**: FCM definitions in `axioms/`, `logic/`, `patterns/`
+- **Interface Layer**: GitHub-compatible actions in `actions/`
+- **Bridge Layer**: Automated generation via `.bridge/` tools
+
+All GitHub Actions are **generated** from FCM sources, ensuring consistency and eliminating manual configuration drift.
+
 ## Available Components
 
 ### Core Actions
@@ -81,9 +104,31 @@ The workflows maintain the following changelog format:
 
 ## Setup Instructions
 
+### Using Generated Actions
+
 1. Copy the desired workflow files to your repository's `.github/workflows/` directory
 2. For core actions, reference them in your workflows using the `uses` syntax
 3. No additional configuration needed - workflows use repository context for variables
+
+### Working with FCM Architecture
+
+1. **View capabilities**: Browse `axioms/` directories for available FCM definitions
+2. **Modify actions**: Edit FCM files in `axioms/`, then regenerate using `.bridge/generator.py`
+3. **Validate consistency**: Run `.bridge/validator.py` to ensure alignment
+4. **Never edit directly**: Actions in `actions/` are generated - changes will be overwritten
+
+### Bridge Commands
+
+```bash
+# Generate all actions from FCMs
+./.bridge/generator.py --generate-all
+
+# Generate specific action
+./.bridge/generator.py axioms/git/tag-operations.fcm
+
+# Validate bridge alignment
+./.bridge/validator.py
+```
 
 ## Requirements
 

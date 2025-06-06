@@ -1,0 +1,37 @@
+# Tag Operations Axiom - Formal Conceptual Model
+Model: git.tag-operations
+Version: 1.0.0
+Layer: Axiom
+Domain: git
+
+Capability: Manage git tags with create, delete, list, push, and check operations
+
+Parameters:
+  - action: create|delete|list|push|check
+  - tag_name: string (optional)
+  - message: string (optional)
+  - remote: boolean (optional)
+  - force: boolean (optional)
+  - target_commit: string (optional)
+  - prefix: string (optional)
+
+Outputs:
+  - tag_created
+  - tag_deleted
+  - tags_list
+  - tag_exists
+  - operation_status
+
+Interface:
+  type: docker
+  image: python:3.9-slim
+  requirements: [git]
+
+Dependencies:
+  - git
+  - github-token (optional)
+
+Patterns:
+  - git-operation
+  - tag-management
+  - version-control
