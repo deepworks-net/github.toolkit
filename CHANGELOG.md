@@ -4,13 +4,14 @@
 
 
 
-## **06/06/2025 - v1.0.278 Unreleased**
+## **06/06/2025 - v1.0.281 Unreleased**
 ### What's Changed
+- fix: Add current directory to safe directories in commit operations @mattbuske (#178)
 - fix: Add safe directory config to commit operations test workflow @mattbuske (#177)
 - Refines GitHub Action validation and test result reporting @mattbuske (#176)
 - Improves test infrastructure and updates workflow @mattbuske (#174)
 - FCM Updates @mattbuske (#172)
-#### **Full Changelog**: [v1.0.261...v1.0.278](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.278)
+#### **Full Changelog**: [v1.0.261...v1.0.281](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.281)
 
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
