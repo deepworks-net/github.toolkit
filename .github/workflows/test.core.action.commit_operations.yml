@@ -2,6 +2,7 @@ name: Test Core Commit Operations
 
 on:
   push:
+    branches: [main, staging, develop/*, feature/*]
     paths:
       - 'actions/core/commit_operations/**'
       - '.github/workflows/test.core.action.commit_operations.yml'
@@ -10,6 +11,11 @@ on:
       - 'actions/core/commit_operations/**'
       - '.github/workflows/test.core.action.commit_operations.yml'
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug logging'
+        required: false
+        default: 'false'
 
 jobs:
   test-unit:
@@ -92,6 +98,13 @@ jobs:
             exit 1
           fi
       
+      # Fix permissions after Docker action
+      - name: Fix file permissions
+        run: |
+          # Docker actions may create files with different ownership
+          # Fix permissions to allow subsequent operations
+          sudo chown -R $USER:$USER .
+          
       # Create another change for amending
       - name: Create change for amend
         run: |

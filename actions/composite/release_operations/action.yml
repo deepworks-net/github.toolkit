@@ -83,17 +83,75 @@ runs:
       if: ${{ inputs.action == 'create' && inputs.release_branch != '' }}
       shell: bash
       run: |
-        # Check if target branch exists
-        if git rev-parse --verify "${{ inputs.target_branch }}" &>/dev/null; then
-          # Create and checkout new branch
-          echo "Creating branch ${{ inputs.release_branch }} from ${{ inputs.target_branch }}"
-          git checkout -b "${{ inputs.release_branch }}" "${{ inputs.target_branch }}"
+        # Determine the actual target branch to use
+        TARGET_BRANCH="${{ inputs.target_branch }}"
+        
+        # If target branch doesn't exist, try to use current branch
+        if ! git rev-parse --verify "$TARGET_BRANCH" &>/dev/null; then
+          echo "Warning: Target branch $TARGET_BRANCH does not exist"
           
-          # Push to remote if requested
-          git push -u origin "${{ inputs.release_branch }}"
-          echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+          # Get current branch name
+          CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+          
+          if [[ -n "$CURRENT_BRANCH" && "$CURRENT_BRANCH" != "HEAD" ]]; then
+            echo "Using current branch: $CURRENT_BRANCH"
+            TARGET_BRANCH="$CURRENT_BRANCH"
+          else
+            # If we're in detached HEAD, try to find a suitable branch
+            echo "In detached HEAD state, looking for available branches..."
+            
+            # Try common branch names in order of preference
+            for branch in "main" "master" "develop" "staging"; do
+              if git rev-parse --verify "$branch" &>/dev/null; then
+                echo "Using available branch: $branch"
+                TARGET_BRANCH="$branch"
+                break
+              fi
+            done
+            
+            # If still no branch found, try the first available remote branch
+            if ! git rev-parse --verify "$TARGET_BRANCH" &>/dev/null; then
+              REMOTE_BRANCH=$(git branch -r | grep -v 'HEAD' | head -1 | sed 's/^ *origin\///' | xargs)
+              if [[ -n "$REMOTE_BRANCH" ]]; then
+                echo "Using remote branch: $REMOTE_BRANCH"
+                git checkout -b "$REMOTE_BRANCH" "origin/$REMOTE_BRANCH" || true
+                TARGET_BRANCH="$REMOTE_BRANCH"
+              fi
+            fi
+          fi
+        fi
+        
+        # Final check and branch creation
+        if git rev-parse --verify "$TARGET_BRANCH" &>/dev/null; then
+          echo "Creating branch ${{ inputs.release_branch }} from $TARGET_BRANCH"
+          
+          # Check if release branch already exists locally or remotely
+          if git show-ref --verify --quiet "refs/heads/${{ inputs.release_branch }}" || \
+             git show-ref --verify --quiet "refs/remotes/origin/${{ inputs.release_branch }}"; then
+            echo "Branch ${{ inputs.release_branch }} already exists, deleting and recreating for test"
+            
+            # Delete local branch if it exists
+            git branch -D "${{ inputs.release_branch }}" 2>/dev/null || true
+            
+            # Create new branch
+            git checkout -b "${{ inputs.release_branch }}" "$TARGET_BRANCH"
+            
+            # Force push to overwrite remote branch for testing
+            git push -f -u origin "${{ inputs.release_branch }}"
+            echo "Successfully recreated and force pushed branch ${{ inputs.release_branch }}"
+          else
+            # Create new branch normally
+            git checkout -b "${{ inputs.release_branch }}" "$TARGET_BRANCH"
+            
+            # Push to remote
+            git push -u origin "${{ inputs.release_branch }}"
+            echo "Successfully created and pushed branch ${{ inputs.release_branch }}"
+          fi
         else
-          echo "Warning: Target branch ${{ inputs.target_branch }} does not exist, skipping branch creation"
+          echo "Error: Could not find any suitable target branch for release branch creation"
+          echo "Available branches:"
+          git branch -a
+          exit 1
         fi
     
     # Debug environment
