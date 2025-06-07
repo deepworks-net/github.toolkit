@@ -41,16 +41,23 @@ for action_dir in actions/core/* actions/composite/*; do
             ((errors++))
         fi
         
-        # Check bridge sync
+        # Check bridge sync (only for generated actions)
         if [[ ! -f "$bridge_sync" ]]; then
-            echo "  ! WARNING: Missing .bridge-sync metadata"
-            ((warnings++))
+            # Check if this is a generated action or original
+            if grep -q "# GENERATED FILE" "$action_yml" 2>/dev/null; then
+                echo "  ✗ ERROR: Generated action missing .bridge-sync metadata"
+                ((errors++))
+            else
+                echo "  - Original action (not bridge-generated)"
+            fi
         else
             # Verify FCM source exists
-            source_fcm=$(grep '"source_fcm"' "$bridge_sync" | cut -d'"' -f4)
-            if [[ ! -f "$source_fcm" ]]; then
+            source_fcm=$(grep '"source_fcm"' "$bridge_sync" | sed 's/.*"source_fcm":[[:space:]]*"\([^"]*\)".*/\1/')
+            if [[ -n "$source_fcm" ]] && [[ ! -f "$source_fcm" ]]; then
                 echo "  ✗ ERROR: Source FCM missing: $source_fcm"
                 ((errors++))
+            elif [[ -f "$source_fcm" ]]; then
+                echo "  ✓ Source FCM verified: $source_fcm"
             fi
         fi
         
