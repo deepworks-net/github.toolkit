@@ -15,6 +15,14 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
+# Custom YAML representer to properly quote strings with colons
+def str_presenter(dumper, data):
+    if ':' in data:
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='"')
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+yaml.add_representer(str, str_presenter)
+
 class FCMParser:
     """Parse FCM (Formal Conceptual Model) files."""
     
@@ -223,7 +231,9 @@ class FCMToActionBridge:
         action_yml_path = output_dir / 'action.yml'
         with open(action_yml_path, 'w') as f:
             f.write(header_comment)
-            yaml.dump(action_yml, f, default_flow_style=False, sort_keys=False)
+            # Use safe dumper with proper string quoting for special characters
+            yaml.dump(action_yml, f, default_flow_style=False, sort_keys=False, 
+                     allow_unicode=True, width=1000)
         
         # Generate Dockerfile
         self._generate_dockerfile(fcm, output_dir)
