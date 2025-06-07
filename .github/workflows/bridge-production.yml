@@ -7,7 +7,6 @@ on:
       - '.bridge/**'
     tags:
       - 'v*'
-      - 'prep*'
   pull_request:
     paths:
       - 'axioms/**/*.fcm'
