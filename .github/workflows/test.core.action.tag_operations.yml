@@ -5,6 +5,8 @@ on:
     paths:
       - 'actions/core/tag_operations/**'
       - '.github/workflows/test.core.action.tag_operations.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     paths:
       - 'actions/core/tag_operations/**'

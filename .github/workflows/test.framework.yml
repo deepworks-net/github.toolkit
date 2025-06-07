@@ -6,6 +6,8 @@ on:
     paths:
       - 'actions/**/*.py'
       - '.github/workflows/test.framework.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     branches: [main, develop]
     paths:

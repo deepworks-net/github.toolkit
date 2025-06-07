@@ -7,6 +7,8 @@ on:
       - 'axioms/**/*.fcm'
       - '.bridge/**'
       - 'actions/**'
+    tags-ignore:
+      - '**'
   pull_request:
     branches: [main, develop]
     paths:

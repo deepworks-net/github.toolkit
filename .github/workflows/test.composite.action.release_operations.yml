@@ -5,6 +5,8 @@ on:
     paths:
       - 'actions/composite/release_operations/**'
       - '.github/workflows/test.composite.action.release_operations.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     paths:
       - 'actions/composite/release_operations/**'

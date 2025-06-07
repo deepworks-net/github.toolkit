@@ -6,6 +6,8 @@ on:
     paths:
       - 'actions/core/git-ops/tag/**'
       - '.github/workflows/test.action.git_ops.tag.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     branches: [ main, staging ]
     paths:
