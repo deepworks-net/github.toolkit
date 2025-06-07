@@ -1,0 +1,7 @@
+{
+  "source_fcm": "axioms/git/commit-operations.fcm",
+  "generated_at": "2025-06-07T15:22:50Z",
+  "generator_version": "stage3-bash-1.0",
+  "model": "git.commit-operations",
+  "version": "1.0.0"
+}

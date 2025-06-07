@@ -1,0 +1,38 @@
+# Branch Operations Axiom - Formal Conceptual Model
+Model: git.branch-operations
+Version: 1.0.0
+Layer: Axiom
+Domain: git
+
+Capability: Manage git branches with create, delete, list, checkout, and merge operations
+
+Parameters:
+  - action: create|delete|list|checkout|merge
+  - branch_name: string (optional)
+  - target_branch: string (optional)
+  - remote: boolean (optional)
+  - force: boolean (optional)
+  - include_remote: boolean (optional)
+  - pattern: string (optional)
+
+Outputs:
+  - branch_created
+  - branch_deleted
+  - branches_list
+  - current_branch
+  - merge_result
+  - operation_status
+
+Interface:
+  type: docker
+  image: python:3.9-slim
+  requirements: [git]
+
+Dependencies:
+  - git
+  - github-token (optional)
+
+Patterns:
+  - git-operation
+  - branch-management
+  - version-control
