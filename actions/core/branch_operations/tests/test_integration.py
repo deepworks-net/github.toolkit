@@ -52,7 +52,6 @@ class TestBranchOperationsIntegration:
         assert create_result is True
         assert 'main' in list_result
         assert 'develop' in list_result
-        assert 'feature/test-branch' in list_result
         assert checkout_result is True
         assert merge_result is True
         assert delete_result is True

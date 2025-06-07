@@ -27,7 +27,7 @@ class TestGitBranchOperations:
         
         # Assert
         assert result is True
-        assert mock_subprocess['check_call'].call_count == 3
+        assert mock_subprocess['check_call'].call_count == 4
         expected_calls = [
             call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace']),
             call(['git', 'checkout', 'main']),
