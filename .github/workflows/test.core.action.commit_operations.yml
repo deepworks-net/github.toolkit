@@ -2,6 +2,7 @@ name: Test Core Commit Operations
 
 on:
   push:
+    branches: [main, staging, develop/*, feature/*]
     paths:
       - 'actions/core/commit_operations/**'
       - '.github/workflows/test.core.action.commit_operations.yml'
@@ -10,16 +11,21 @@ on:
       - 'actions/core/commit_operations/**'
       - '.github/workflows/test.core.action.commit_operations.yml'
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug logging'
+        required: false
+        default: 'false'
 
 jobs:
   test-unit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
       
@@ -43,12 +49,13 @@ jobs:
     needs: [test-unit]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup test environment
         run: |
           git config --global user.email "test@github.com"
           git config --global user.name "Test User"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           
           # Initialize a clean environment
           git checkout -b test-commits || true
@@ -91,6 +98,13 @@ jobs:
             exit 1
           fi
       
+      # Fix permissions after Docker action
+      - name: Fix file permissions
+        run: |
+          # Docker actions may create files with different ownership
+          # Fix permissions to allow subsequent operations
+          sudo chown -R $USER:$USER .
+          
       # Create another change for amending
       - name: Create change for amend
         run: |
