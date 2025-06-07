@@ -1,0 +1,16 @@
+# Minimal FCM for Bridge Testing
+Model: test.minimal
+Version: 1.0.0
+Layer: Axiom
+Domain: test
+
+Capability: Test minimal bridge functionality
+
+Parameters:
+  - message: string
+
+Outputs:
+  - result
+
+Interface:
+  type: composite
