@@ -4,8 +4,9 @@
 
 
 
-## **06/07/2025 - v1.0.292 Unreleased**
+## **06/07/2025 - v1.0.295 Unreleased**
 ### What's Changed
+- feat: Configure Dependabot to target staging branch @mattbuske (#183)
 - feat: Add cleanup step for test release branches and tags @mattbuske (#182)
 - Improves branch management in workflows @mattbuske (#181)
 - fix: Add current directory to safe directories in commit operations @mattbuske (#178)
@@ -13,7 +14,7 @@
 - Refines GitHub Action validation and test result reporting @mattbuske (#176)
 - Improves test infrastructure and updates workflow @mattbuske (#174)
 - FCM Updates @mattbuske (#172)
-#### **Full Changelog**: [v1.0.261...v1.0.292](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.292)
+#### **Full Changelog**: [v1.0.261...v1.0.295](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.295)
 
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
