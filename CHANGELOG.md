@@ -4,8 +4,9 @@
 
 
 
-## **06/07/2025 - v1.0.311 Unreleased**
+## **[(06/07/2025) - v1.0.321](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.321)**
 ### What's Changed
+- Enhances FCM-to-GitHub Actions bridge for production deployment @mattbuske (#195)
 - Enhances YAML handling and updates dependencies @mattbuske (#191)
 - Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @mattbuske (#190)
 - Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @[dependabot[bot]](https://github.com/apps/dependabot) (#170)
@@ -22,7 +23,7 @@
 - Refines GitHub Action validation and test result reporting @mattbuske (#176)
 - Improves test infrastructure and updates workflow @mattbuske (#174)
 - FCM Updates @mattbuske (#172)
-#### **Full Changelog**: [v1.0.261...v1.0.311](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.311)
+#### **Full Changelog**: [v1.0.261...v1.0.321](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.321)
 
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
