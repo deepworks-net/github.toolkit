@@ -4,7 +4,7 @@
 
 
 
-## **06/07/2025 - v1.0.311 Unreleased**
+## **[(06/07/2025) - v1.0.312](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.312)**
 ### What's Changed
 - Enhances YAML handling and updates dependencies @mattbuske (#191)
 - Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @mattbuske (#190)
