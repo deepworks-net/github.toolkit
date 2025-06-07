@@ -1,0 +1,57 @@
+# FCM Bridge Makefile
+# Production operations for the FCM-to-GitHub bridge
+
+.PHONY: all generate validate clean sync check help
+
+# Default target
+all: generate validate
+
+# Generate all actions from FCMs
+generate:
+	@echo "Generating actions from FCMs..."
+	@bash .bridge/production-generator.sh
+
+# Validate all generated actions
+validate:
+	@echo "Validating generated actions..."
+	@bash .bridge/production-validator.sh
+
+# Clean generated files (preserving FCMs)
+clean:
+	@echo "Cleaning generated actions..."
+	@find actions -name ".bridge-sync" -type f -delete
+	@echo "Removed bridge sync files"
+
+# Sync check - verify generated files match FCMs
+sync:
+	@echo "Checking FCM-Action synchronization..."
+	@for sync_file in $$(find actions -name ".bridge-sync"); do \
+		fcm=$$(grep '"source_fcm"' "$$sync_file" | cut -d'"' -f4); \
+		if [[ -f "$$fcm" ]]; then \
+			fcm_sum=$$(sha256sum "$$fcm" | cut -d' ' -f1); \
+			sync_sum=$$(grep '"checksum"' "$$sync_file" | cut -d'"' -f4); \
+			if [[ "$$fcm_sum" != "$$sync_sum" ]]; then \
+				echo "  ✗ Out of sync: $$fcm"; \
+			fi \
+		fi \
+	done
+
+# Check if regeneration needed
+check:
+	@echo "Checking if regeneration needed..."
+	@bash -c 'if make -s sync | grep -q "Out of sync"; then \
+		echo "Regeneration needed - run: make generate"; \
+		exit 1; \
+	else \
+		echo "All actions in sync with FCMs"; \
+	fi'
+
+# Help target
+help:
+	@echo "FCM Bridge Production Commands:"
+	@echo "  make generate  - Generate all actions from FCMs"
+	@echo "  make validate  - Validate all generated actions"
+	@echo "  make clean     - Remove generated metadata"
+	@echo "  make sync      - Check FCM-Action synchronization"
+	@echo "  make check     - Check if regeneration needed"
+	@echo "  make help      - Show this help message"

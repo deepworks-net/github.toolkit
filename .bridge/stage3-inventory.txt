@@ -1,0 +1,36 @@
+# Stage 3 Action Inventory
+# Generated: 2025-06-07T15:15:34Z
+
+CORE_ACTIONS:
+branch_operations
+commit_operations
+manage_release
+minimal
+tag-operations-stage2
+tag-operations
+tag_operations
+version_calculator
+version_updater
+
+COMPOSITE_ACTIONS:
+git_ops
+release_notes
+release_operations
+update_changelog
+
+NEEDS_FCM:
+branch_operations
+commit_operations
+manage_release
+minimal
+tag-operations-stage2
+version_calculator
+version_updater
+git_ops
+release_notes
+release_operations
+update_changelog
+
+HAS_FCM:
+tag-operations
+tag_operations

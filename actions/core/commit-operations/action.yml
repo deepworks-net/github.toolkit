@@ -1,0 +1,82 @@
+# GENERATED FILE - DO NOT EDIT
+# Source: axioms/git/commit-operations.fcm
+# Model: git.commit-operations v1.0.0
+# Generated: 2025-06-07T15:42:53Z
+# 
+# To modify this action:
+# 1. Edit the source FCM at axioms/git/commit-operations.fcm
+# 2. Run: make generate-actions
+# 3. Commit both FCM and generated files
+
+name: Commit Operations
+description: Manage git commits with create, amend, list, get, cherry-pick, and revert operations
+author: 'Deepworks (via FCM Bridge)'
+
+inputs:
+  action:
+    description: "Action (Options: create|amend|list|get|cherry-pick|revert)"
+    required: true
+  message:
+    description: Message
+    required: false
+    default: ""
+  files:
+    description: Files
+    required: false
+    default: ""
+  commit_hash:
+    description: Commit hash
+    required: false
+    default: ""
+  limit:
+    description: Limit
+    required: false
+    default: ""
+  author:
+    description: Author
+    required: false
+    default: ""
+  since:
+    description: Since
+    required: false
+    default: ""
+  until:
+    description: Until
+    required: false
+    default: ""
+  path:
+    description: Path
+    required: false
+    default: ""
+  format:
+    description: Format
+    required: false
+    default: ""
+  no_verify:
+    description: No verify
+    required: false
+    default: ""
+outputs:
+  commits:
+    description: Commits
+  commit_hash:
+    description: Commit hash
+  result:
+    description: Result
+  author:
+    description: Author
+  date:
+    description: Date
+  message:
+    description: Message
+  hash:
+    description: Hash
+  body:
+    description: Body
+runs:
+  using: docker
+  image: Dockerfile
+  
+branding:
+  icon: 'code'
+  color: 'blue'

@@ -1,0 +1,8 @@
+{
+  "source_fcm": "axioms/git/branch-operations.fcm",
+  "model": "git.branch-operations",
+  "version": "1.0.0",
+  "generated_at": "2025-06-07T15:42:53Z",
+  "generator_version": "production-1.0.0",
+  "checksum": "97af7b6124d0ed7a87e8e6e87c4c61698aa9c35a5220c5c5a8604e13ab7b25e8"
+}
