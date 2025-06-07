@@ -174,6 +174,42 @@ jobs:
           echo "Changelog content:"
           cat CHANGELOG.md
           
+      # Clean up test release branch
+      - name: Clean up test release branch
+        if: always()
+        run: |
+          echo "Cleaning up test release branch..."
+          
+          # Switch to a different branch before deleting
+          git checkout develop/bridge-tests 2>/dev/null || git checkout main 2>/dev/null || git checkout master 2>/dev/null || true
+          
+          # Delete local release branch if it exists
+          if git branch --list | grep -q "release/0.2.0-test"; then
+            echo "Deleting local branch release/0.2.0-test"
+            git branch -D release/0.2.0-test 2>/dev/null || true
+          fi
+          
+          # Delete remote release branch if it exists
+          if git ls-remote --heads origin release/0.2.0-test | grep -q "release/0.2.0-test"; then
+            echo "Deleting remote branch release/0.2.0-test"
+            git push origin --delete release/0.2.0-test 2>/dev/null || true
+          fi
+          
+          # Clean up test tags
+          if git tag -l | grep -q "v0.1.0-test"; then
+            echo "Deleting test tag v0.1.0-test"
+            git tag -d v0.1.0-test 2>/dev/null || true
+            git push origin --delete v0.1.0-test 2>/dev/null || true
+          fi
+          
+          if git tag -l | grep -q "v0.2.0-test"; then
+            echo "Deleting test tag v0.2.0-test"
+            git tag -d v0.2.0-test 2>/dev/null || true
+            git push origin --delete v0.2.0-test 2>/dev/null || true
+          fi
+          
+          echo "Cleanup completed"
+          
       # Skip changelog verification - not needed for this test
       - name: Skip changelog verification
         run: |
