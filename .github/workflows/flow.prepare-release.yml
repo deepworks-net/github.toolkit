@@ -23,7 +23,7 @@ on:
 
 jobs:
   create-release-branch:
-    if: (github.event_name == 'push' && github.ref_type == 'tag' && github.ref == 'refs/tags/prep') || github.event_name == 'workflow_call'
+    if: (github.event_name == 'push' && github.ref == 'refs/tags/prep') || github.event_name == 'workflow_call'
     runs-on: ubuntu-latest
 
     steps:
