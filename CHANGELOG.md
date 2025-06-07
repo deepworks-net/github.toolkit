@@ -4,15 +4,16 @@
 
 
 
-## **06/07/2025 - v1.0.289 Unreleased**
+## **06/07/2025 - v1.0.292 Unreleased**
 ### What's Changed
+- feat: Add cleanup step for test release branches and tags @mattbuske (#182)
 - Improves branch management in workflows @mattbuske (#181)
 - fix: Add current directory to safe directories in commit operations @mattbuske (#178)
 - fix: Add safe directory config to commit operations test workflow @mattbuske (#177)
 - Refines GitHub Action validation and test result reporting @mattbuske (#176)
 - Improves test infrastructure and updates workflow @mattbuske (#174)
 - FCM Updates @mattbuske (#172)
-#### **Full Changelog**: [v1.0.261...v1.0.289](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.289)
+#### **Full Changelog**: [v1.0.261...v1.0.292](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.292)
 
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
