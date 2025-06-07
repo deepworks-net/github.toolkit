@@ -1,0 +1,44 @@
+# Commit Operations Axiom - Formal Conceptual Model
+Model: git.commit-operations
+Version: 1.0.0
+Layer: Axiom
+Domain: git
+
+Capability: Manage git commits with create, amend, list, get, cherry-pick, and revert operations
+
+Parameters:
+  - action: create|amend|list|get|cherry-pick|revert
+  - message: string (optional)
+  - files: string (optional)
+  - commit_hash: string (optional)
+  - limit: number (optional)
+  - author: string (optional)
+  - since: string (optional)
+  - until: string (optional)
+  - path: string (optional)
+  - format: string (optional)
+  - no_verify: boolean (optional)
+
+Outputs:
+  - commits
+  - commit_hash
+  - result
+  - author
+  - date
+  - message
+  - hash
+  - body
+
+Interface:
+  type: docker
+  image: python:3.9-slim
+  requirements: [git]
+
+Dependencies:
+  - git
+  - github-token (optional)
+
+Patterns:
+  - git-operation
+  - commit-management
+  - version-control

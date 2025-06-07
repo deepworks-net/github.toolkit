@@ -3,6 +3,28 @@
 
 
 
+
+## **[(06/07/2025) - v1.0.324](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.324)**
+### What's Changed
+- Enhances FCM-to-GitHub Actions bridge for production deployment @mattbuske (#195)
+- Enhances YAML handling and updates dependencies @mattbuske (#191)
+- Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @mattbuske (#190)
+- Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @[dependabot[bot]](https://github.com/apps/dependabot) (#170)
+- Bump mkdocs-material from 9.6.11 to 9.6.14 @mattbuske (#189)
+- Bump mkdocs-monorepo-plugin from 1.1.0 to 1.1.2 @mattbuske (#186)
+- Bump mkdocs-git-revision-date-localized-plugin from 1.4.5 to 1.4.7 @mattbuske (#187)
+- Bump mkdocs-material from 9.6.11 to 9.6.14 @mattbuske (#188)
+- Bump actions/setup-python from 4 to 5 @mattbuske (#184)
+- feat: Configure Dependabot to target staging branch @mattbuske (#183)
+- feat: Add cleanup step for test release branches and tags @mattbuske (#182)
+- Improves branch management in workflows @mattbuske (#181)
+- fix: Add current directory to safe directories in commit operations @mattbuske (#178)
+- fix: Add safe directory config to commit operations test workflow @mattbuske (#177)
+- Refines GitHub Action validation and test result reporting @mattbuske (#176)
+- Improves test infrastructure and updates workflow @mattbuske (#174)
+- FCM Updates @mattbuske (#172)
+#### **Full Changelog**: [v1.0.261...v1.0.324](https://github.com/deepworks-net/github.toolkit/compare/v1.0.261...v1.0.324)
+
 ## **[(04/03/2025) - v1.0.261](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.261)**
 ### What's Changed
 - Bump actions/setup-python from 4 to 5 @mattbuske (#162)

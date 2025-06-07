@@ -1,0 +1,15 @@
+# Generated from axioms/git/branch-operations.fcm
+# Model: git.branch-operations v1.0.0
+# Generated: 2025-06-07T15:22:50Z
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
+name: 'Branch Operations'
+description: 'Manage git branches with create, delete, list, checkout, and merge operations'
+inputs:
+outputs:
+runs:
+  using: docker
+  image: Dockerfile
+branding:
+  icon: 'git-branch'
+  color: 'blue'

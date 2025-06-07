@@ -2,6 +2,14 @@
 
 This guide will help you understand and implement Deepworks GitHub Actions workflows in your repositories.
 
+## Architecture Overview
+
+Deepworks Actions use a **six-layer FCM architecture** with a bridge system:
+
+- **Axioms**: Core capabilities defined as Formal Conceptual Models
+- **Generated Actions**: GitHub-compatible interfaces automatically generated from axioms
+- **Bridge System**: Ensures consistency between pure definitions and GitHub requirements
+
 ## Overview
 
 Deepworks Actions provide a suite of reusable workflows for:
@@ -10,6 +18,8 @@ Deepworks Actions provide a suite of reusable workflows for:
 - Release management and versioning
 - Changelog automation
 - Repository standardization
+- Git operations (branches, tags, commits)
+- Version calculation and updating
 
 ## Core Workflows
 
@@ -62,6 +72,8 @@ graph TD
 
 ## Setup Instructions
 
+### Using Generated Actions
+
 1. **Repository Configuration**
 
    ```yaml
@@ -77,15 +89,33 @@ graph TD
        uses: deepworks-net/github.actions/.github/workflows/mkdocs-gh-pages.yml@main
    ```
 
-2. **Required Files**
+2. **Using Core Actions**
+
+   ```yaml
+   # Using generated tag operations
+   - uses: deepworks-net/github.actions/actions/core/tag-operations@main
+     with:
+       action: create
+       tag_name: v1.0.0
+       message: "Release version 1.0.0"
+   ```
+
+3. **Required Files**
    - `mkdocs.yml` for documentation
    - `CHANGELOG.md` for release notes
    - `.github/release-drafter.yml` for release configuration
 
-3. **Repository Settings**
+4. **Repository Settings**
    - Enable GitHub Pages
    - Set appropriate branch protections
    - Configure required status checks
+
+### Working with FCM Architecture
+
+1. **Understanding Axioms**: Browse `axioms/` to see available capabilities
+2. **Never Edit Actions Directly**: All actions in `actions/` are generated
+3. **Modify Through FCMs**: Edit capability definitions in `axioms/` directory
+4. **Regenerate When Needed**: Use bridge tools to update generated actions
 
 ## Basic Usage
 

@@ -1,8 +1,27 @@
-# Meta-Level Documentation: Git Development and Deployment Workflows
+# Meta-Level Documentation: FCM Architecture and Development Workflows
 
 ## Overview
 
-This document provides a meta-level analysis of the Git-based development and deployment workflows used in the repository. The goal is to align these workflows conceptually and technically while identifying gaps and ensuring consistency.
+This document provides a meta-level analysis of the repository's Formal Conceptual Model (FCM) architecture and development workflows. The repository has evolved from a traditional action collection to a **six-layer architecture** with bridge-based generation, achieving both architectural purity and GitHub compatibility.
+
+## Architecture Evolution
+
+### Traditional Structure → FCM Architecture
+
+The repository has transformed from mixed architecture-operation structure to pure architectural patterns:
+
+- **Before**: Actions contained both definitions and implementations
+- **After**: Pure FCM definitions with generated GitHub interfaces
+- **Bridge**: Automated generation maintains GitHub compatibility
+
+### Six-Layer FCM Structure
+
+1. **Axioms** (`axioms/`) - Foundational capability definitions
+2. **Logic** (`logic/`) - Compositions and relationships  
+3. **Patterns** (`patterns/`) - Reusable workflow structures
+4. **Mechanics** (`mechanics/`) - Implementation templates
+5. **Reflection** (`reflection/`) - Self-awareness and analysis
+6. **Emergence** (`emergence/`) - Discovered system properties
 
 ---
 
@@ -57,9 +76,24 @@ This document provides a meta-level analysis of the Git-based development and de
 #### Tools and Actions
 
 - **Release Drafter**: Generates draft release notes based on merged PRs.
-- **Custom Actions**:
-  - `version_calculation.py` for semantic versioning.
-  - `update_changelog.py` for changelog management.
+- **Generated Actions**: All actions are now generated from FCM axioms:
+  - `axioms/version/calculate.fcm` → `actions/core/version-calculator/`
+  - `axioms/release/changelog.fcm` → `actions/core/update-changelog/`
+  - `axioms/git/tag.fcm` → `actions/core/tag-operations/`
+
+#### Bridge Integration
+
+- **Source of Truth**: FCM definitions in `axioms/`
+- **Generated Interface**: GitHub-compatible actions in `actions/`
+- **Validation**: Automated alignment checking via `.bridge/validator.py`
+- **Regeneration**: Actions updated when FCMs change
+
+#### FCM Migration Status
+
+- ✅ Architecture established
+- ✅ Bridge generation system operational  
+- ✅ First axiom (tag-operations) generated
+- 🔄 Migration of remaining actions in progress
 
 #### Known Issues
 

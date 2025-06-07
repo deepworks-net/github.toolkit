@@ -1,0 +1,8 @@
+{
+  "source_fcm": "axioms/test/minimal.fcm",
+  "model": "test.minimal",
+  "version": "1.0.0",
+  "generated_at": "2025-06-07T16:01:14Z",
+  "generator_version": "production-1.0.0",
+  "checksum": "866f44c511b9c7f2987f730917e12adb83d9fb54270dbd4b4ad0f480f0c4c967"
+}

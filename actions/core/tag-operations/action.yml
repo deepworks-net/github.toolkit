@@ -1,0 +1,60 @@
+# GENERATED FILE - DO NOT EDIT
+# Source: axioms/git/tag-operations.fcm
+# Model: git.tag-operations v1.0.0
+# Generated: 2025-06-07T16:01:14Z
+# 
+# To modify this action:
+# 1. Edit the source FCM at axioms/git/tag-operations.fcm
+# 2. Run: make generate-actions
+# 3. Commit both FCM and generated files
+
+name: Tag Operations
+description: Manage git tags with create, delete, list, push, and check operations
+author: 'Deepworks (via FCM Bridge)'
+
+inputs:
+  action:
+    description: "Action (Options: create|delete|list|push|check)"
+    required: true
+  tag_name:
+    description: Tag name
+    required: false
+    default: ""
+  message:
+    description: Message
+    required: false
+    default: ""
+  remote:
+    description: Remote
+    required: false
+    default: ""
+  force:
+    description: Force
+    required: false
+    default: ""
+  target_commit:
+    description: Target commit
+    required: false
+    default: ""
+  prefix:
+    description: Prefix
+    required: false
+    default: ""
+outputs:
+  tag_created:
+    description: Tag created
+  tag_deleted:
+    description: Tag deleted
+  tags_list:
+    description: Tags list
+  tag_exists:
+    description: Tag exists
+  operation_status:
+    description: Operation status
+runs:
+  using: docker
+  image: Dockerfile
+  
+branding:
+  icon: 'code'
+  color: 'blue'

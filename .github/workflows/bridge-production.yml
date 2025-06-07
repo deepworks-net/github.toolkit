@@ -1,0 +1,50 @@
+name: Bridge Production Pipeline
+
+on:
+  push:
+    paths:
+      - 'axioms/**/*.fcm'
+      - '.bridge/**'
+    tags:
+      - 'v*'
+  pull_request:
+    paths:
+      - 'axioms/**/*.fcm'
+      - '.bridge/**'
+  workflow_dispatch:
+
+jobs:
+  generate-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate Actions from FCMs
+        run: |
+          bash .bridge/production-generator.sh
+          
+      - name: Validate Generated Actions
+        run: |
+          bash .bridge/production-validator.sh
+          
+      - name: Check for Changes
+        id: check-changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit Generated Actions
+        if: steps.check-changes.outputs.changes == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add actions/
+          git commit -m "chore: Regenerate actions from FCMs [skip ci]"
+          
+      - name: Push Changes
+        if: steps.check-changes.outputs.changes == 'true' && github.event_name == 'push'
+        run: |
+          git push

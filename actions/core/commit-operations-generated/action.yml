@@ -1,0 +1,15 @@
+# Generated from axioms/git/commit-operations.fcm
+# Model: git.commit-operations v1.0.0
+# Generated: 2025-06-07T15:22:50Z
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
+name: 'Commit Operations'
+description: 'Manage git commits with create, amend, list, get, cherry-pick, and revert operations'
+inputs:
+outputs:
+runs:
+  using: docker
+  image: Dockerfile
+branding:
+  icon: 'git-branch'
+  color: 'blue'

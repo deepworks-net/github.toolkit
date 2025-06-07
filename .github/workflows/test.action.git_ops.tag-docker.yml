@@ -6,6 +6,8 @@ on:
     paths:
       - 'actions/git-ops/tag/Dockerfile'
       - '.github/workflows/build-git-tag-ops.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     branches: [ main, staging ]
     paths:

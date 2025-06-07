@@ -5,6 +5,8 @@ on:
     paths:
       - 'actions/core/tag_operations/**'
       - '.github/workflows/test.core.action.tag_operations.yml'
+    tags-ignore:
+      - '**'
   pull_request:
     paths:
       - 'actions/core/tag_operations/**'
@@ -16,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -69,7 +71,7 @@ jobs:
     needs: [test-unit, test-integration]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Setup test environment
         run: |

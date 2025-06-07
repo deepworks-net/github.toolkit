@@ -30,8 +30,9 @@ class GitCommitOperations:
             # Check if git is available
             subprocess.check_output(['git', '--version'], stderr=subprocess.STDOUT)
             
-            # Configure safe directory
+            # Configure safe directory - add both common GitHub Actions paths
             subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', '/github/workspace'])
+            subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', os.getcwd()])
             
             # Set default Git identity if not configured
             try:
