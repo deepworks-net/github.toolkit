@@ -1,0 +1,30 @@
+# GENERATED FILE - DO NOT EDIT
+# Source: axioms/test/minimal.fcm
+# Model: test.minimal v1.0.0
+# Generated: 2025-06-07T15:32:30Z
+# 
+# To modify this action:
+# 1. Edit the source FCM at axioms/test/minimal.fcm
+# 2. Run: make generate-actions
+# 3. Commit both FCM and generated files
+
+name: Minimal
+description: Test minimal bridge functionality
+author: 'Deepworks (via FCM Bridge)'
+
+inputs:
+  message:
+    description: Message
+    required: true
+outputs:
+  result:
+    description: Result
+runs:
+  using: composite
+  steps:
+    - name: Execute minimal
+      shell: bash
+      run: |
+        echo "Executing minimal"
+        echo "This is a generated composite action"
+        # Implementation would go here
