@@ -4,6 +4,12 @@
 
 
 
+
+## **06/16/2025 - v1.0.328 Unreleased**
+### What's Changed
+- Bump mkdocs-git-authors-plugin from 0.9.4 to 0.10.0 @[dependabot[bot]](https://github.com/apps/dependabot) (#202)
+#### **Full Changelog**: [v1.0.326...v1.0.328](https://github.com/deepworks-net/github.toolkit/compare/v1.0.326...v1.0.328)
+
 ## **[(06/07/2025) - v1.0.324](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.324)**
 ### What's Changed
 - Enhances FCM-to-GitHub Actions bridge for production deployment @mattbuske (#195)
