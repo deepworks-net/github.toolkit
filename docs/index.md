@@ -1,6 +1,15 @@
-# Deepworks Core GitHub Repository
+# GitHub Toolkit
 
-This repository contains a collection of reusable GitHub Actions workflows. These workflows are designed to standardize common CI/CD tasks across Deepworks repositories.
+This repository contains a comprehensive toolkit for GitHub Actions automation, featuring a sophisticated FCM (Formal Conceptual Model) bridge system that generates actions from conceptual definitions. The toolkit provides standardized approaches for git operations, version management, and release automation.
+
+## Getting Started
+
+For a comprehensive understanding of the toolkit architecture and components:
+
+- **[Understanding Actions](guides/understanding-actions.md)** - Learn about Core and Composite Actions
+- **[Understanding Workflows](guides/understanding-workflows.md)** - How workflows orchestrate actions  
+- **[Understanding FCM Bridge](guides/understanding-fcm-bridge.md)** - The generation system behind actions
+- **[Testing Framework](guides/testing-framework.md)** - Comprehensive testing patterns and requirements
 
 ## Available Workflows
 

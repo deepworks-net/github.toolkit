@@ -1,5 +1,7 @@
 # Workflows Overview
 
+**📖 For comprehensive documentation:** [Understanding Workflows Guide](../guides/understanding-workflows.md)
+
 ## Structure
 
 ```markdown
