@@ -327,12 +327,12 @@ strategy:
 
 steps:
   - name: Run tests
-    working-directory: ${{ matrix.action-path }}
+    working-directory: ${% raw %}{{ matrix.action-path }}{% endraw %}
     run: |
       pytest --cov=. --cov-report=xml --cov-report=term-missing
   
   - name: Verify coverage threshold
-    working-directory: ${{ matrix.action-path }}
+    working-directory: ${% raw %}{{ matrix.action-path }}{% endraw %}
     run: |
       COVERAGE=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(root.attrib['line-rate'])")
       COVERAGE_PCT=$(echo "$COVERAGE * 100" | bc)

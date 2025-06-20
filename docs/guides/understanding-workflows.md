@@ -41,13 +41,13 @@ on:
       # Action-specific outputs
       result:
         description: "Operation result"
-        value: ${{ jobs.main.outputs.result }}
+        value: ${% raw %}{{ jobs.main.outputs.result }}{% endraw %}
 
 jobs:
   main:
     runs-on: ubuntu-latest
     outputs:
-      result: ${{ steps.action.outputs.result }}
+      result: ${% raw %}{{ steps.action.outputs.result }}{% endraw %}
     
     steps:
       - name: Checkout code
@@ -59,7 +59,7 @@ jobs:
         id: action
         uses: ./actions/core/[action-name]
         with:
-          action: ${{ inputs.action }}
+          action: ${% raw %}{{ inputs.action }}{% endraw %}
           # ... other inputs
 ```
 
@@ -139,31 +139,31 @@ jobs:
       - name: Update Version Numbers
         uses: deepworks-net/github.toolkit/actions/version_update
         with:
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
         uses: deepworks-net/github.toolkit/actions/release_notes
         id: notes
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${% raw %}{{ secrets.GITHUB_TOKEN }}{% endraw %}
           mode: 'prepare-release'
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
 
       - name: Update Changelog File
         uses: deepworks-net/github.toolkit/actions/update_changelog
         with:
-          content: ${{ steps.notes.outputs.content }}
+          content: ${% raw %}{{ steps.notes.outputs.content }}{% endraw %}
           mode: 'release'
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
 
       - name: Create Release Branch & PR
         uses: deepworks-net/github.toolkit/actions/git_ops
         with:
           files: 'CHANGELOG.md'
-          commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
+          commit-message: 'Prepare release ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}'
           create-pr: true
-          pr-title: 'Release ${{ steps.version.outputs.next_version }}'
+          pr-title: 'Release ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}'
 ```
 
 This workflow demonstrates key Flow Workflow patterns:
@@ -230,12 +230,12 @@ strategy:
 
 steps:
   - name: Run tests
-    working-directory: ${{ matrix.action-path }}
+    working-directory: ${% raw %}{{ matrix.action-path }}{% endraw %}
     run: |
       pytest --cov=. --cov-report=xml --cov-report=term-missing
   
   - name: Verify coverage threshold
-    working-directory: ${{ matrix.action-path }}
+    working-directory: ${% raw %}{{ matrix.action-path }}{% endraw %}
     run: |
       COVERAGE=$(python -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(root.attrib['line-rate'])")
       COVERAGE_PCT=$(echo "$COVERAGE * 100" | bc)
@@ -326,17 +326,17 @@ steps:
 ```yaml
 # From workflow input to action
 with:
-  version: ${{ inputs.version }}
-  content: ${{ steps.previous.outputs.content }}
+  version: ${% raw %}{{ inputs.version }}{% endraw %}
+  content: ${% raw %}{{ steps.previous.outputs.content }}{% endraw %}
 ```
 
 #### Secret Management
 ```yaml
 # Secure token handling
 with:
-  github-token: ${{ secrets.GITHUB_TOKEN }}
+  github-token: ${% raw %}{{ secrets.GITHUB_TOKEN }}{% endraw %}
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${% raw %}{{ secrets.GITHUB_TOKEN }}{% endraw %}
 ```
 
 #### Conditional Execution

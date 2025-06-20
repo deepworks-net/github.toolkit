@@ -229,9 +229,9 @@ The `update_changelog` action demonstrates the LCMCP pattern in practice:
 ```yaml
 - uses: deepworks-net/github.toolkit/actions/composite/update_changelog@v1
   with:
-    content: ${{ steps.notes.outputs.content }}
+    content: ${% raw %}{{ steps.notes.outputs.content }}{% endraw %}
     mode: 'unreleased'
-    version: ${{ steps.version.outputs.next_version }}
+    version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
 ```
 
 ### Composition Over Steps
@@ -255,13 +255,13 @@ steps:
     id: notes
     uses: ./actions/composite/release_notes
     with:
-      version: ${{ steps.version.outputs.next_version }}
+      version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
       
   - name: Update Changelog
     uses: ./actions/composite/update_changelog
     with:
-      content: ${{ steps.notes.outputs.content }}
-      version: ${{ steps.version.outputs.next_version }}
+      content: ${% raw %}{{ steps.notes.outputs.content }}{% endraw %}
+      version: ${% raw %}{{ steps.version.outputs.next_version }}{% endraw %}
 ```
 
 ### Benefits of This Approach
