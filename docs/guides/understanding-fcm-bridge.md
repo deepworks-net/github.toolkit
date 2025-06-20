@@ -13,10 +13,10 @@ The FCM Bridge is an automated compilation system that:
 
 ### Key Principle: FCMs are Source Code
 
-**Critical Understanding**: Everything in the `actions/` directory is GENERATED. Never edit actions directly—they will be overwritten during regeneration.
+**Critical Understanding**: Generated actions (with hyphens in names) should never be edited directly—they will be overwritten during regeneration. Manual actions (with underscores) contain custom implementation logic.
 
 ```
-axioms/git/branch-operations.fcm  →  actions/core/branch_operations/
+axioms/git/branch-operations.fcm  →  actions/core/branch-operations/
        (SOURCE)                          (GENERATED)
 ```
 
@@ -24,6 +24,20 @@ Think of it like compiling source code to binaries:
 - FCM files = Source code
 - Generated actions = Compiled binaries
 - Bridge system = Compiler
+
+### Naming Convention
+
+The repository uses a dual naming convention to distinguish between generated and manual actions:
+
+- **Generated Actions**: Use hyphens (`branch-operations`, `tag-operations`) 
+  - Created automatically from FCM definitions
+  - Should not be edited manually
+  - Include `.bridge-sync` metadata files
+
+- **Manual Actions**: Use underscores (`branch_operations`, `tag_operations`)
+  - Contain custom implementation logic
+  - Include test suites and documentation
+  - Can be edited and maintained manually
 
 ## Bridge Architecture
 
@@ -52,11 +66,14 @@ Repository Structure:
 │
 └── actions/               # INTERFACE: Generated actions
     ├── core/              # Generated from axioms
-    │   ├── branch_operations/
+    │   ├── branch-operations/  # Generated actions use hyphens
     │   │   ├── action.yml      # Generated
     │   │   ├── Dockerfile      # Generated
-    │   │   ├── main.py         # Generated/Manual
     │   │   └── .bridge-sync    # Generation metadata
+    │   ├── branch_operations/  # Manual actions use underscores
+    │   │   ├── action.yml      # Manual
+    │   │   ├── main.py         # Manual implementation
+    │   │   └── tests/          # Test suite
     │   └── tag_operations/
     └── composite/         # Composite actions
 ```
@@ -499,10 +516,10 @@ Interface:
 cat axioms/git/branch-operations.fcm
 
 # View sync status
-cat actions/core/branch_operations/.bridge-sync
+cat actions/core/branch-operations/.bridge-sync
 
 # Check generated action
-cat actions/core/branch_operations/action.yml
+cat actions/core/branch-operations/action.yml
 
 # Test sync status
 make sync

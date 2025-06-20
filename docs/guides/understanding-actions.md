@@ -1,6 +1,6 @@
 # Understanding Actions in GitHub Toolkit
 
-This guide explains the two types of actions in the GitHub Toolkit: Core Actions and Composite Actions. Understanding these concepts is essential for effectively using and extending the toolkit.
+This guide explains the two types of actions in the GitHub Toolkit: Core Actions and Composite Actions. Both follow the Loosely Coupled Modular Composition Pattern (LCMCP) for consistent architecture. Understanding these concepts is essential for effectively using and extending the toolkit.
 
 ## Core Actions
 
@@ -162,19 +162,27 @@ This action showcases all the patterns and best practices for Core Actions:
 
 ## Composite Actions
 
-Composite Actions combine multiple Core Actions or other operations to create higher-level workflows. They orchestrate complex processes by sequencing simpler operations.
+Composite Actions in this toolkit follow the **Loosely Coupled Modular Composition Pattern (LCMCP)**, a design philosophy that emphasizes modularity, encapsulation, and composition. While GitHub provides a native composite action format using `using: composite` with steps, this toolkit deliberately uses Docker-based implementations for all actions, including composites.
 
-### What is a Composite Action
+### Design Philosophy: Why Docker for Composite Actions
 
-Composite Actions are:
-- **Orchestrators**: Combine multiple actions into workflows
-- **Higher-level**: Provide business logic and process flows
-- **Flexible**: Can include conditional logic and complex decision-making
-- **Reusable**: Encapsulate common multi-step processes
+The decision to use Docker for Composite Actions rather than GitHub's native composite format is based on the LCMCP principles:
 
-### Structure Differences from Core Actions
+1. **Strict Encapsulation**: Docker containers provide complete encapsulation of dependencies, environment, and implementation details
+2. **Atomic Responsibility**: Each action, whether Core or Composite, maintains a single, well-defined responsibility
+3. **Consistent Interface**: All actions expose the same interface pattern regardless of complexity
+4. **Framework Agnosticism**: Docker-based actions can run in any environment that supports containers
+5. **Progressive Complexity**: Complex behavior emerges from composing simpler modules, not from inheritance or steps
 
-Composite Actions use a different execution model:
+### What are Composite Actions
+
+In this toolkit, Composite Actions are:
+- **Higher-level orchestrators**: Combine multiple operations into unified workflows
+- **Business logic containers**: Encapsulate domain-specific processes
+- **Docker-based modules**: Use the same container pattern as Core Actions
+- **Loosely coupled**: Interact with other actions through well-defined interfaces
+
+### Architecture Pattern
 
 ```yaml
 name: "Update Changelog"
@@ -186,46 +194,81 @@ inputs:
   mode:
     description: 'Operation mode (unreleased, release)'
     required: true
+  version:
+    description: 'Version number for release mode'
+    required: false
 
 runs:
-  using: "composite"
-  steps:
-    - name: "Process changelog content"
-      run: |
-        # Complex shell logic or call to other actions
-        echo "Processing changelog..."
-      shell: bash
-    
-    - name: "Update file"
-      uses: ./actions/core/file_operations
-      with:
-        action: update
-        file: CHANGELOG.md
-        content: ${{ inputs.content }}
+  using: "docker"
+  image: "Dockerfile"
 ```
+
+This pattern provides several advantages:
+- **Consistency**: All actions follow the same execution model
+- **Isolation**: Each action runs in its own environment
+- **Testability**: Docker containers can be tested independently
+- **Portability**: Actions work identically across different systems
 
 ### Example: Update Changelog Composite Action
 
-The `update_changelog` action demonstrates Composite Action patterns:
+The `update_changelog` action demonstrates the LCMCP pattern in practice:
 
 **Location**: `actions/composite/update_changelog/`
 
-**Purpose**: Manages CHANGELOG.md file updates with proper formatting
+**Purpose**: Manages CHANGELOG.md file updates with complex formatting logic
 
-**Key Features**:
-- Processes changelog content with complex logic
-- Handles different modes (unreleased, release)
-- Maintains changelog formatting standards
-- Integrates with version management workflow
+**Key Design Elements**:
+- Encapsulates all changelog logic within a single container
+- Exposes a simple interface hiding complex implementation
+- Maintains no direct dependencies on other actions
+- Can be composed with other actions in workflows
 
 **Usage in Workflow**:
 ```yaml
-- uses: ./actions/composite/update_changelog
+- uses: deepworks-net/github.toolkit/actions/composite/update_changelog@v1
   with:
-    content: "## [1.2.0] - 2024-01-15\n### Added\n- New feature"
-    mode: release
-    version: "1.2.0"
+    content: ${{ steps.notes.outputs.content }}
+    mode: 'unreleased'
+    version: ${{ steps.version.outputs.next_version }}
 ```
+
+### Composition Over Steps
+
+Unlike traditional GitHub composite actions that define steps, LCMCP composite actions achieve complexity through:
+
+1. **Internal Composition**: Complex logic is handled within the container
+2. **External Orchestration**: Workflows compose multiple actions
+3. **Clear Boundaries**: Each action maintains its own state and logic
+4. **Minimal Coupling**: Actions communicate only through inputs/outputs
+
+Example workflow composition:
+```yaml
+steps:
+  # Each action is a self-contained module
+  - name: Calculate Version
+    id: version
+    uses: ./actions/core/version_calculator
+    
+  - name: Generate Release Notes
+    id: notes
+    uses: ./actions/composite/release_notes
+    with:
+      version: ${{ steps.version.outputs.next_version }}
+      
+  - name: Update Changelog
+    uses: ./actions/composite/update_changelog
+    with:
+      content: ${{ steps.notes.outputs.content }}
+      version: ${{ steps.version.outputs.next_version }}
+```
+
+### Benefits of This Approach
+
+1. **Uniform Testing**: All actions can be tested the same way
+2. **Consistent Deployment**: Same deployment pattern for all actions
+3. **Clear Boundaries**: No confusion about where logic resides
+4. **Better Encapsulation**: Implementation details truly hidden
+5. **Easier Maintenance**: Changes don't cascade through step definitions
 
 ## Action Development Guidelines
 
@@ -240,10 +283,10 @@ Create Core Actions when you need:
 ### When to Create Composite Actions
 
 Create Composite Actions when you need:
-- Multi-step processes with complex logic
-- Business workflow orchestration
-- Conditional execution based on inputs
-- Integration of multiple Core Actions
+- Multi-step processes that form a cohesive business operation
+- Complex logic that combines multiple atomic operations
+- Domain-specific workflows that hide implementation complexity
+- Reusable patterns that appear across multiple workflows
 
 ### Best Practices
 
@@ -253,6 +296,16 @@ Create Composite Actions when you need:
 4. **Document Thoroughly**: Clear descriptions and usage examples
 5. **Handle Errors Gracefully**: Provide meaningful error messages and appropriate exit codes
 6. **Maintain Consistency**: Follow established patterns and conventions
+
+### LCMCP Principles in Action Development
+
+When developing actions in this toolkit, follow these LCMCP principles:
+
+1. **Maintain Module Independence**: Each action should function without knowledge of other actions
+2. **Use Explicit Interfaces**: All inputs and outputs must be clearly defined
+3. **Avoid Hidden Dependencies**: Don't rely on external state or side effects
+4. **Compose, Don't Inherit**: Build complex behavior by combining simple actions
+5. **Encapsulate Completely**: Hide all implementation details behind the action interface
 
 ## Integration with FCM Bridge
 
