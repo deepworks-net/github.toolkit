@@ -1,6 +1,6 @@
 services:
 
-  # This service runs the documentation for Secure Coding Standards for SUNY Upstate
+  # This service runs the documentation
   mkdocs-scs:
     # Vars are set in the .env file
     image: deepworks-net/github-toolkit-docs:${MKDOCS_IMAGE_VERSION:?err}
@@ -15,7 +15,6 @@ services:
     # Ports
     ports:
       - "${MKDOCS_PORT:-8000}:${MKDOCS_EXTERNAL_PORT:-8000}"
-    #hostname: mkdocs.upstate.local # Not Used Yet
     # Extra Environmental Variables
     environment:
       - ENVIRONMENT=development
