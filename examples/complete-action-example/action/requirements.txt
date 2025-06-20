@@ -1,0 +1,6 @@
+# No external dependencies required for this example
+# The action uses only Python standard library
+
+# For testing only (not needed in production)
+pytest>=7.0.0
+pytest-cov>=4.0.0

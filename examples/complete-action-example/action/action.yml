@@ -1,0 +1,55 @@
+name: 'File Operations'
+description: 'Perform file system operations following LCMCP principles'
+author: 'Deepworks'
+inputs:
+  action:
+    description: 'File operation to perform (create, read, update, delete, copy, move, search)'
+    required: true
+  file_path:
+    description: 'Path to the file to operate on'
+    required: false
+  content:
+    description: 'Content for create/update operations'
+    required: false
+  destination:
+    description: 'Destination path for copy/move operations'
+    required: false
+  pattern:
+    description: 'Pattern for search operations (glob pattern)'
+    required: false
+  encoding:
+    description: 'File encoding (utf-8, ascii, base64)'
+    required: false
+    default: 'utf-8'
+  create_dirs:
+    description: 'Create parent directories if they dont exist'
+    required: false
+    default: 'true'
+  overwrite:
+    description: 'Overwrite existing files'
+    required: false
+    default: 'false'
+
+outputs:
+  file_created:
+    description: 'Path of created file (for create action)'
+  file_content:
+    description: 'Content of file (for read action)'
+  file_deleted:
+    description: 'Path of deleted file (for delete action)'
+  files_found:
+    description: 'Comma-separated list of files found (for search action)'
+  operation_status:
+    description: 'Status of the operation (success/failure)'
+  file_size:
+    description: 'Size of the file in bytes'
+  file_exists:
+    description: 'Whether the file exists (true/false)'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  
+branding:
+  icon: 'file'
+  color: 'blue'
