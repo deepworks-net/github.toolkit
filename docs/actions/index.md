@@ -2,7 +2,7 @@
 
 ## Architecture
 
-Our GitHub Actions toolkit follows a layered architecture that promotes reusability, maintainability, and clear separation of concerns.
+Our GitHub Actions toolkit follows a layered architecture that promotes reusability, maintainability, and clear separation of concerns. The architecture implements the [Loosely Coupled Modular Composition Pattern (LCMCP)](https://github.com/deepworks-net/models.lcmcp).
 
 **📖 For comprehensive documentation:** [Understanding Actions Guide](../guides/understanding-actions.md)
 

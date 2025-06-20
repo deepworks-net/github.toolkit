@@ -162,7 +162,9 @@ This action showcases all the patterns and best practices for Core Actions:
 
 ## Composite Actions
 
-Composite Actions in this toolkit follow the **Loosely Coupled Modular Composition Pattern (LCMCP)**, a design philosophy that emphasizes modularity, encapsulation, and composition. While GitHub provides a native composite action format using `using: composite` with steps, this toolkit deliberately uses Docker-based implementations for all actions, including composites.
+Composite Actions in this toolkit follow the **Loosely Coupled Modular Composition Pattern (LCMCP)**, a design philosophy that emphasizes modularity, encapsulation, and composition. For complete details on LCMCP principles and implementation patterns, see the [LCMCP Models Repository](https://github.com/deepworks-net/models.lcmcp).
+
+While GitHub provides a native composite action format using `using: composite` with steps, this toolkit deliberately uses Docker-based implementations for all actions, including composites.
 
 ### Design Philosophy: Why Docker for Composite Actions
 
@@ -299,7 +301,7 @@ Create Composite Actions when you need:
 
 ### LCMCP Principles in Action Development
 
-When developing actions in this toolkit, follow these LCMCP principles:
+When developing actions in this toolkit, follow these LCMCP principles (detailed in the [LCMCP Models Repository](https://github.com/deepworks-net/models.lcmcp)):
 
 1. **Maintain Module Independence**: Each action should function without knowledge of other actions
 2. **Use Explicit Interfaces**: All inputs and outputs must be clearly defined

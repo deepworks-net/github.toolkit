@@ -1,6 +1,6 @@
 # GitHub Toolkit
 
-This repository contains a comprehensive toolkit for GitHub Actions automation, featuring a sophisticated FCM (Formal Conceptual Model) bridge system that generates actions from conceptual definitions. The toolkit provides standardized approaches for git operations, version management, and release automation.
+This repository contains a comprehensive toolkit for GitHub Actions automation, featuring a sophisticated FCM (Formal Conceptual Model) bridge system that generates actions from conceptual definitions. The toolkit implements the [Loosely Coupled Modular Composition Pattern (LCMCP)](https://github.com/deepworks-net/models.lcmcp) and provides standardized approaches for git operations, version management, and release automation.
 
 ## Getting Started
 
