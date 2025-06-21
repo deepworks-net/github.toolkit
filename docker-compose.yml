@@ -30,7 +30,7 @@ services:
       - ./claude/models:/home/coder/claude/models:ro
       - ./claude/validation:/home/coder/claude/validation:ro
       # Documentation
-      - ./CLAUDE.md:/home/coder/CLAUDE.md:ro
+      - ./CLAUDE.md:/home/coder/claude/CLAUDE.md:ro
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     working_dir: /home/coder/project
