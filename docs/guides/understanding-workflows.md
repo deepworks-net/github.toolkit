@@ -249,9 +249,20 @@ steps:
 
 The toolkit uses a structured naming convention to organize workflows:
 
+### Private/Internal Workflows
+- **Pattern**: `.flow.[name].yml` or `.core.[name].yml`
+- **Purpose**: Repository-specific workflows not intended for external use
+- **Visibility**: Private to the repository (like private access modifiers in programming languages)
+- **Examples**:
+  - `.flow.update_version.yml` - Internal version management
+  - `.core.repository_setup.yml` - Repository-specific setup
+
+> **Important**: Workflows prefixed with a dot (`.`) are internal to the repository and should not be referenced externally via `uses:` statements. These handle repository-specific operations and may change without notice.
+
 ### Core Workflows
 - **Pattern**: `core.action.[action-name].yml`
 - **Purpose**: Reusable wrappers for Core Actions
+- **Visibility**: Public - can be used by external repositories
 - **Examples**: 
   - `core.action.branch_operations.yml`
   - `core.action.version_calculator.yml`
@@ -259,6 +270,7 @@ The toolkit uses a structured naming convention to organize workflows:
 ### Flow Workflows
 - **Pattern**: `flow.[process-name].yml` or `[process-name].yml`
 - **Purpose**: Business process orchestration
+- **Visibility**: Public - can be used externally depending on exposed inputs/outputs
 - **Examples**:
   - `flow.prepare-release.yml`
   - `update-changelog.yml`

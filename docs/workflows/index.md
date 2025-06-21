@@ -6,23 +6,36 @@
 
 ```markdown
 .github/workflows/
-├── core.action.*.yml          # Atomic, reusable workflows
-├── flow.*.yml                 # Higher-level flows combining actions/workflows
+├── .flow.*.yml                # Private/internal flows for this repository
+├── .core.*.yml                # Private/internal core workflows
+├── core.action.*.yml          # Public atomic, reusable workflows
+├── flow.*.yml                 # Public higher-level flows combining actions/workflows
 └── test.*.yml                # Test workflows for actions/flows
 ```
 
 ## Naming Convention
 
+### Private/Internal Workflows
+
+- Pattern: `.flow.<name>.yml` or `.core.<name>.yml`
+- Purpose: Repository-specific workflows not intended for external use
+- Visibility: Private to the repository (like private access modifiers)
+- Example: `.flow.update_version.yml`
+
+> **Note**: Workflows prefixed with a dot (`.`) are internal to the repository and should not be referenced externally via `uses:` statements. These handle repository-specific operations.
+
 ### Core Action Workflows
 
 - Pattern: `core.action.<name>.yml`
 - Purpose: Atomic, reusable operations
+- Visibility: Public - can be used externally
 - Example: `core.action.version_calculator.yml`
 
 ### Flow Workflows
 
 - Pattern: `flow.<name>.yml`
 - Purpose: Combine core actions into higher-level operations
+- Visibility: Public - can be used externally depending on exposed inputs/outputs
 - Example: `flow.prepare_release.yml`
 
 ### Test Workflows
