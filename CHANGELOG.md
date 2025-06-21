@@ -1,6 +1,13 @@
 # github.actions Repository Changelog
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
+
+## **06/21/2025 - v1.0.356 Unreleased**
+### What's Changed
+- Merging Patch Updates @mattbuske (#208)
+- Lets Merge @mattbuske (#207)
+#### **Full Changelog**: [v1.0.333...v1.0.356](https://github.com/deepworks-net/github.toolkit/compare/v1.0.333...v1.0.356)
+
 ## **[(06/16/2025) - v1.0.331](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.331)**
 ### What's Changed
 - Bump mkdocs-git-authors-plugin from 0.9.4 to 0.10.0 @[dependabot[bot]](https://github.com/apps/dependabot) (#202)
