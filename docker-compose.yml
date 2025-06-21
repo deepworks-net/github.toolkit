@@ -21,7 +21,7 @@ services:
       - WATCH_DOCS=true
 
   claude-code:
-    image: deepworks/claude-code:latest
+    image: deepworks/claude-code:v0.4.0
     volumes:
       # Main repository mount
       - .:/home/coder/project:rw
