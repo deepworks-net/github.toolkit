@@ -4,10 +4,27 @@ on:
   push:
     tags:
       - 'prep'  # Simple trigger
+  # Add workflow_call to make it reusable
+  workflow_call:
+    inputs:
+      base-branch:
+        description: 'Base branch to create release from'
+        required: false
+        type: string
+        default: 'staging'
+      version:
+        description: 'Override version number (if not provided, will auto-calculate)'
+        required: false
+        type: string
+    secrets:
+      token:
+        description: 'GitHub token for PR creation'
+        required: false
 
 jobs:
   create-release-branch:
-    if: github.ref_type == 'tag' && github.ref == 'refs/tags/prep'
+    # Run on tag push OR when called as a workflow
+    if: (github.event_name == 'push' && github.ref_type == 'tag' && github.ref == 'refs/tags/prep') || github.event_name == 'workflow_call'
     runs-on: ubuntu-latest
 
     steps:
@@ -15,40 +32,61 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository }}  # Ensures the current repository
-          ref: staging  # Explicitly specify the staging branch
+          ref: ${{ inputs.base-branch || 'staging' }}  # Use input or default to staging
           fetch-depth: 0
           
       - name: Calculate Version
-        uses: deepworks-net/github.toolkit/actions/version_calculation
+        uses: deepworks-net/github.toolkit/actions/version_calculation@v1
         id: version
+        if: ${{ !inputs.version }}  # Skip if version is provided
+
+      - name: Set Version
+        id: set-version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "next_version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "next_version=${{ steps.version.outputs.next_version }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Update Version Numbers
-        uses: deepworks-net/github.toolkit/actions/version_update
+        uses: deepworks-net/github.toolkit/actions/version_update@v1
         with:
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${{ steps.set-version.outputs.next_version }}
           files: 'mkdocs.yml'
 
       - name: Get Release Content
-        uses: deepworks-net/github.toolkit/actions/release_notes
+        uses: deepworks-net/github.toolkit/actions/release_notes@v1
         id: notes
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.token || secrets.GITHUB_TOKEN }}
           mode: 'prepare-release'
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${{ steps.set-version.outputs.next_version }}
 
       - name: Update Changelog File
-        uses: deepworks-net/github.toolkit/actions/update_changelog
+        uses: deepworks-net/github.toolkit/actions/update_changelog@v1
         with:
           content: ${{ steps.notes.outputs.content }}
           mode: 'release'
-          version: ${{ steps.version.outputs.next_version }}
+          version: ${{ steps.set-version.outputs.next_version }}
 
       - name: Create Release Branch & PR
-        uses: deepworks-net/github.toolkit/actions/git_ops
+        uses: deepworks-net/github.toolkit/actions/git_ops@v1
         with:
-          files: 'CHANGELOG.md'
-          commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
+          files: 'CHANGELOG.md mkdocs.yml'
+          commit-message: 'Prepare release ${{ steps.set-version.outputs.next_version }}'
           create-pr: true
-          pr-title: 'Release ${{ steps.version.outputs.next_version }}'
+          pr-title: 'Release ${{ steps.set-version.outputs.next_version }}'
+          pr-body: |
+            ## Release ${{ steps.set-version.outputs.next_version }}
+            
+            This PR prepares the release for version ${{ steps.set-version.outputs.next_version }}.
+            
+            ### Changes included:
+            - Updated version in mkdocs.yml
+            - Updated CHANGELOG.md with release notes
+            
+            ### Release Notes:
+            ${{ steps.notes.outputs.content }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GH_TOKEN: ${{ secrets.token || secrets.GITHUB_TOKEN }} 
