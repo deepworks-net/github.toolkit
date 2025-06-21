@@ -23,7 +23,21 @@ The repository uses a **bridge architecture** to maintain GitHub Actions compati
 - **Interface Layer**: GitHub-compatible actions in `actions/`
 - **Bridge Layer**: Automated generation via `.bridge/` tools
 
-All GitHub Actions are **generated** from FCM sources, ensuring consistency and eliminating manual configuration drift.
+## Action Naming Convention
+
+This repository uses a naming convention to indicate action source and maintenance:
+
+- **Hyphen naming** (`branch-operations`) - Generated from FCM definitions
+  - Maintained by the FCM bridge system
+  - Regenerated periodically from `axioms/` definitions
+  - Manual changes will be overwritten unless incorporated into the FCM
+  
+- **Underscore naming** (`branch_operations`) - Manual implementations
+  - Maintained by human developers
+  - Changes made directly to action files
+  - Developer responsible for updates and compatibility
+
+Both types follow identical design patterns and functionality - the naming only indicates source and maintenance model.
 
 ## Available Components
 
