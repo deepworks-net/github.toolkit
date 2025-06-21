@@ -1,7 +1,0 @@
-{
-  "source_fcm": "axioms/git/branch-operations.fcm",
-  "generated_at": "2025-06-07T15:22:50Z",
-  "generator_version": "stage3-bash-1.0",
-  "model": "git.branch-operations",
-  "version": "1.0.0"
-}
