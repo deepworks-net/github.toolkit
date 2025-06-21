@@ -2,13 +2,17 @@
 
 ## Architecture
 
-Our GitHub Actions toolkit follows a layered architecture that promotes reusability, maintainability, and clear separation of concerns.
+Our GitHub Actions toolkit follows a layered architecture that promotes reusability, maintainability, and clear separation of concerns. The architecture implements the [Loosely Coupled Modular Composition Pattern (LCMCP)](https://github.com/deepworks-net/models.lcmcp).
+
+**📖 For comprehensive documentation:** [Understanding Actions Guide](../guides/understanding-actions.md)
 
 ### Core Actions
 
 - Atomic, self-contained operations
 - Single responsibility principle
 - Highly reusable
+- Docker-based execution
+- Generated from FCM definitions
 - [Learn more about Core Actions](core/index.md)
 
 ### Composite Actions
@@ -16,6 +20,7 @@ Our GitHub Actions toolkit follows a layered architecture that promotes reusabil
 - Combine core actions
 - Add workflow-specific logic
 - Higher-level operations
+- Business process orchestration
 - [Learn more about Composite Actions](composite/index.md)
 
 ## Directory Structure
@@ -108,3 +113,13 @@ steps:
 ### Shared Utilities
 
 - [Git Utilities](../guides/git-utilities.md) - Common git operation utilities
+
+## FCM Bridge System
+
+Many Core Actions are automatically generated from Formal Conceptual Models (FCMs) using the bridge system:
+
+- **FCM Definitions**: Located in `axioms/` directory
+- **Generated Actions**: Automatically created in `actions/core/`
+- **Bridge System**: Maintains synchronization between FCMs and actions
+
+**📖 Learn more:** [Understanding FCM Bridge Guide](../guides/understanding-fcm-bridge.md)

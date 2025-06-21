@@ -2,6 +2,8 @@
 
 This section describes the testing approach, standards, and tools used across the repository.
 
+**📖 For comprehensive documentation:** [Testing Framework Guide](../guides/testing-framework.md)
+
 ## Testing Framework
 
 All actions in this repository use a standardized testing framework for consistent testing.

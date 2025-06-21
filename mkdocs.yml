@@ -101,3 +101,6 @@ theme:
         - 'Tag Operations': 'tests/core/tag_operations.md'
         - 'Version Calculator': 'tests/core/version_calculator.md'
         - 'Version Updater': 'tests/core/version_updater.md'
+    - 'Examples':
+      - 'Complete Action Example': 'examples/complete-action-example/index.md'
+      - 'File Operations Action': 'examples/complete-action-example/file-operations.md'
