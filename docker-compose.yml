@@ -19,3 +19,21 @@ services:
     environment:
       - ENVIRONMENT=development
       - WATCH_DOCS=true
+
+  claude-code:
+    image: deepworks/claude-code:latest
+    volumes:
+      # Main repository mount
+      - .:/home/coder/project:rw
+      # Source repo's config/models/validation folders
+      - ./claude/config:/home/coder/claude/config:rw
+      - ./claude/models:/home/coder/claude/models:ro
+      - ./claude/validation:/home/coder/claude/validation:ro
+      # Documentation
+      - ./CLAUDE.md:/home/coder/CLAUDE.md:ro
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    working_dir: /home/coder/project
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
