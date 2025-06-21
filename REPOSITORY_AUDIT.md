@@ -11,7 +11,7 @@
 ### Core Structure
 - `README.md` - Main documentation with action naming convention explained
 - `CHANGELOG.md` - Version history
-- `LICENSE.md` - Legal requirements
+- `LICENSE` - Legal requirements
 - `mkdocs.yml` - Documentation site configuration
 - `requirements.txt` - Python dependencies
 - `Makefile.bridge` - FCM bridge operations
