@@ -2,7 +2,7 @@
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
 
-## **06/21/2025 - v1.0.356 Unreleased**
+## **[(06/22/2025) - v1.0.357](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.357)**
 ### What's Changed
 - Merging Patch Updates @mattbuske (#208)
 - Lets Merge @mattbuske (#207)
