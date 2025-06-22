@@ -66,41 +66,61 @@ theme:
     - 'Home': 
       - 'index.md'
       - 'Getting Started': 'getting-started.md'
-      - 'Meta Level': 'meta-level.md'
-      - 'Release Process': 'release-process.md'
-      - 'Repository': 'repo/index.md'
-    - 'Strategies':
-      - 'Branching': 'strategies/branching.md'
-    - 'Actions':
-      - 'Overview': 'actions/index.md'
-      - 'Core': 
-        - 'actions/core/index.md'
-        - 'Branch Operations': 'actions/core/branch_operations/index.md'
-        - 'Tag Operations': 'actions/core/tag_operations/index.md'
-        - 'Manage Release': 'actions/core/manage_release/index.md'
-        - 'Version Calculator': 'actions/core/version_calculator/index.md'
-        - 'Version Updater': 'actions/core/version_updater/index.md'
-      - 'Composite':
-        - 'actions/composite/index.md'
-        - 'Update Changelog': 'actions/composite/update_changelog/index.md'
-    - 'Workflows':
-      - 'Overview': 'workflows/index.md'
-      - 'Core': 
-        - 'Version Calculator': 'workflows/core/version_calculator.md'
-        - 'Version Updater': 'workflows/core/version_updater.md'
-      - 'Composite':
-        - 'Create Release Tag': 'workflows/create-release-tag.md'
-        - 'Publish Github Release': 'workflows/release-drafter.md'
-        - 'Prepare Release': 'workflows/prepare-release.md'
-        - 'Update Changelog': 'workflows/update-changelog.md'
-        - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
-    - 'Tests':
-      - 'Overview': 'tests/index.md'
-      - 'Core': 
-        - 'Branch Operations': 'tests/core/branch_operations.md'
-        - 'Tag Operations': 'tests/core/tag_operations.md'
-        - 'Version Calculator': 'tests/core/version_calculator.md'
-        - 'Version Updater': 'tests/core/version_updater.md'
+      - 'Architecture Overview': 'architecture.md'
+    - 'Core Concepts':
+      - 'concepts/index.md'
+      - 'FCM Bridge System': 'concepts/fcm-bridge.md'
+      - 'Six-Layer Architecture': 'concepts/six-layers.md'
+      - 'Naming Conventions': 'concepts/naming-convention.md'
+      - 'LCMCP Pattern': 'concepts/lcmcp-pattern.md'
+    - 'User Guide':
+      - 'guides/index.md'
+      - 'Using Actions': 'guides/understanding-actions.md'
+      - 'Using Workflows': 'guides/understanding-workflows.md'
+      - 'Testing Framework': 'guides/testing-framework.md'
+      - 'Git Utilities': 'guides/git-utilities.md'
+      - 'Migration Guide': 'guides/migrating-to-atomic-git-operations.md'
+    - 'Reference':
+      - 'Actions':
+        - 'Overview': 'actions/index.md'
+        - 'Core': 
+          - 'actions/core/index.md'
+          - 'Branch Operations': 'actions/core/branch_operations/index.md'
+          - 'Tag Operations': 'actions/core/tag_operations/index.md'
+          - 'Manage Release': 'actions/core/manage_release/index.md'
+          - 'Version Calculator': 'actions/core/version_calculator/index.md'
+          - 'Version Updater': 'actions/core/version_updater/index.md'
+        - 'Composite':
+          - 'actions/composite/index.md'
+          - 'Update Changelog': 'actions/composite/update_changelog/index.md'
+      - 'Workflows':
+        - 'Overview': 'workflows/index.md'
+        - 'Core': 
+          - 'Version Calculator': 'workflows/core/version_calculator.md'
+          - 'Version Updater': 'workflows/core/version_updater.md'
+        - 'Composite':
+          - 'Create Release Tag': 'workflows/create-release-tag.md'
+          - 'Publish Github Release': 'workflows/release-drafter.md'
+          - 'Prepare Release': 'workflows/prepare-release.md'
+          - 'Update Changelog': 'workflows/update-changelog.md'
+          - 'MkDocs Publish': 'workflows/mkdocs-gh-pages.md'
+      - 'Tests':
+        - 'Overview': 'tests/index.md'
+        - 'Core': 
+          - 'Branch Operations': 'tests/core/branch_operations.md'
+          - 'Tag Operations': 'tests/core/tag_operations.md'
+          - 'Version Calculator': 'tests/core/version_calculator.md'
+          - 'Version Updater': 'tests/core/version_updater.md'
+    - 'Architecture':
+      - 'architecture/index.md'
+      - 'Meta Level': 'architecture/meta-level.md'
+    - 'Development':
+      - 'development/index.md'
+      - 'Release Process': 'development/release-process.md'
+      - 'Documentation Gaps': 'development/documentation-gaps.md'
     - 'Examples':
       - 'Complete Action Example': 'examples/complete-action-example/index.md'
       - 'File Operations Action': 'examples/complete-action-example/file-operations.md'
+    - 'Appendix':
+      - 'Branching Strategy': 'appendix/branching-strategy.md'
+      - 'Versioning Strategy': 'appendix/versioning.md'
