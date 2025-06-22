@@ -1,7 +1,0 @@
-{
-  "source_fcm": "axioms/git/tag-operations.fcm",
-  "generated_at": "2025-06-07T15:22:51Z",
-  "generator_version": "stage3-bash-1.0",
-  "model": "git.tag-operations",
-  "version": "1.0.0"
-}

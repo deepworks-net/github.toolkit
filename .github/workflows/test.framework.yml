@@ -24,6 +24,7 @@ jobs:
           - actions/core/version_calculator
           - actions/core/version_updater
           - actions/core/manage_release
+          - actions/composite/update_changelog
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

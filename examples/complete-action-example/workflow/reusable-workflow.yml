@@ -1,0 +1,92 @@
+name: Reusable File Operations Workflow
+
+on:
+  workflow_call:
+    inputs:
+      action:
+        description: 'File operation to perform'
+        required: true
+        type: string
+      file_path:
+        description: 'Path to file'
+        required: true
+        type: string
+      content:
+        description: 'File content (for create/update operations)'
+        required: false
+        type: string
+        default: ''
+      destination:
+        description: 'Destination path (for copy/move operations)'
+        required: false
+        type: string
+      pattern:
+        description: 'Search pattern (for search operations)'
+        required: false
+        type: string
+      encoding:
+        description: 'File encoding'
+        required: false
+        type: string
+        default: 'utf-8'
+      create_dirs:
+        description: 'Create parent directories'
+        required: false
+        type: boolean
+        default: true
+      overwrite:
+        description: 'Overwrite existing files'
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      operation_status:
+        description: 'Status of the operation'
+        value: ${{ jobs.file-operation.outputs.operation_status }}
+      file_content:
+        description: 'Content of file (for read operations)'
+        value: ${{ jobs.file-operation.outputs.file_content }}
+      files_found:
+        description: 'Files found (for search operations)'
+        value: ${{ jobs.file-operation.outputs.files_found }}
+      file_exists:
+        description: 'Whether file exists'
+        value: ${{ jobs.file-operation.outputs.file_exists }}
+      file_size:
+        description: 'File size in bytes'
+        value: ${{ jobs.file-operation.outputs.file_size }}
+
+jobs:
+  file-operation:
+    runs-on: ubuntu-latest
+    outputs:
+      operation_status: ${{ steps.file-op.outputs.operation_status }}
+      file_content: ${{ steps.file-op.outputs.file_content }}
+      files_found: ${{ steps.file-op.outputs.files_found }}
+      file_exists: ${{ steps.file-op.outputs.file_exists }}
+      file_size: ${{ steps.file-op.outputs.file_size }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Execute File Operation
+        id: file-op
+        uses: ./examples/complete-action-example/action
+        with:
+          action: ${{ inputs.action }}
+          file_path: ${{ inputs.file_path }}
+          content: ${{ inputs.content }}
+          destination: ${{ inputs.destination }}
+          pattern: ${{ inputs.pattern }}
+          encoding: ${{ inputs.encoding }}
+          create_dirs: ${{ inputs.create_dirs }}
+          overwrite: ${{ inputs.overwrite }}
+      
+      - name: Log Operation Result
+        run: |
+          echo "File operation completed:"
+          echo "  Action: ${{ inputs.action }}"
+          echo "  File Path: ${{ inputs.file_path }}"
+          echo "  Status: ${{ steps.file-op.outputs.operation_status }}"
+          echo "  File Exists: ${{ steps.file-op.outputs.file_exists }}"

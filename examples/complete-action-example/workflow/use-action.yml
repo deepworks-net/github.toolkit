@@ -1,0 +1,89 @@
+name: File Operations Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'File operation to perform'
+        required: true
+        default: 'create'
+        type: choice
+        options:
+          - create
+          - read
+          - update
+          - delete
+          - copy
+          - move
+          - search
+      file_path:
+        description: 'Path to file'
+        required: false
+        default: 'example/test.txt'
+      content:
+        description: 'File content (for create/update)'
+        required: false
+        default: 'Hello from GitHub Actions!'
+
+jobs:
+  file-operations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Execute File Operation
+        id: file-op
+        uses: ./examples/complete-action-example/action
+        with:
+          action: ${{ github.event.inputs.operation }}
+          file_path: ${{ github.event.inputs.file_path }}
+          content: ${{ github.event.inputs.content }}
+          create_dirs: true
+          overwrite: true
+      
+      - name: Display Results
+        run: |
+          echo "Operation Status: ${{ steps.file-op.outputs.operation_status }}"
+          echo "File Exists: ${{ steps.file-op.outputs.file_exists }}"
+          
+          if [ "${{ steps.file-op.outputs.file_created }}" != "" ]; then
+            echo "File Created: ${{ steps.file-op.outputs.file_created }}"
+          fi
+          
+          if [ "${{ steps.file-op.outputs.file_content }}" != "" ]; then
+            echo "File Content: ${{ steps.file-op.outputs.file_content }}"
+          fi
+          
+          if [ "${{ steps.file-op.outputs.files_found }}" != "" ]; then
+            echo "Files Found: ${{ steps.file-op.outputs.files_found }}"
+          fi
+          
+          if [ "${{ steps.file-op.outputs.file_size }}" != "" ]; then
+            echo "File Size: ${{ steps.file-op.outputs.file_size }} bytes"
+          fi
+
+  # Example of error handling
+  test-error-handling:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Try Invalid Operation
+        id: invalid-op
+        continue-on-error: true
+        uses: ./examples/complete-action-example/action
+        with:
+          action: read
+          file_path: /nonexistent/path/file.txt
+      
+      - name: Check Error Handling
+        run: |
+          if [ "${{ steps.invalid-op.outputs.operation_status }}" = "failure" ]; then
+            echo "✅ Error handling working correctly"
+            echo "Status: ${{ steps.invalid-op.outputs.operation_status }}"
+          else
+            echo "❌ Error handling failed"
+            exit 1
+          fi

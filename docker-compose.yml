@@ -1,6 +1,6 @@
 services:
 
-  # This service runs the documentation for Secure Coding Standards for SUNY Upstate
+  # This service runs the documentation
   mkdocs-scs:
     # Vars are set in the .env file
     image: deepworks-net/github-toolkit-docs:${MKDOCS_IMAGE_VERSION:?err}
@@ -15,8 +15,25 @@ services:
     # Ports
     ports:
       - "${MKDOCS_PORT:-8000}:${MKDOCS_EXTERNAL_PORT:-8000}"
-    #hostname: mkdocs.upstate.local # Not Used Yet
     # Extra Environmental Variables
     environment:
       - ENVIRONMENT=development
       - WATCH_DOCS=true
+
+  claude-code:
+    image: deepworks/claude-code:v0.4.0
+    volumes:
+      # Main repository mount
+      - .:/home/coder/project:rw
+      # Source repo's config/models/validation folders
+      - ./claude/config:/home/coder/claude/config:rw
+      - ./claude/models:/home/coder/claude/models:ro
+      - ./claude/validation:/home/coder/claude/validation:ro
+      # Documentation
+      - ./claude/CLAUDE.md:/home/coder/claude/CLAUDE.md:ro
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    working_dir: /home/coder/project
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
