@@ -1,0 +1,38 @@
+# Version Calculator Axiom - Formal Conceptual Model
+Model: version.calculator
+Version: 1.0.0
+Layer: Axiom
+Domain: version
+
+Capability: Calculate semantic versions based on git tags and commit history
+
+Parameters:
+  - default_version: string (optional, default: "v0.1.0")
+  - version_prefix: string (optional, default: "v")
+  - tag_pattern: string (optional, default: "v*")
+
+Outputs:
+  - next_version
+  - current_version
+  - commit_count
+
+Interface:
+  type: docker
+  image: python:3.9-slim
+  requirements: [git]
+
+Dependencies:
+  - git
+  - safe-directory-config
+
+Patterns:
+  - version-management
+  - semantic-versioning
+  - git-operation
+
+Logic:
+  - Fetch latest tag matching pattern
+  - Count commits since latest tag
+  - Calculate next version by incrementing patch by commit count
+  - Validate version format compliance
+  - Set git safe directory for workspace
