@@ -2,6 +2,12 @@
 *Note: the changes in this log are automatically generated and commited via github actions, modify only if you know what you are doing!*
 
 
+
+## **07/03/2025 - v1.0.358 Unreleased**
+### What's Changed
+- Bump mkdocs-material from 9.6.14 to 9.6.15 @[dependabot[bot]](https://github.com/apps/dependabot) (#210)
+#### **Full Changelog**: [v1.0.357...v1.0.358](https://github.com/deepworks-net/github.toolkit/compare/v1.0.357...v1.0.358)
+
 ## **[(06/22/2025) - v1.0.357](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.357)**
 ### What's Changed
 - Merging Patch Updates @mattbuske (#208)
