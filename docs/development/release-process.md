@@ -28,28 +28,30 @@ graph TD
 
 ```mermaid
 graph TD
-    A[Staging Branch] --> B[Create prep-v* Tag]
-    B --> C[Create Release Branch]
-    C --> D[Update Version Numbers]
-    D --> E[Create Release PR]
-    E --> F[Review Changes]
-    F --> G[Merge to Main]
+    A[Staging Branch] --> B[Create 'prep' Tag]
+    B --> C[Version Auto-Calculated]
+    C --> D[Create Release Branch vX.Y.Z]
+    D --> E[Update Version Files]
+    E --> F[Generate Release Notes]
+    F --> G[Create Release PR]
+    G --> H[Review & Merge to Main]
 ```
 
-#### Process
+#### Process (Simplified)
 
-1. Create prep tag:
+1. Create prep tag (no version needed):
 
    ```bash
-   git tag prep-v1.0.0
-   git push origin prep-v1.0.0
+   git tag prep
+   git push origin prep
    ```
 
-2. Automated actions:
-   - Release branch created
-   - Changelog updated
-   - Version numbers updated
-   - Release PR created
+2. Automated GitHub Actions workflow:
+   - **Version Calculation**: Uses commit count since last tag to determine next version
+   - **Release Branch**: Creates `release/vX.Y.Z` automatically from staging
+   - **File Updates**: Updates `mkdocs.yml` and other configured version files
+   - **Changelog**: Auto-generates from PRs and commits using Release Drafter
+   - **Release PR**: Creates PR with complete description and release notes
 
 ### 3. Release Publication
 
@@ -77,9 +79,10 @@ graph TD
 
 ### Version Tag Format
 
-- Release tags: `v1.0.0`
-- Prep tags: `prep-v1.0.0`
-- Development: calculated automatically
+- **Release tags**: `v1.0.0` (created after PR merge to main)
+- **Prep tags**: `prep` (simple trigger, no version specified)
+- **Version calculation**: Automatic based on commit count since last release tag
+- **Format**: `v{major}.{minor}.{patch + commit_count}`
 
 ## Changelog Management
 
@@ -155,13 +158,13 @@ graph LR
 4. Merge to staging for integration testing
 5. Automatic updates occur
 
-### Release Creation
+### Release Creation (Automated)
 
-1. Create prep tag
-2. Review release PR
-3. Merge release PR
-4. Create version tag
-5. Release publishes
+1. **Trigger**: Push `prep` tag to staging branch
+2. **GitHub Actions**: Automatically calculates version, creates release branch, updates files
+3. **Review**: Review generated release PR (release/vX.Y.Z → main)
+4. **Merge**: Merge release PR to main
+5. **Publish**: Version tag and GitHub release created automatically
 
 ### Hotfix Process
 
@@ -208,22 +211,52 @@ graph LR
    - Review all changes
    - Test before release
 
+## Customization Points
+
+### Version Calculation
+- **Default Version**: `v0.1.0` (configurable in workflow)
+- **Version Prefix**: `v` (can be changed to suit project needs)
+- **Tag Pattern**: `v*` (filters which tags to consider for version calculation)
+- **File Updates**: Configure which files get version updates (default: `mkdocs.yml`)
+
+### Workflow Triggers
+- **Prep Tag**: Currently `prep` (simple and clean)
+- **Base Branch**: Default `staging` (can be overridden via workflow_call)
+- **Target Branch**: Always `main` for releases
+
+### Automation Behavior
+- **Release Notes**: Auto-generated from PRs and commits
+- **Changelog**: Automatically updated and formatted
+- **Branch Creation**: `release/vX.Y.Z` naming convention
+- **PR Templates**: Standardized release PR descriptions
+
+### Repository-Specific Configuration
+```yaml
+# In repository's workflow file
+uses: deepworks-net/github.toolkit/workflows/prepare-release.yml@v1
+with:
+  base-branch: 'staging'  # or 'develop' for different flow
+  files: 'package.json mkdocs.yml VERSION'  # files to update
+```
+
 ## Integration Points
 
 ### GitHub Actions
 
-- Release Drafter
-- Changelog Updater
-- MkDocs Publisher
+- **Version Calculator**: Core logic for semantic versioning
+- **Release Notes Generator**: PR and commit aggregation
+- **Git Operations**: Branch creation, file updates, PR creation
+- **Changelog Updater**: Automated formatting and linking
 
 ### Repository Settings
 
-- Branch protection
-- Required reviews
-- Status checks
+- **Branch Protection**: Prevent direct pushes to main/staging
+- **Required Reviews**: Ensure release PRs are reviewed
+- **Status Checks**: Run tests before allowing merges
+- **Release Permissions**: Control who can trigger releases
 
 ### Documentation
 
-- Version updates
-- Release notes
-- Changelog links
+- **Version Synchronization**: Keep docs in sync with releases
+- **Release Notes**: Auto-linked from changelogs
+- **Deployment Triggers**: Releases trigger documentation builds
