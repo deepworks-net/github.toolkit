@@ -8,8 +8,8 @@ This guide details the complete release process used across Deepworks repositori
 
 ```mermaid
 graph TD
-    A[Feature Branch] --> B[Create PR]
-    B --> C[Merge to Develop]
+    A[Develop Branch] --> B[Create PR]
+    B --> C[Merge to Staging]
     C --> D[Update Changelog]
     C --> E[Update Draft Release]
     D --> F[Next Development]
@@ -18,8 +18,8 @@ graph TD
 
 #### Activities
 
-- Feature development in branches
-- PRs created for review
+- Feature development in develop branch
+- PRs created for review (develop → staging)
 - Merges trigger automatic updates
 - Changelog entries added
 - Draft release updated
@@ -28,12 +28,12 @@ graph TD
 
 ```mermaid
 graph TD
-    A[Develop Branch] --> B[Create prep-v* Tag]
+    A[Staging Branch] --> B[Create prep-v* Tag]
     B --> C[Create Release Branch]
     C --> D[Update Version Numbers]
     D --> E[Create Release PR]
     E --> F[Review Changes]
-    F --> G[Merge to Develop]
+    F --> G[Merge to Main]
 ```
 
 #### Process
@@ -132,27 +132,27 @@ graph TD
 
 ```mermaid
 graph LR
-    A[Feature] --> B[Develop]
+    A[Develop] --> B[Staging]
     B --> C[Release Branch]
-    C --> D[Develop]
-    D --> E[Main/Tag]
+    C --> D[Main]
+    D --> E[Version Tag]
 ```
 
 ### Branch Naming
 
-- Feature: `feature/*`
-- Release: `release/v*`
-- Main: `main`
-- Develop: `develop`
+- Development: `develop` (active development)
+- Pre-production: `staging` (testing/integration)
+- Release: `release/v*` (preparation branches)
+- Production: `main` (stable releases)
 
 ## Common Scenarios
 
 ### Regular Development
 
-1. Create feature branch
-2. Make changes
-3. Create PR
-4. Merge to develop
+1. Work in develop branch
+2. Make changes and test locally
+3. Create PR (develop → staging)
+4. Merge to staging for integration testing
 5. Automatic updates occur
 
 ### Release Creation
