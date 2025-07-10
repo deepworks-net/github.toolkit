@@ -37,21 +37,13 @@ jobs:
         uses: ./actions/core/version_calculator
         id: version
 
-      - name: Generate Release Notes
+      - name: Generate Release Content
         uses: ./actions/composite/release_notes
         id: notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          mode: 'prepare-release'
-          version: ${{ steps.version.outputs.next_version }}
-
-      - name: Update Draft Release
-        uses: ./actions/composite/release_notes
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'update-draft'
           version: ${{ steps.version.outputs.next_version }}
-          content: ${{ steps.notes.outputs.content }}
 
   publish_release:
     runs-on: ubuntu-latest
