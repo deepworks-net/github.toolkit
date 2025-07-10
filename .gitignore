@@ -2,3 +2,9 @@
 .claude/
 .env
 claude/
+__pycache__/
+
+# Project data sync outputs (keep tools, ignore data)
+project_data/
+issues_sync.json
+*_sync.json
