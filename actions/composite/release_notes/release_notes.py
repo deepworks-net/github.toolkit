@@ -256,7 +256,10 @@ def handle_prepare_release():
             sys.exit(1)
         
         # Use existing draft content if it exists and is meaningful
-        if draft['body'] and draft['body'].strip() and not ('Recent Changes' in draft['body'] or 'Updates and improvements' in draft['body']):
+        placeholder_texts = ['Recent Changes', 'Updates and improvements', 'No changes', 'What\'s Changed', 'No Changes']
+        is_placeholder = any(placeholder in draft['body'] for placeholder in placeholder_texts)
+        
+        if draft['body'] and draft['body'].strip() and not is_placeholder:
             print("Using existing draft release content...")
             content = draft['body'].strip()
         else:
@@ -283,9 +286,16 @@ def handle_update_draft():
         content = os.environ.get('INPUT_CONTENT', '')
         version = os.environ.get('INPUT_VERSION', 'v1.0.0')
         
+        print(f"Received content for draft update: {content[:100]}...")  # Debug output
+        
         if not content:
-            print("No content provided for draft update")
-            sys.exit(1)
+            print("No content provided for draft update, generating new content...")
+            content = create_meaningful_release_content(version)
+        
+        # Decode the content if it was escaped from GitHub Actions
+        content = content.replace('%0A', '\n')
+        
+        print(f"Final content to update: {content[:100]}...")  # Debug output
         
         # Update the draft release with the provided content
         update_draft_release(content)
