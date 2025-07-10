@@ -89,7 +89,7 @@ jobs:
         uses: ./actions/composite/git_ops
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          files: 'CHANGELOG.md'
+          files: 'CHANGELOG.md mkdocs.yml'
           commit-message: 'Prepare release ${{ steps.version.outputs.next_version }}'
           create-pr: true
           pr-title: 'Release ${{ steps.version.outputs.next_version }}'
