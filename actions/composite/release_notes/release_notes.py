@@ -277,6 +277,23 @@ def handle_prepare_release():
         print(f"Error in prepare_release mode: {e}")
         sys.exit(1)
 
+def handle_update_draft():
+    """Handle update-draft mode - create or update draft release with provided content."""
+    try:
+        content = os.environ.get('INPUT_CONTENT', '')
+        version = os.environ.get('INPUT_VERSION', 'v1.0.0')
+        
+        if not content:
+            print("No content provided for draft update")
+            sys.exit(1)
+        
+        # Update the draft release with the provided content
+        update_draft_release(content)
+        
+    except Exception as e:
+        print(f"Error in update-draft mode: {e}")
+        sys.exit(1)
+
 def main():
     """Main function."""
     setup_git()
@@ -290,6 +307,8 @@ def main():
         handle_pr_merge()
     elif mode == 'prepare-release':
         handle_prepare_release()
+    elif mode == 'update-draft':
+        handle_update_draft()
     else:
         print(f"Unknown mode: {mode}")
         sys.exit(1)

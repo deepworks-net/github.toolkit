@@ -46,30 +46,12 @@ jobs:
           version: ${{ steps.version.outputs.next_version }}
 
       - name: Update Draft Release
-        run: |
-          # Create or update draft release with our generated content
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{
-              "tag_name": "DRAFT",
-              "name": "Draft Release - ${{ steps.version.outputs.next_version }}",
-              "draft": true,
-              "body": "${{ steps.notes.outputs.content }}"
-            }' || \
-          # If draft already exists, update it
-          DRAFT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases | \
-            jq -r '.[] | select(.draft==true) | .id' | head -1) && \
-          curl -X PATCH \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/releases/$DRAFT_ID \
-            -d '{
-              "name": "Draft Release - ${{ steps.version.outputs.next_version }}",
-              "body": "${{ steps.notes.outputs.content }}"
-            }'
+        uses: ./actions/composite/release_notes
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: 'update-draft'
+          version: ${{ steps.version.outputs.next_version }}
+          content: ${{ steps.notes.outputs.content }}
 
   publish_release:
     runs-on: ubuntu-latest
