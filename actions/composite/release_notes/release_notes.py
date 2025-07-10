@@ -225,7 +225,14 @@ def handle_pr_merge():
         print("No draft release content")
 
 def handle_prepare_release():
-    """Handle prepare-release mode."""
+    """
+    Handle prepare-release mode.
+    
+    Intended flow:
+    1. release-drafter.yml maintains draft release with PR content during development
+    2. prep tag workflow reuses existing draft content for final release
+    3. Only generates new content if draft is empty or contains placeholder text
+    """
     try:
         # Still process PR merge if info is provided
         pr_number = os.environ.get('INPUT_PR_NUMBER')
@@ -236,10 +243,11 @@ def handle_prepare_release():
         # Get version for better content generation
         version = os.environ.get('INPUT_VERSION', 'v1.0.0')
         
-        # Get full draft content
+        # Get existing draft content (release-drafter should have created this)
         draft = get_draft_release()
         if not draft:
-            print("No draft release found, creating one...")
+            print("No draft release found - this should have been created by release-drafter workflow")
+            print("Creating fallback draft release...")
             create_draft_release()
             draft = get_draft_release()
             
@@ -247,12 +255,13 @@ def handle_prepare_release():
             print("Failed to create/get draft release")
             sys.exit(1)
         
-        # Generate meaningful content based on commits if draft is empty or basic
-        if not draft['body'] or 'Recent Changes' in draft['body'] or 'Updates and improvements' in draft['body']:
-            print("Generating meaningful release content based on actual commits...")
-            content = create_meaningful_release_content(version)
-        else:
+        # Use existing draft content if it exists and is meaningful
+        if draft['body'] and draft['body'].strip() and not ('Recent Changes' in draft['body'] or 'Updates and improvements' in draft['body']):
+            print("Using existing draft release content...")
             content = draft['body'].strip()
+        else:
+            print("Draft release is empty or contains placeholder content, generating meaningful content...")
+            content = create_meaningful_release_content(version)
         
         if content:
             escaped_content = content.replace('\n', '%0A')
