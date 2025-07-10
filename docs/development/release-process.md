@@ -48,6 +48,7 @@ graph TD
 
 2. Automated GitHub Actions workflow:
    - **Version Calculation**: Uses commit count since last tag to determine next version
+   - **Version Drift Prevention**: If already on a release branch, uses version from branch name (prevents drift from release process commits)
    - **Release Branch**: Creates `release/vX.Y.Z` automatically from staging
    - **File Updates**: Updates `mkdocs.yml` and other configured version files
    - **Changelog**: Auto-generates from PRs and commits using Release Drafter

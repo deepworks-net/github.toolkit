@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
 
       - name: Calculate Next Version
-        uses: deepworks-net/github.toolkit/actions/version_calculation@v1
+        uses: ./actions/core/version_calculator
         id: version
 
       - name: Draft Release
