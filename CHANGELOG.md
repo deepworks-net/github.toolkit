@@ -3,10 +3,11 @@
 
 
 
-## **07/03/2025 - v1.0.358 Unreleased**
+## **07/10/2025 - v1.0.363 Unreleased**
 ### What's Changed
+- Update release process documentation to match current implementation @mattbuske (#211)
 - Bump mkdocs-material from 9.6.14 to 9.6.15 @[dependabot[bot]](https://github.com/apps/dependabot) (#210)
-#### **Full Changelog**: [v1.0.357...v1.0.358](https://github.com/deepworks-net/github.toolkit/compare/v1.0.357...v1.0.358)
+#### **Full Changelog**: [v1.0.357...v1.0.363](https://github.com/deepworks-net/github.toolkit/compare/v1.0.357...v1.0.363)
 
 ## **[(06/22/2025) - v1.0.357](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.357)**
 ### What's Changed
