@@ -43,6 +43,23 @@ def validate_version_format(version, prefix):
         sys.exit(1)
     return True
 
+def get_current_branch():
+    """Get the current branch name."""
+    try:
+        output = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], text=True).strip()
+        return output
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting current branch: {e}")
+        sys.exit(1)
+
+def extract_version_from_branch(branch_name, version_prefix):
+    """Extract version from release branch name like 'release/v1.0.364'."""
+    pattern = f'release/{version_prefix}(\\d+\\.\\d+\\.\\d+)'
+    match = re.match(pattern, branch_name)
+    if match:
+        return f"{version_prefix}{match.group(1)}"
+    return None
+
 def main():
     """Main function."""
     # Get inputs with defaults
@@ -56,26 +73,39 @@ def main():
     # Setup git
     setup_git()
 
-    # Get latest tag
-    latest_tag = get_latest_tag(tag_pattern)
-    current_version = latest_tag if latest_tag else default_version
+    # Check if we're on a release branch first (prevents version drift)
+    current_branch = get_current_branch()
+    branch_version = extract_version_from_branch(current_branch, version_prefix)
     
-    # Calculate commit count
-    commit_count = 0
-    if latest_tag:
-        commit_count = get_commit_count_since_tag(latest_tag)
-    
-    # Calculate next version
-    if latest_tag and commit_count > 0:
-        pattern = f'{version_prefix}(\\d+)\\.(\\d+)\\.(\\d+)'
-        match = re.match(pattern, latest_tag)
-        if not match:
-            print(f"Invalid version format: {latest_tag}")
-            sys.exit(1)
-        major, minor, patch = map(int, match.groups())
-        next_version = f"{version_prefix}{major}.{minor}.{patch + commit_count}"
+    if branch_version:
+        # We're on a release branch - use the version from branch name
+        # This prevents version drift when release process adds commits
+        print(f"Using version from release branch: {current_branch}")
+        next_version = branch_version
+        current_version = branch_version
+        commit_count = 0  # Not relevant when using branch version
     else:
-        next_version = current_version
+        # Normal version calculation for non-release branches
+        # Get latest tag
+        latest_tag = get_latest_tag(tag_pattern)
+        current_version = latest_tag if latest_tag else default_version
+        
+        # Calculate commit count
+        commit_count = 0
+        if latest_tag:
+            commit_count = get_commit_count_since_tag(latest_tag)
+        
+        # Calculate next version
+        if latest_tag and commit_count > 0:
+            pattern = f'{version_prefix}(\\d+)\\.(\\d+)\\.(\\d+)'
+            match = re.match(pattern, latest_tag)
+            if not match:
+                print(f"Invalid version format: {latest_tag}")
+                sys.exit(1)
+            major, minor, patch = map(int, match.groups())
+            next_version = f"{version_prefix}{major}.{minor}.{patch + commit_count}"
+        else:
+            next_version = current_version
 
     # Output results
     print(f"Current Version: {current_version}")
