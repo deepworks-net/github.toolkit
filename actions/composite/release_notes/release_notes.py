@@ -178,8 +178,8 @@ def create_draft_release():
         print(f"Error creating draft release: {e}")
         sys.exit(1)
 
-def update_draft_release(content):
-    """Update draft release with new content."""
+def update_draft_release(content, version=None):
+    """Update draft release with new content and version."""
     try:
         draft = get_draft_release()
         if not draft:
@@ -191,13 +191,20 @@ def update_draft_release(content):
             sys.exit(1)
             
         token = os.environ.get('INPUT_GITHUB_TOKEN')
+        
+        # Prepare update data
+        update_data = {'body': content}
+        if version:
+            update_data['tag_name'] = version
+            update_data['name'] = f'{version} 🚀'
+            
         cmd = [
             'curl', '-s',
             '-X', 'PATCH',
             '-H', f'Authorization: token {token}',
             '-H', 'Accept: application/vnd.github+json',
             f'https://api.github.com/repos/{os.environ["GITHUB_REPOSITORY"]}/releases/{draft["id"]}',
-            '-d', json.dumps({'body': content})
+            '-d', json.dumps(update_data)
         ]
         
         subprocess.check_call(cmd)
@@ -297,8 +304,8 @@ def handle_update_draft():
         
         print(f"Final content to update: {content[:100]}...")  # Debug output
         
-        # Update the draft release with the provided content
-        update_draft_release(content)
+        # Update the draft release with the provided content and version
+        update_draft_release(content, version)
         
     except Exception as e:
         print(f"Error in update-draft mode: {e}")
