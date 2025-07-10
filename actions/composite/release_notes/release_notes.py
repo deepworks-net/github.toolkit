@@ -72,24 +72,90 @@ def extract_pr_entries(content):
             entries.append(line.strip())
     return entries
 
+def get_commits_since_last_release():
+    """Get commits since the last release tag."""
+    try:
+        # Get the latest release tag
+        latest_tag = subprocess.check_output([
+            'git', 'tag', '-l', 'v*', '--sort=-v:refname'
+        ], text=True).strip().split('\n')[0] if subprocess.check_output([
+            'git', 'tag', '-l', 'v*', '--sort=-v:refname'
+        ], text=True).strip() else None
+        
+        if latest_tag:
+            # Get commits since the last tag
+            commits = subprocess.check_output([
+                'git', 'log', f'{latest_tag}..HEAD', '--pretty=format:- %s', '--no-merges'
+            ], text=True).strip()
+        else:
+            # No previous tags, get last 10 commits
+            commits = subprocess.check_output([
+                'git', 'log', '--pretty=format:- %s', '--no-merges', '--max-count=10'
+            ], text=True).strip()
+        
+        return commits, latest_tag
+    except subprocess.CalledProcessError:
+        return "- Updates and improvements", None
+
+def create_meaningful_release_content(version=None):
+    """Create meaningful release content based on actual changes."""
+    commits, last_tag = get_commits_since_last_release()
+    
+    if not commits:
+        commits = "- Updates and improvements"
+    
+    # Categorize commits
+    features = []
+    fixes = []
+    improvements = []
+    other = []
+    
+    for line in commits.split('\n'):
+        if not line.strip():
+            continue
+        lower_line = line.lower()
+        if any(word in lower_line for word in ['add', 'new', 'implement', 'create']):
+            features.append(line)
+        elif any(word in lower_line for word in ['fix', 'bug', 'error', 'issue']):
+            fixes.append(line)
+        elif any(word in lower_line for word in ['improve', 'enhance', 'update', 'optimize']):
+            improvements.append(line)
+        else:
+            other.append(line)
+    
+    # Build categorized content
+    content_parts = []
+    
+    if features:
+        content_parts.append("### ✨ New Features\n" + '\n'.join(features))
+    
+    if fixes:
+        content_parts.append("### 🐛 Bug Fixes\n" + '\n'.join(fixes))
+    
+    if improvements:
+        content_parts.append("### 🔧 Improvements\n" + '\n'.join(improvements))
+    
+    if other:
+        content_parts.append("### 📝 Other Changes\n" + '\n'.join(other))
+    
+    if not content_parts:
+        content_parts.append("### 📝 Changes\n- Updates and improvements")
+    
+    content = '\n\n'.join(content_parts)
+    
+    # Add comparison link if we have a previous tag
+    if last_tag and version:
+        content += f"\n\n**Full Changelog**: https://github.com/{os.environ.get('GITHUB_REPOSITORY', 'deepworks-net/github.toolkit')}/compare/{last_tag}...{version}"
+    
+    return content
+
 def create_draft_release():
     """Create new draft release."""
     try:
         token = os.environ.get('INPUT_GITHUB_TOKEN')
         
-        # Get some basic content from recent commits for the draft
-        try:
-            # Get the last few commits for content
-            recent_commits = subprocess.check_output([
-                'git', 'log', '--oneline', '--max-count=5', '--pretty=format:- %s'
-            ], text=True).strip()
-            
-            if recent_commits:
-                body = f"## Recent Changes\n\n{recent_commits}"
-            else:
-                body = "## Changes\n\n- Updates and improvements"
-        except subprocess.CalledProcessError:
-            body = "## Changes\n\n- Updates and improvements"
+        # Create meaningful content based on actual changes
+        body = create_meaningful_release_content()
         
         cmd = [
             'curl', '-s',
@@ -106,7 +172,7 @@ def create_draft_release():
         ]
         
         subprocess.check_call(cmd)
-        print("Created new draft release with basic content")
+        print("Created new draft release with meaningful content")
         
     except subprocess.CalledProcessError as e:
         print(f"Error creating draft release: {e}")
@@ -167,6 +233,9 @@ def handle_prepare_release():
         if pr_number and pr_title:
             handle_pr_merge()
         
+        # Get version for better content generation
+        version = os.environ.get('INPUT_VERSION', 'v1.0.0')
+        
         # Get full draft content
         draft = get_draft_release()
         if not draft:
@@ -178,14 +247,22 @@ def handle_prepare_release():
             print("Failed to create/get draft release")
             sys.exit(1)
         
-        if draft['body']:
+        # Generate meaningful content based on commits if draft is empty or basic
+        if not draft['body'] or 'Recent Changes' in draft['body'] or 'Updates and improvements' in draft['body']:
+            print("Generating meaningful release content based on actual commits...")
+            content = create_meaningful_release_content(version)
+        else:
             content = draft['body'].strip()
+        
+        if content:
             escaped_content = content.replace('\n', '%0A')
             print(f"::set-output name=content::{escaped_content}")
         else:
-            print("Warning: Draft release is empty")
-            # Return empty content instead of failing
-            print(f"::set-output name=content::")
+            print("Warning: No content generated")
+            # Return basic content instead of failing
+            fallback_content = "### 📝 Changes\n- Updates and improvements"
+            escaped_content = fallback_content.replace('\n', '%0A')
+            print(f"::set-output name=content::{escaped_content}")
         
     except Exception as e:
         print(f"Error in prepare_release mode: {e}")
