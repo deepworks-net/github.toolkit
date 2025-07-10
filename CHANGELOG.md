@@ -3,7 +3,7 @@
 
 
 
-## **07/10/2025 - v1.0.363 Unreleased**
+## **[(07/10/2025) - v1.0.364](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.364)**
 ### What's Changed
 - Update release process documentation to match current implementation @mattbuske (#211)
 - Bump mkdocs-material from 9.6.14 to 9.6.15 @[dependabot[bot]](https://github.com/apps/dependabot) (#210)
