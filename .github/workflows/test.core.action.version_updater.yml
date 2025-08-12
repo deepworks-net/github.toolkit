@@ -14,7 +14,7 @@ jobs:
     name: Test YAML File Update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         
       - name: Create Test YAML
         run: |
@@ -41,7 +41,7 @@ jobs:
     name: Test JSON File Update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         
       - name: Create Test JSON
         run: |
@@ -68,7 +68,7 @@ jobs:
     name: Test Multiple Files Update
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         
       - name: Create Test Files
         run: |
@@ -101,7 +101,7 @@ jobs:
     name: Test Keep V Prefix
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         
       - name: Create Test File
         run: |
@@ -127,7 +127,7 @@ jobs:
     name: Test Invalid Version Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Test Invalid Version
         id: updater
@@ -148,7 +148,7 @@ jobs:
     name: Test Missing File
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Test Missing File
         id: updater
@@ -170,7 +170,7 @@ jobs:
     name: Test No Version Field
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Create Test File
         run: |
@@ -196,7 +196,7 @@ jobs:
     name: Test Output Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Create Test Files
         run: |
