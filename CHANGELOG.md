@@ -4,7 +4,7 @@
 
 
 
-## **09/29/2025 - v1.0.387 Unreleased**
+## **[(09/29/2025) - v1.0.388](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.388)**
 ### ✨ New Features
 - Add GitHub issues and centralized project data sync tools
 ### 🐛 Bug Fixes
@@ -19,6 +19,7 @@
 - Fix release workflow to handle missing draft releases
 - Fix version calculation drift in release branches
 ### 🔧 Improvements
+- Update changelog for PR #216
 - Update changelog for PR #219
 - Update changelog for PR #221
 - Update changelog for PR #222
@@ -31,6 +32,7 @@
 - Bump mkdocs-material from 9.6.15 to 9.6.20
 - Bump mkdocs-macros-plugin from 1.3.7 to 1.4.0
 - Prepare release v1.0.375
+**Full Changelog**: https://github.com/deepworks-net/github.toolkit/compare/v1.0.364...v1.0.388
 
 ## **[(07/10/2025) - v1.0.364](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.364)**
 ### What's Changed
