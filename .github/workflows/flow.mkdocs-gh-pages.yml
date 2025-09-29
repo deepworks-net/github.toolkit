@@ -48,10 +48,10 @@ on:
         default: 'docs/repo/inc/LICENSE.md'
         required: false
         type: string
-      secrets: 
-        CHECKOUT_TOKEN:
-          required: false
-          description: 'Token for checkout with submodule access'
+    secrets: 
+      CHECKOUT_TOKEN:
+        required: false
+        description: 'Token for checkout with submodule access'
 
 jobs:
   deploy_gh_pages:
