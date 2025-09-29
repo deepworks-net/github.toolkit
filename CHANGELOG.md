@@ -3,6 +3,37 @@
 
 
 
+
+## **[(09/29/2025) - v1.0.388](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.388)**
+### ✨ New Features
+- Add GitHub issues and centralized project data sync tools
+### 🐛 Bug Fixes
+- Fix draft release version mismatch by updating tag and name
+- Fix placeholder detection logic to include 'No changes' text
+- Fix release-drafter workflow to properly generate and update draft content
+- Fix release-drafter to use release_notes action instead of inline Python
+- Fix JSON escaping issue in release-drafter workflow
+- Fix release-drafter to use our enhanced release notes generation
+- Fix release notes to properly reuse draft content from release-drafter
+- Fix git commit to include all modified files
+- Fix release workflow to handle missing draft releases
+- Fix version calculation drift in release branches
+### 🔧 Improvements
+- Update changelog for PR #216
+- Update changelog for PR #219
+- Update changelog for PR #221
+- Update changelog for PR #222
+- Improve release notes to show actual commit changes
+### 📝 Other Changes
+- Bump actions/checkout from 4 to 5
+- Bump actions/setup-python from 5 to 6
+- Removes duplicate Dependabot configuration
+- Removes assignees from dependabot config
+- Bump mkdocs-material from 9.6.15 to 9.6.20
+- Bump mkdocs-macros-plugin from 1.3.7 to 1.4.0
+- Prepare release v1.0.375
+**Full Changelog**: https://github.com/deepworks-net/github.toolkit/compare/v1.0.364...v1.0.388
+
 ## **[(07/10/2025) - v1.0.364](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.364)**
 ### What's Changed
 - Update release process documentation to match current implementation @mattbuske (#211)

@@ -11,27 +11,12 @@ updates:
     interval: daily
   open-pull-requests-limit: 10
   target-branch: "staging"
-  # Unfortunately, Dependabot doesn't support custom prefixes like "develop/patch-"
-  # It uses fixed patterns like "dependabot/github_actions/package-version"
-  # However, we can use labels and assignees to help manage these PRs
-  labels:
-    - "dependencies"
-    - "github-actions"
-    - "develop"
-  assignees:
-    - "mattbuske"
 - package-ecosystem: pip
   directory: "/"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
   target-branch: "staging"
-  labels:
-    - "dependencies"
-    - "python"
-    - "develop"
-  assignees:
-    - "mattbuske"
 #- package-ecosystem: gitsubmodule
 #  directory: "/"
 #  schedule:
