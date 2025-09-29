@@ -3,6 +3,27 @@
 
 
 
+
+## **09/29/2025 - v1.0.379 Unreleased**
+### ✨ New Features
+- Add GitHub issues and centralized project data sync tools
+### 🐛 Bug Fixes
+- Fix draft release version mismatch by updating tag and name
+- Fix placeholder detection logic to include 'No changes' text
+- Fix release-drafter workflow to properly generate and update draft content
+- Fix release-drafter to use release_notes action instead of inline Python
+- Fix JSON escaping issue in release-drafter workflow
+- Fix release-drafter to use our enhanced release notes generation
+- Fix release notes to properly reuse draft content from release-drafter
+- Fix git commit to include all modified files
+- Fix release workflow to handle missing draft releases
+- Fix version calculation drift in release branches
+### 🔧 Improvements
+- Improve release notes to show actual commit changes
+### 📝 Other Changes
+- Bump mkdocs-macros-plugin from 1.3.7 to 1.4.0
+- Prepare release v1.0.375
+
 ## **[(07/10/2025) - v1.0.364](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.364)**
 ### What's Changed
 - Update release process documentation to match current implementation @mattbuske (#211)
