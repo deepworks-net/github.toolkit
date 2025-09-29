@@ -6,7 +6,7 @@ repo_url: https://github.com/deepworks-net/github.toolkit
 docs_dir: docs
 site_dir: site
 extra:
-    version: 1.0.392
+    version: 1.0.393
 extra_css:
   - stylesheets/extra.css
 plugins:
