@@ -4,7 +4,7 @@
 
 
 
-## **09/29/2025 - v1.0.385 Unreleased**
+## **09/29/2025 - v1.0.387 Unreleased**
 ### ✨ New Features
 - Add GitHub issues and centralized project data sync tools
 ### 🐛 Bug Fixes
@@ -19,10 +19,12 @@
 - Fix release workflow to handle missing draft releases
 - Fix version calculation drift in release branches
 ### 🔧 Improvements
+- Update changelog for PR #219
 - Update changelog for PR #221
 - Update changelog for PR #222
 - Improve release notes to show actual commit changes
 ### 📝 Other Changes
+- Bump actions/checkout from 4 to 5
 - Bump actions/setup-python from 5 to 6
 - Removes duplicate Dependabot configuration
 - Removes assignees from dependabot config
