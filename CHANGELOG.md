@@ -4,7 +4,7 @@
 
 
 
-## **09/29/2025 - v1.0.379 Unreleased**
+## **09/29/2025 - v1.0.381 Unreleased**
 ### ✨ New Features
 - Add GitHub issues and centralized project data sync tools
 ### 🐛 Bug Fixes
@@ -19,8 +19,10 @@
 - Fix release workflow to handle missing draft releases
 - Fix version calculation drift in release branches
 ### 🔧 Improvements
+- Update changelog for PR #222
 - Improve release notes to show actual commit changes
 ### 📝 Other Changes
+- Bump mkdocs-material from 9.6.15 to 9.6.20
 - Bump mkdocs-macros-plugin from 1.3.7 to 1.4.0
 - Prepare release v1.0.375
 
