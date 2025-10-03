@@ -1,0 +1,3578 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The core repository that contains documentation, actions and templates for Deepworks github repositories.">
+      
+      
+        <meta name="author" content="Deepworks">
+      
+      
+      
+        <link rel="prev" href="../understanding-workflows/">
+      
+      
+        <link rel="next" href="../git-utilities/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Testing Framework - Deepworks Core Github Repository</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testing-framework-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Deepworks Core Github Repository" class="md-header__button md-logo" aria-label="Deepworks Core Github Repository" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Deepworks Core Github Repository
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testing Framework
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/deepworks-net/github.toolkit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Deepworks Core Github Repository" class="md-nav__button md-logo" aria-label="Deepworks Core Github Repository" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Deepworks Core Github Repository
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/deepworks-net/github.toolkit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../.." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../concepts/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Core Concepts
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Core Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/fcm-bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FCM Bridge System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/six-layers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Six-Layer Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/naming-convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Naming Conventions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/lcmcp-pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LCMCP Pattern
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    User Guide
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../understanding-actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Actions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../understanding-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Workflows
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Testing Framework
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing Framework
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#framework-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Action Test Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pytestini-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      pytest.ini Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Markers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Fixtures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Fixtures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Fixtures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Fixtures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock_subprocess" class="md-nav__link">
+    <span class="md-ellipsis">
+      mock_subprocess
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock_git_env" class="md-nav__link">
+    <span class="md-ellipsis">
+      mock_git_env
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branch_outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      branch_outputs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specialized-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specialized Fixtures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unit Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit Test Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-test-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration Test Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-function-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Main Function Testing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coverage-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coverage Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Coverage Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coverage Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      CI/CD Integration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CI/CD Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-framework-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Framework Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-tests-for-new-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up Tests for New Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting Up Tests for New Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create Test Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Create Unit Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-create-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Create Integration Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-run-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Run Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-composite-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Composite Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Composite Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock-component-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mock Component Actions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-action-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Action Orchestration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Organization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Quality
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mock Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Testing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Commands
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-guides" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related Guides
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../git-utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Git Utilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrating-to-atomic-git-operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Migration Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../actions/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Actions
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Actions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../actions/core/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Core
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1_2" id="__nav_4_1_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            Core
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/core/branch_operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Branch Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/core/tag_operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tag Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/core/manage_release/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Manage Release
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/core/version_calculator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Calculator
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/core/version_updater/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Updater
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../actions/composite/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Composite
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_1_3" id="__nav_4_1_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Composite
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../actions/composite/update_changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Update Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../workflows/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Workflows
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            Workflows
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2_2" id="__nav_4_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Core
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/core/version_calculator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Calculator
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/core/version_updater/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Updater
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2_3" id="__nav_4_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Composite
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Composite
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/create-release-tag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Create Release Tag
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/release-drafter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Publish Github Release
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/prepare-release/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prepare Release
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/update-changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Update Changelog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/mkdocs-gh-pages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MkDocs Publish
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tests/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Tests
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tests
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3_2" id="__nav_4_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Core
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tests/core/branch_operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Branch Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tests/core/tag_operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tag Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tests/core/version_calculator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Calculator
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tests/core/version_updater/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Version Updater
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../architecture/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/meta-level/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Meta Level
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../development/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Development
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/release-process/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Process
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/documentation-gaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Documentation Gaps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../examples/complete-action-example/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Examples
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/complete-action-example/file-operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    File Operations Action
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Appendix
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Appendix
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendix/branching-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Branching Strategy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendix/versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Versioning Strategy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#framework-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#action-test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Action Test Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pytestini-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      pytest.ini Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Markers
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Fixtures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Fixtures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Fixtures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Fixtures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock_subprocess" class="md-nav__link">
+    <span class="md-ellipsis">
+      mock_subprocess
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock_git_env" class="md-nav__link">
+    <span class="md-ellipsis">
+      mock_git_env
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branch_outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      branch_outputs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specialized-fixtures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specialized Fixtures
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unit Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-test-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unit Test Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration Testing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-test-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration Test Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-function-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Main Function Testing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coverage-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coverage Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Coverage Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Coverage Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      CI/CD Integration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CI/CD Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-framework-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Framework Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#framework-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-tests-for-new-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up Tests for New Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setting Up Tests for New Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create Test Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Create Unit Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-create-integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Create Integration Tests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-run-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Run Tests
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-composite-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing Composite Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing Composite Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mock-component-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mock Component Actions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-action-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Action Orchestration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Organization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Quality
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mock-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mock Usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Testing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Commands
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-guides" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related Guides
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="testing-framework-guide">Testing Framework Guide</h1>
+<p>This guide explains the comprehensive testing framework used throughout the GitHub Toolkit. The framework provides standardized approaches for testing both Core Actions and Composite Actions with consistent patterns and quality requirements.</p>
+<h2 id="overview">Overview</h2>
+<p>The testing framework ensures reliability and maintainability through:</p>
+<ul>
+<li><strong>Standardized Structure</strong>: Consistent test organization across all actions</li>
+<li><strong>Common Fixtures</strong>: Reusable testing utilities and mocks</li>
+<li><strong>Coverage Requirements</strong>: Minimum 80% code coverage for all actions</li>
+<li><strong>Multi-Level Testing</strong>: Unit, integration, and end-to-end testing</li>
+<li><strong>CI/CD Integration</strong>: Automated testing in GitHub workflows</li>
+</ul>
+<h2 id="testing-architecture">Testing Architecture</h2>
+<h3 id="framework-components">Framework Components</h3>
+<p>The testing framework consists of several key components:</p>
+<div class="highlight"><pre><span></span><code>actions/test_framework/
+├── README.md                    # Framework documentation
+├── conftest.py                  # Shared fixtures and utilities
+├── pytest.ini                  # Global test configuration
+└── test_templates/              # Template files for new tests
+    ├── test_unit_template.py
+    └── test_integration_template.py
+</code></pre></div>
+<h3 id="action-test-structure">Action Test Structure</h3>
+<p>Every action follows this standardized test structure:</p>
+<div class="highlight"><pre><span></span><code>actions/core/[action-name]/
+├── main.py                      # Implementation
+├── pytest.ini                  # Test configuration
+└── tests/                       # Test suite
+    ├── conftest.py              # Action-specific fixtures
+    ├── test_unit.py             # Unit tests
+    └── test_integration.py      # Integration tests
+</code></pre></div>
+<h2 id="test-configuration">Test Configuration</h2>
+<h3 id="pytestini-configuration">pytest.ini Configuration</h3>
+<p>Each action includes a <code>pytest.ini</code> file that defines testing behavior:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[pytest]</span>
+<span class="na">testpaths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">tests</span>
+<span class="na">python_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*.py</span>
+<span class="na">python_classes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">Test*</span>
+<span class="na">python_functions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">test_*</span>
+<span class="na">markers</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="na">unit</span><span class="o">:</span><span class="w"> </span><span class="s">unit tests</span>
+<span class="w">    </span><span class="na">integration</span><span class="o">:</span><span class="w"> </span><span class="s">integration tests</span>
+<span class="w">    </span><span class="na">branch</span><span class="o">:</span><span class="w"> </span><span class="s">tests for branch operations</span>
+<span class="na">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">-v</span>
+</code></pre></div>
+<p>The framework-level configuration includes additional options:</p>
+<div class="highlight"><pre><span></span><code><span class="na">addopts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">-v --cov=src --cov-report=term-missing</span>
+</code></pre></div>
+<h3 id="test-markers">Test Markers</h3>
+<p>The framework uses standardized markers to organize tests:</p>
+<ul>
+<li><code>unit</code>: Fast, isolated unit tests</li>
+<li><code>integration</code>: End-to-end integration tests</li>
+<li><code>slow</code>: Tests that take longer to execute</li>
+<li><code>git</code>: Tests for git operations</li>
+<li><code>branch</code>: Tests for branch operations</li>
+<li><code>tag</code>: Tests for tag operations</li>
+<li><code>commit</code>: Tests for commit operations</li>
+<li><code>release</code>: Tests for release operations</li>
+<li><code>changelog</code>: Tests for changelog operations</li>
+<li><code>composite</code>: Tests for composite actions</li>
+</ul>
+<h2 id="available-fixtures">Available Fixtures</h2>
+<p>The framework provides comprehensive fixtures for consistent testing:</p>
+<h3 id="core-fixtures">Core Fixtures</h3>
+<h4 id="mock_subprocess">mock_subprocess</h4>
+<p>Mocks all subprocess operations for safe testing:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_subprocess</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock subprocess for testing without executing shell commands.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;subprocess.check_call&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_check_call</span><span class="p">,</span> \
+         <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;subprocess.check_output&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_check_output</span><span class="p">,</span> \
+         <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;subprocess.run&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_run</span><span class="p">:</span>
+
+        <span class="c1"># Configure default successful behavior</span>
+        <span class="n">mock_check_call</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">mock_check_output</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="s2">&quot;mocked output&quot;</span>
+
+        <span class="k">yield</span> <span class="p">{</span>
+            <span class="s1">&#39;check_call&#39;</span><span class="p">:</span> <span class="n">mock_check_call</span><span class="p">,</span>
+            <span class="s1">&#39;check_output&#39;</span><span class="p">:</span> <span class="n">mock_check_output</span><span class="p">,</span>
+            <span class="s1">&#39;run&#39;</span><span class="p">:</span> <span class="n">mock_run</span>
+        <span class="p">}</span>
+</code></pre></div>
+<p><strong>Usage Example:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_git_operation</span><span class="p">(</span><span class="n">mock_subprocess</span><span class="p">):</span>
+    <span class="c1"># Act</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">git_ops</span><span class="o">.</span><span class="n">create_branch</span><span class="p">(</span><span class="s1">&#39;test-branch&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Assert</span>
+    <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">True</span>
+    <span class="n">mock_subprocess</span><span class="p">[</span><span class="s1">&#39;check_call&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assert_called_with</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;checkout&#39;</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="s1">&#39;test-branch&#39;</span><span class="p">])</span>
+</code></pre></div></p>
+<h4 id="mock_git_env">mock_git_env</h4>
+<p>Sets up GitHub Actions environment variables:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_git_env</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock environment variables for git operations.&quot;&quot;&quot;</span>
+    <span class="n">env_vars</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;GITHUB_REPOSITORY&#39;</span><span class="p">:</span> <span class="s1">&#39;test-org/test-repo&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GITHUB_TOKEN&#39;</span><span class="p">:</span> <span class="s1">&#39;mock-token&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GITHUB_WORKSPACE&#39;</span><span class="p">:</span> <span class="s1">&#39;/github/workspace&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GITHUB_OUTPUT&#39;</span><span class="p">:</span> <span class="s1">&#39;/tmp/github_output&#39;</span>
+    <span class="p">}</span>
+    <span class="c1"># ... setup and teardown logic</span>
+</code></pre></div>
+<p><strong>Usage Example:</strong>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_github_integration</span><span class="p">(</span><span class="n">mock_git_env</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;GITHUB_REPOSITORY&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;test-org/test-repo&#39;</span>
+</code></pre></div></p>
+<h4 id="branch_outputs">branch_outputs</h4>
+<p>Provides sample branch command outputs:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">branch_outputs</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide sample git branch command outputs for testing.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;show_current&#39;</span><span class="p">:</span> <span class="s2">&quot;feature/test-branch&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;list_local&#39;</span><span class="p">:</span> <span class="s2">&quot;* main</span><span class="se">\n</span><span class="s2">  develop</span><span class="se">\n</span><span class="s2">  feature/test-branch&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;list_remote&#39;</span><span class="p">:</span> <span class="s2">&quot;* main</span><span class="se">\n</span><span class="s2">  develop</span><span class="se">\n</span><span class="s2">  feature/test-branch</span><span class="se">\n</span><span class="s2">  remotes/origin/main&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;list_pattern&#39;</span><span class="p">:</span> <span class="s2">&quot;  feature/test-branch</span><span class="se">\n</span><span class="s2">  feature/another-branch&quot;</span>
+    <span class="p">}</span>
+</code></pre></div>
+<h3 id="specialized-fixtures">Specialized Fixtures</h3>
+<p>Additional fixtures are available for specific testing scenarios:</p>
+<ul>
+<li><code>mock_git_repo</code>: Simulates git repository structure</li>
+<li><code>git_outputs</code>: General git command output samples</li>
+<li><code>tag_outputs</code>: Sample outputs for tag operations</li>
+<li><code>commit_outputs</code>: Sample outputs for commit operations</li>
+</ul>
+<h2 id="testing-patterns">Testing Patterns</h2>
+<h3 id="unit-testing">Unit Testing</h3>
+<p>Unit tests focus on testing individual methods and functions in isolation:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">unit</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestGitBranchOperations</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit tests for GitBranchOperations class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_create_branch_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_subprocess</span><span class="p">,</span> <span class="n">mock_git_env</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test successful branch creation.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">branch_ops</span> <span class="o">=</span> <span class="n">GitBranchOperations</span><span class="p">()</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">create_branch</span><span class="p">(</span><span class="s1">&#39;feature/test-branch&#39;</span><span class="p">,</span> <span class="s1">&#39;main&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="n">expected_calls</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">call</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;--global&#39;</span><span class="p">,</span> <span class="s1">&#39;--add&#39;</span><span class="p">,</span> <span class="s1">&#39;safe.directory&#39;</span><span class="p">,</span> <span class="s1">&#39;/github/workspace&#39;</span><span class="p">]),</span>
+            <span class="n">call</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;checkout&#39;</span><span class="p">,</span> <span class="s1">&#39;main&#39;</span><span class="p">]),</span>
+            <span class="n">call</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;pull&#39;</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;main&#39;</span><span class="p">]),</span>
+            <span class="n">call</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span> <span class="s1">&#39;checkout&#39;</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="s1">&#39;feature/test-branch&#39;</span><span class="p">])</span>
+        <span class="p">]</span>
+        <span class="n">mock_subprocess</span><span class="p">[</span><span class="s1">&#39;check_call&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assert_has_calls</span><span class="p">(</span><span class="n">expected_calls</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="unit-test-best-practices">Unit Test Best Practices</h4>
+<ol>
+<li><strong>Single Responsibility</strong>: Test one function/method per test</li>
+<li><strong>Clear Naming</strong>: Use descriptive test names that explain the scenario</li>
+<li><strong>AAA Pattern</strong>: Arrange, Act, Assert structure</li>
+<li><strong>Mock External Dependencies</strong>: Use fixtures to mock subprocess, file operations</li>
+<li><strong>Test Both Success and Failure</strong>: Include error handling scenarios</li>
+</ol>
+<h3 id="integration-testing">Integration Testing</h3>
+<p>Integration tests verify complete workflows and component interactions:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">integration</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestBranchOperationsIntegration</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Integration tests for branch operations.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_branch_lifecycle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_subprocess</span><span class="p">,</span> <span class="n">mock_git_env</span><span class="p">,</span> <span class="n">branch_outputs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test the complete lifecycle of a branch: create, list, checkout, merge, delete.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">branch_ops</span> <span class="o">=</span> <span class="n">GitBranchOperations</span><span class="p">()</span>
+        <span class="n">branch_name</span> <span class="o">=</span> <span class="s2">&quot;feature/test-lifecycle&quot;</span>
+
+        <span class="c1"># Configure mock outputs for different stages</span>
+        <span class="n">mock_subprocess</span><span class="p">[</span><span class="s1">&#39;check_output&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;main&#39;</span><span class="p">,</span>                           <span class="c1"># Current branch check during create</span>
+            <span class="n">branch_outputs</span><span class="p">[</span><span class="s1">&#39;list_local&#39;</span><span class="p">],</span>     <span class="c1"># List branches</span>
+            <span class="n">branch_name</span><span class="p">,</span>                      <span class="c1"># Current branch after checkout</span>
+            <span class="s1">&#39;main&#39;</span><span class="p">,</span>                           <span class="c1"># Current branch after merge</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Act - Execute complete workflow</span>
+        <span class="n">create_result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">create_branch</span><span class="p">(</span><span class="n">branch_name</span><span class="p">,</span> <span class="s1">&#39;main&#39;</span><span class="p">)</span>
+        <span class="n">list_result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">list_branches</span><span class="p">()</span>
+        <span class="n">checkout_result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">checkout_branch</span><span class="p">(</span><span class="n">branch_name</span><span class="p">)</span>
+        <span class="n">merge_result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">merge_branch</span><span class="p">(</span><span class="n">branch_name</span><span class="p">,</span> <span class="s1">&#39;main&#39;</span><span class="p">)</span>
+        <span class="n">delete_result</span> <span class="o">=</span> <span class="n">branch_ops</span><span class="o">.</span><span class="n">delete_branch</span><span class="p">(</span><span class="n">branch_name</span><span class="p">)</span>
+
+        <span class="c1"># Assert all operations were successful</span>
+        <span class="k">assert</span> <span class="n">create_result</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="s1">&#39;main&#39;</span> <span class="ow">in</span> <span class="n">list_result</span>
+        <span class="k">assert</span> <span class="n">checkout_result</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">merge_result</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">delete_result</span> <span class="ow">is</span> <span class="kc">True</span>
+</code></pre></div>
+<h4 id="integration-test-best-practices">Integration Test Best Practices</h4>
+<ol>
+<li><strong>End-to-End Flows</strong>: Test complete user scenarios</li>
+<li><strong>State Management</strong>: Verify state changes throughout the workflow</li>
+<li><strong>Error Propagation</strong>: Test how errors flow through the system</li>
+<li><strong>Resource Cleanup</strong>: Ensure proper cleanup after test execution</li>
+</ol>
+<h3 id="main-function-testing">Main Function Testing</h3>
+<p>Test the entry point functions that handle GitHub Actions integration:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">unit</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestMainFunction</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit tests for main function.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_create_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_subprocess</span><span class="p">,</span> <span class="n">mock_git_env</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test create action in main function.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;INPUT_ACTION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;create&#39;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;INPUT_BRANCH_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;feature/test-branch&#39;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;INPUT_BASE_BRANCH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;develop&#39;</span>
+
+        <span class="n">mock_subprocess</span><span class="p">[</span><span class="s1">&#39;check_output&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="s1">&#39;feature/test-branch&#39;</span>
+
+        <span class="c1"># Import main here to ensure env vars are set</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">main</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">main</span><span class="p">()</span>  <span class="c1"># Should not raise an exception</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mock_git_env</span><span class="p">[</span><span class="s1">&#39;GITHUB_OUTPUT&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="s1">&#39;result=success&#39;</span> <span class="ow">in</span> <span class="n">output</span>
+        <span class="k">assert</span> <span class="s1">&#39;current_branch=feature/test-branch&#39;</span> <span class="ow">in</span> <span class="n">output</span>
+</code></pre></div>
+<h2 id="coverage-requirements">Coverage Requirements</h2>
+<p>All actions must maintain minimum 80% code coverage:</p>
+<h3 id="running-coverage">Running Coverage</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># In action directory</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>.<span class="w"> </span>--cov-report<span class="o">=</span>xml<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+
+<span class="c1"># Check coverage percentage</span>
+<span class="nv">COVERAGE</span><span class="o">=</span><span class="k">$(</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import xml.etree.ElementTree as ET; tree = ET.parse(&#39;coverage.xml&#39;); root = tree.getroot(); print(root.attrib[&#39;line-rate&#39;])&quot;</span><span class="k">)</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Coverage: </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COVERAGE</span><span class="s2"> * 100&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bc<span class="k">)</span><span class="s2">%&quot;</span>
+</code></pre></div>
+<h3 id="coverage-validation">Coverage Validation</h3>
+<p>The test framework automatically validates coverage in CI:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="o">((</span><span class="w"> </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$COVERAGE_PCT</span><span class="s2"> &lt; 80&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bc<span class="w"> </span>-l<span class="k">)</span><span class="w"> </span><span class="o">))</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Error: Code coverage is below 80%&quot;</span>
+<span class="w">  </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+</code></pre></div>
+<h2 id="cicd-integration">CI/CD Integration</h2>
+<h3 id="test-framework-workflow">Test Framework Workflow</h3>
+<p><strong>Location</strong>: <code>.github/workflows/test.framework.yml</code></p>
+<p>The framework includes automated testing across all actions:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">action-path</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/core/branch_operations</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/core/version_calculator</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/core/version_updater</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/core/manage_release</span>
+
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run tests</span>
+<span class="w">    </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.action-path }}</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">pytest --cov=. --cov-report=xml --cov-report=term-missing</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Verify coverage threshold</span>
+<span class="w">    </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.action-path }}</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">COVERAGE=$(python -c &quot;import xml.etree.ElementTree as ET; tree = ET.parse(&#39;coverage.xml&#39;); root = tree.getroot(); print(root.attrib[&#39;line-rate&#39;])&quot;)</span>
+<span class="w">      </span><span class="no">COVERAGE_PCT=$(echo &quot;$COVERAGE * 100&quot; | bc)</span>
+<span class="w">      </span><span class="no">if (( $(echo &quot;$COVERAGE_PCT &lt; 80&quot; | bc -l) )); then</span>
+<span class="w">        </span><span class="no">echo &quot;Error: Code coverage is below 80%&quot;</span>
+<span class="w">        </span><span class="no">exit 1</span>
+<span class="w">      </span><span class="no">fi</span>
+</code></pre></div>
+<h3 id="framework-validation">Framework Validation</h3>
+<p>The workflow also validates the framework itself:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Validate test templates</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">python -c &quot;import sys; import os; sys.path.append(os.path.join(os.getcwd(), &#39;actions/test_framework&#39;)); from test_templates import test_unit_template, test_integration_template; print(&#39;Test templates are valid&#39;)&quot;</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Verify test documentation</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">if [ ! -f &quot;actions/test_framework/README.md&quot; ]; then</span>
+<span class="w">      </span><span class="no">echo &quot;Error: Test framework documentation is missing&quot;</span>
+<span class="w">      </span><span class="no">exit 1</span>
+<span class="w">    </span><span class="no">fi</span>
+</code></pre></div>
+<h2 id="setting-up-tests-for-new-actions">Setting Up Tests for New Actions</h2>
+<h3 id="1-create-test-structure">1. Create Test Structure</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># From your action directory</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>tests
+cp<span class="w"> </span>/path/to/test_framework/conftest.py<span class="w"> </span>tests/
+cp<span class="w"> </span>/path/to/test_framework/pytest.ini<span class="w"> </span>./
+</code></pre></div>
+<h3 id="2-create-unit-tests">2. Create Unit Tests</h3>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>/path/to/test_framework/test_templates/test_unit_template.py<span class="w"> </span>tests/test_unit.py
+</code></pre></div>
+<p>Customize the template for your specific action:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Import your action class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">main</span><span class="w"> </span><span class="kn">import</span> <span class="n">YourActionClass</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">unit</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestYourActionClass</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit tests for YourActionClass.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_your_method_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_subprocess</span><span class="p">,</span> <span class="n">mock_git_env</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test successful execution of your method.&quot;&quot;&quot;</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">YourActionClass</span><span class="p">()</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">your_method</span><span class="p">(</span><span class="s1">&#39;test-input&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="n">mock_subprocess</span><span class="p">[</span><span class="s1">&#39;check_call&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assert_called_with</span><span class="p">([</span><span class="s1">&#39;expected&#39;</span><span class="p">,</span> <span class="s1">&#39;command&#39;</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="3-create-integration-tests">3. Create Integration Tests</h3>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>/path/to/test_framework/test_templates/test_integration_template.py<span class="w"> </span>tests/test_integration.py
+</code></pre></div>
+<h3 id="4-run-tests">4. Run Tests</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run all tests</span>
+pytest
+
+<span class="c1"># Run specific test types</span>
+pytest<span class="w"> </span>-m<span class="w"> </span>unit
+pytest<span class="w"> </span>-m<span class="w"> </span>integration
+
+<span class="c1"># Run with coverage</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>.<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+</code></pre></div>
+<h2 id="testing-composite-actions">Testing Composite Actions</h2>
+<p>Composite Actions require different testing approaches:</p>
+<h3 id="mock-component-actions">Mock Component Actions</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_composite_action</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock composite actions for testing interrelated actions.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;subprocess.run&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_run</span><span class="p">:</span>
+        <span class="n">mock_result</span> <span class="o">=</span> <span class="n">MagicMock</span><span class="p">()</span>
+        <span class="n">mock_result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">mock_result</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
+        <span class="n">mock_run</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">mock_result</span>
+        <span class="k">yield</span> <span class="n">mock_run</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_composite_workflow</span><span class="p">(</span><span class="n">mock_composite_action</span><span class="p">,</span> <span class="n">mock_git_env</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test composite action workflow.&quot;&quot;&quot;</span>
+    <span class="c1"># Test the orchestration logic</span>
+    <span class="c1"># Mock each component action</span>
+    <span class="c1"># Verify proper parameter passing</span>
+</code></pre></div>
+<h3 id="test-action-orchestration">Test Action Orchestration</h3>
+<p>Focus on testing:
+1. <strong>Parameter Flow</strong>: How inputs flow between actions
+2. <strong>Error Handling</strong>: How failures in one action affect the workflow
+3. <strong>Conditional Logic</strong>: Different execution paths based on inputs
+4. <strong>Output Aggregation</strong>: How outputs are combined and reported</p>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="test-organization">Test Organization</h3>
+<ol>
+<li><strong>Clear Structure</strong>: Follow the standardized directory structure</li>
+<li><strong>Descriptive Names</strong>: Use clear, descriptive test method names</li>
+<li><strong>Logical Grouping</strong>: Group related tests in classes</li>
+<li><strong>Consistent Markers</strong>: Use appropriate pytest markers</li>
+</ol>
+<h3 id="test-quality">Test Quality</h3>
+<ol>
+<li><strong>Single Assertion Focus</strong>: Each test should verify one specific behavior</li>
+<li><strong>Independent Tests</strong>: Tests should not depend on each other</li>
+<li><strong>Deterministic Results</strong>: Tests should produce consistent results</li>
+<li><strong>Resource Cleanup</strong>: Properly clean up any test artifacts</li>
+</ol>
+<h3 id="mock-usage">Mock Usage</h3>
+<ol>
+<li><strong>Mock External Dependencies</strong>: Always mock subprocess, file operations, network calls</li>
+<li><strong>Realistic Mock Data</strong>: Use realistic sample data in fixtures</li>
+<li><strong>Verify Mock Calls</strong>: Assert that mocks were called with expected parameters</li>
+<li><strong>Configure Mock Behavior</strong>: Set up mocks to return appropriate values</li>
+</ol>
+<h3 id="error-testing">Error Testing</h3>
+<ol>
+<li><strong>Test Failure Scenarios</strong>: Include tests for error conditions</li>
+<li><strong>Exception Handling</strong>: Verify proper exception handling</li>
+<li><strong>Error Messages</strong>: Test that meaningful error messages are provided</li>
+<li><strong>Exit Codes</strong>: Verify correct exit codes for different scenarios</li>
+</ol>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>Test Discovery Problems</strong>:
+- Ensure <code>pytest.ini</code> is configured correctly
+- Check that test files follow naming conventions (<code>test_*.py</code>)
+- Verify test classes start with <code>Test</code></p>
+<p><strong>Mock Configuration Issues</strong>:
+- Check that fixtures are properly imported
+- Ensure mock return values match expected types
+- Verify mock side effects are configured for multiple calls</p>
+<p><strong>Coverage Issues</strong>:
+- Review uncovered lines in coverage reports
+- Add tests for missing code paths
+- Consider if some code should be excluded from coverage</p>
+<h3 id="debug-commands">Debug Commands</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run tests with verbose output</span>
+pytest<span class="w"> </span>-v
+
+<span class="c1"># Run specific test</span>
+pytest<span class="w"> </span>tests/test_unit.py::TestClass::test_method
+
+<span class="c1"># Run tests with debug output</span>
+pytest<span class="w"> </span>-s
+
+<span class="c1"># Generate detailed coverage report</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>.<span class="w"> </span>--cov-report<span class="o">=</span>html
+</code></pre></div>
+<h2 id="related-guides">Related Guides</h2>
+<ul>
+<li><a href="../understanding-actions/">Understanding Actions</a> - Learn about the actions being tested</li>
+<li><a href="../understanding-workflows/">Understanding Workflows</a> - How actions integrate in workflows</li>
+<li><a href="understanding-fcm-bridge.md">Understanding FCM Bridge</a> - Testing generated actions</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>The testing framework provides a comprehensive foundation for ensuring the reliability and quality of the GitHub Toolkit. By following the standardized patterns and leveraging the provided fixtures, developers can create robust test suites that maintain the 80% coverage requirement while providing confidence in the system's behavior.</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 1, 2025 14:31:55 UTC">October 1, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 1, 2025 14:31:55 UTC">October 1, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Deepworks 2022-2024
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.indexes", "navigation.top", "content.tabs", "content.tabs.link", "content.code.copy", "search.suggest", "search.highlight", "search.share"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "1.0.393"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
