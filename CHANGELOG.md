@@ -4,6 +4,12 @@
 
 
 
+
+## **10/03/2025 - v1.0.395 Unreleased**
+### 📝 Other Changes
+- Allows using a dedicated token for submodule checkout
+**Full Changelog**: https://github.com/deepworks-net/github.toolkit/compare/v1.0.392...v1.0.393
+
 ## **[(09/29/2025) - v1.0.388](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.388)**
 ### ✨ New Features
 - Add GitHub issues and centralized project data sync tools
