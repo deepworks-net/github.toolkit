@@ -5,9 +5,9 @@
 
 
 
-## **08/21/2026 - v1.0.418 Unreleased**
+## **08/21/2026 - v1.0.419 Unreleased**
 ### 📝 Other Changes
-- Bump release-drafter/release-drafter from 7 to 7.6.0
+- Bump release-drafter/release-drafter from 7.6.0 to 7.7.0
 
 ## **[(09/29/2025) - v1.0.388](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.388)**
 ### ✨ New Features
