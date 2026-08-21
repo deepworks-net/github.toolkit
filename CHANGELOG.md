@@ -5,10 +5,9 @@
 
 
 
-## **06/20/2026 - v1.0.407 Unreleased**
+## **08/21/2026 - v1.0.408 Unreleased**
 ### 📝 Other Changes
-- Allows using a dedicated token for submodule checkout
-**Full Changelog**: https://github.com/deepworks-net/github.toolkit/compare/v1.0.392...v1.0.393
+- Bump release-drafter/release-drafter from 7 to 7.6.0
 
 ## **[(09/29/2025) - v1.0.388](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.388)**
 ### ✨ New Features
