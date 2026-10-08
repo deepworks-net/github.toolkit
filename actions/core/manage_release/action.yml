@@ -1,3 +1,6 @@
+# Generated from axioms/release.fcm
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
 name: "Manage Release"
 description: "Manages GitHub draft releases - create, get, and update operations"
 author: "Deepworks"

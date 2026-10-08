@@ -1,3 +1,6 @@
+# Generated from axioms/version-calculator.fcm
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
 name: "Version Calculator"
 description: "Calculate the next version based on the latest Git tag and get statistics based on the Git repo"
 author: "Deepworks"
