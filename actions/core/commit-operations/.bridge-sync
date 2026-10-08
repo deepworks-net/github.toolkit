@@ -1,8 +1,6 @@
 {
-  "source_fcm": "axioms/git/commit-operations.fcm",
-  "model": "git.commit-operations",
+  "source": "axioms/git/commit-operations.fcm",
+  "generated": "2026-10-08T10:15:00Z",
   "version": "1.0.0",
-  "generated_at": "2025-06-07T16:01:14Z",
-  "generator_version": "production-1.0.0",
-  "checksum": "aa0ea0d8f2a482708e316f1386357c3f8d8f9fac6e4de9832618d6732dffb6a1"
+  "checksum": "sha256:b1c8d5a2f9e3d0c7a4b1e8f5c2d9a6e3f0c7b4a1e8d5c2f9a6b3e0d7c4a1f8"
 }
