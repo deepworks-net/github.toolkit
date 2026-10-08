@@ -5,7 +5,7 @@
 
 
 
-## **10/08/2026 - v1.0.423 Unreleased**
+## **[(10/08/2026) - v1.0.429](https://github.com/deepworks-net/github.toolkit/releases/tag/v1.0.429)**
 ### 📝 Other Changes
 - Bump release-drafter/release-drafter from 7.6.0 to 7.7.0
 
