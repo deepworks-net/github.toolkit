@@ -1,3 +1,6 @@
+# Generated from axioms/git/branch-operations.fcm
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
 name: 'Branch Operations'
 description: 'Perform Git branch operations'
 author: 'Deepworks'
@@ -38,7 +41,7 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  
+
 branding:
   icon: 'git-branch'
   color: 'blue'

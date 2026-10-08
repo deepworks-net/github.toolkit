@@ -1,3 +1,6 @@
+# Generated from axioms/git/commit-operations.fcm
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
 name: 'Commit Operations'
 description: 'Perform Git commit operations'
 author: 'Deepworks'
@@ -60,7 +63,7 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  
+
 branding:
   icon: 'git-commit'
   color: 'blue'
