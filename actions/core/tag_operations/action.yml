@@ -1,3 +1,6 @@
+# Generated from axioms/git/tag-operations.fcm
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
 name: 'Tag Operations'
 description: 'Perform Git tag operations'
 author: 'Deepworks'
@@ -43,7 +46,7 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  
+
 branding:
   icon: 'tag'
   color: 'blue'
