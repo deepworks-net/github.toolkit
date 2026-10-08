@@ -1,12 +1,7 @@
-# GENERATED FILE - DO NOT EDIT
-# Source: axioms/git/commit-operations.fcm
+# Generated from axioms/git/commit-operations.fcm
 # Model: git.commit-operations v1.0.0
-# Generated: 2025-06-07T16:01:14Z
-# 
-# To modify this action:
-# 1. Edit the source FCM at axioms/git/commit-operations.fcm
-# 2. Run: make generate-actions
-# 3. Commit both FCM and generated files
+# Generated: 2026-10-08T10:15:00Z
+# DO NOT EDIT - Changes will be overwritten by bridge generator
 
 name: Commit Operations
 description: Manage git commits with create, amend, list, get, cherry-pick, and revert operations
@@ -14,69 +9,71 @@ author: 'Deepworks (via FCM Bridge)'
 
 inputs:
   action:
-    description: "Action (Options: create|amend|list|get|cherry-pick|revert)"
+    description: 'Action (Options: create|amend|list|get|cherry-pick|revert)'
     required: true
   message:
-    description: Message
+    description: 'Message'
     required: false
-    default: ""
+    default: ''
   files:
-    description: Files
+    description: 'Files'
     required: false
-    default: ""
+    default: ''
   commit_hash:
-    description: Commit hash
+    description: 'Commit hash'
     required: false
-    default: ""
+    default: ''
   limit:
-    description: Limit
+    description: 'Limit'
     required: false
-    default: ""
+    default: ''
   author:
-    description: Author
+    description: 'Author'
     required: false
-    default: ""
+    default: ''
   since:
-    description: Since
+    description: 'Since'
     required: false
-    default: ""
+    default: ''
   until:
-    description: Until
+    description: 'Until'
     required: false
-    default: ""
+    default: ''
   path:
-    description: Path
+    description: 'Path'
     required: false
-    default: ""
+    default: ''
   format:
-    description: Format
+    description: 'Format'
     required: false
-    default: ""
+    default: ''
   no_verify:
-    description: No verify
+    description: 'No verify'
     required: false
-    default: ""
+    default: ''
+
 outputs:
   commits:
-    description: Commits
+    description: 'Commits'
   commit_hash:
-    description: Commit hash
+    description: 'Commit hash'
   result:
-    description: Result
+    description: 'Result'
   author:
-    description: Author
+    description: 'Author'
   date:
-    description: Date
+    description: 'Date'
   message:
-    description: Message
+    description: 'Message'
   hash:
-    description: Hash
+    description: 'Hash'
   body:
-    description: Body
+    description: 'Body'
+
 runs:
   using: docker
   image: Dockerfile
-  
+
 branding:
-  icon: 'code'
+  icon: 'git-commit'
   color: 'blue'

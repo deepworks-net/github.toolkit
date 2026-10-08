@@ -1,12 +1,7 @@
-# GENERATED FILE - DO NOT EDIT
-# Source: axioms/git/branch-operations.fcm
+# Generated from axioms/git/branch-operations.fcm
 # Model: git.branch-operations v1.0.0
-# Generated: 2025-06-07T16:01:14Z
-# 
-# To modify this action:
-# 1. Edit the source FCM at axioms/git/branch-operations.fcm
-# 2. Run: make generate-actions
-# 3. Commit both FCM and generated files
+# Generated: 2026-10-08T10:15:00Z
+# DO NOT EDIT - Changes will be overwritten by bridge generator
 
 name: Branch Operations
 description: Manage git branches with create, delete, list, checkout, and merge operations
@@ -14,49 +9,51 @@ author: 'Deepworks (via FCM Bridge)'
 
 inputs:
   action:
-    description: "Action (Options: create|delete|list|checkout|merge)"
+    description: 'Action (Options: create|delete|list|checkout|merge)'
     required: true
   branch_name:
-    description: Branch name
+    description: 'Branch name'
     required: false
-    default: ""
+    default: ''
   target_branch:
-    description: Target branch
+    description: 'Target branch'
     required: false
-    default: ""
+    default: ''
   remote:
-    description: Remote
+    description: 'Remote'
     required: false
-    default: ""
+    default: ''
   force:
-    description: Force
+    description: 'Force'
     required: false
-    default: ""
+    default: ''
   include_remote:
-    description: Include remote
+    description: 'Include remote'
     required: false
-    default: ""
+    default: ''
   pattern:
-    description: Pattern
+    description: 'Pattern'
     required: false
-    default: ""
+    default: ''
+
 outputs:
   branch_created:
-    description: Branch created
+    description: 'Branch created'
   branch_deleted:
-    description: Branch deleted
+    description: 'Branch deleted'
   branches_list:
-    description: Branches list
+    description: 'Branches list'
   current_branch:
-    description: Current branch
+    description: 'Current branch'
   merge_result:
-    description: Merge result
+    description: 'Merge result'
   operation_status:
-    description: Operation status
+    description: 'Operation status'
+
 runs:
   using: docker
   image: Dockerfile
-  
+
 branding:
-  icon: 'code'
+  icon: 'git-branch'
   color: 'blue'

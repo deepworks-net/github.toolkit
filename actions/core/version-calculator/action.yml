@@ -1,0 +1,38 @@
+# Generated from axioms/version/version-calculator.fcm
+# Model: version.calculator v1.0.0
+# Generated: 2026-10-08T10:15:00Z
+# DO NOT EDIT - Changes will be overwritten by bridge generator
+
+name: Version Calculator
+description: Calculate semantic versions based on git tags and commit history
+author: 'Deepworks (via FCM Bridge)'
+
+inputs:
+  default_version:
+    description: 'Default version'
+    required: false
+    default: 'v0.1.0'
+  version_prefix:
+    description: 'Version prefix'
+    required: false
+    default: 'v'
+  tag_pattern:
+    description: 'Tag pattern'
+    required: false
+    default: 'v*'
+
+outputs:
+  next_version:
+    description: 'Next version'
+  current_version:
+    description: 'Current version'
+  commit_count:
+    description: 'Commit count'
+
+runs:
+  using: docker
+  image: Dockerfile
+
+branding:
+  icon: 'hash'
+  color: 'blue'

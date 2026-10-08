@@ -1,8 +1,6 @@
 {
-  "source_fcm": "axioms/git/tag-operations.fcm",
-  "model": "git.tag-operations",
+  "source": "axioms/git/tag-operations.fcm",
+  "generated": "2026-10-08T10:15:00Z",
   "version": "1.0.0",
-  "generated_at": "2025-06-07T16:01:14Z",
-  "generator_version": "production-1.0.0",
-  "checksum": "55ec560003b8011c69934df116b26ba08b6d6614c4ba4b504b5d7d34b97f59a8"
+  "checksum": "sha256:82c1f8a3e7b2d5c9f4a1e6b3c8d2a9e5f7c1b4d6e8a2c5f9b3e6a1d4c7f2a9"
 }

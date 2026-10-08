@@ -1,1 +1,30 @@
-{"mappings": {}, "generated": {}}
+{
+  "mappings": {
+    "axioms/git/tag-operations.fcm": "actions/core/tag-operations",
+    "axioms/git/branch-operations.fcm": "actions/core/branch-operations",
+    "axioms/git/commit-operations.fcm": "actions/core/commit-operations",
+    "axioms/version/version-calculator.fcm": "actions/core/version-calculator"
+  },
+  "generated": {
+    "actions/core/tag-operations": {
+      "source": "axioms/git/tag-operations.fcm",
+      "timestamp": "2026-10-08T10:15:00Z",
+      "model_version": "1.0.0"
+    },
+    "actions/core/branch-operations": {
+      "source": "axioms/git/branch-operations.fcm",
+      "timestamp": "2026-10-08T10:15:00Z",
+      "model_version": "1.0.0"
+    },
+    "actions/core/commit-operations": {
+      "source": "axioms/git/commit-operations.fcm",
+      "timestamp": "2026-10-08T10:15:00Z",
+      "model_version": "1.0.0"
+    },
+    "actions/core/version-calculator": {
+      "source": "axioms/version/version-calculator.fcm",
+      "timestamp": "2026-10-08T10:15:00Z",
+      "model_version": "1.0.0"
+    }
+  }
+}
